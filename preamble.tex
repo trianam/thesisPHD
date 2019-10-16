@@ -1,0 +1,89 @@
+
+
+\newcommand{\svm}{\textbf{\emph{T-SVM}}}
+\newcommand{\svmb}{\textbf{\emph{T2-SVM}}}
+\newcommand{\lstmng}{\textbf{\emph{T2-2LSTM}}}
+\newcommand{\lstmc}{\textbf{\emph{G-CLSTM}}}
+\newcommand{\lstmb}{\textbf{\emph{G-2LSTM}}}
+
+\newcommand{\site}{Main-site}
+\newcommand{\fullSite}{Full-site}
+\newcommand{\type}{Type}
+\newcommand{\behaviour}{Behavior}
+
+\newcommand{\matr}[1]{\bm{#1}}
+\newcommand{\vect}[1]{\bm{#1}}
+\def\RSet{\mathbb{R}}
+\def\NSet{\mathbb{N}}
+\def\XSet{\mathbb{X}}
+\def\YSet{\mathbb{Y}}
+
+\def\MAX{MPM}
+\def\loss{\mathcal{L}}
+
+\def\maxi{MPMi}
+\def\maxb{MPMb}
+
+\acrodef{rtt}[RTT]{Registro Tumori della Toscana, Tumor Register of Tuscany}
+\acrodef{icdo}[ICD-O]{International Classification of Diseases for Oncology}
+\acrodef{icdo1}[ICD-O-1]{International Classification of Diseases for Oncology, first edition}
+\acrodef{icdo3}[ICD-O-3]{International Classification of Diseases for Oncology, third edition}
+\acrodef{hdr}[HDR]{Hospital Discharge Register}
+\acrodef{cdf}[CDF]{Cumulative Distribution Function}
+\acrodef{an}[AN]{Artificial Neuron}
+\acrodef{ann}[ANN]{Artificial Neural Network}
+\acrodef{cnn}[CNN]{Convolutional Neural Network}
+\acrodef{rnn}[RNN]{Recurrent Neural Network}
+\acrodef{mlp}[MLP]{Multilayer Perceptron}
+\acrodef{lstm}[LSTM]{Long Short-Term Memory}
+\acrodef{sgd}[SGD]{Stochastic Gradient Descend}
+\acrodef{glove}[GloVe]{Global Vectors}
+\acrodef{nb}[NB]{Naive Bayes}
+\acrodef{svm}[SVM]{Support Vector Machine}
+\acrodef{tfidf}[TF-IDF]{Term-Frequency Inverse-Document-Frequency}
+\acrodef{map}[MAP]{Mean Average Precision}
+\acrodef{relu}[ReLU]{Rectified Linear Unit}
+\acrodef{max}[MPM]{Max Pooling Model}
+\acrodef{gru}[GRU]{Gated Recurrent Unit}
+\acrodef{nlp}[NLP]{Natural Language Processing}
+\acrodef{bert}[BERT]{Bidirectional Encoder Representations from Transformers}
+\acrodef{mlm}[MLM]{Masked Language Model}
+\acrodef{nsp}[NSP]{Next Sentence Prediction}
+
+\newcommand\floatwidth{0.45\textwidth}
+\newcommand\attTableIcdoWidth{2.5cm}
+\newcommand\attTableTextWidth{4.5cm}
+\newlength\lunderset
+\newlength\rulethick
+\lunderset=1.7pt\relax
+\rulethick=.8pt\relax
+\def\stackalignment{l}
+\newcommand\att[4][1]{\setbox0=\hbox{#2}%
+  \stackunder[#1\lunderset-\rulethick]{\strut#2}{\color{#3!#4}\rule{\wd0}{\rulethick}}}
+
+\definecolor{att}{rgb}{0, 1, 0}
+\definecolor{attb}{rgb}{1, 0, 0}
+\newcommand{\attvisB}[3]{\tikz[overlay]\node[fill=att!#2,inner sep=1pt, anchor=text, rectangle, rounded corners=1mm,draw=attb!#3] {#1};\phantom{#1}}
+
+\makeatletter
+  \providecommand*\setfloatlocations[2]{\@namedef{fps@#1}{#2}}
+\makeatother
+\setfloatlocations{figure}{htbp}
+\setfloatlocations{table}{htbp}
+
+\tikzstyle{every neuron}=[circle, draw, minimum size=1cm]
+\tikzstyle{bias}=[circle,draw]
+\tikzstyle{operation}=[circle,draw]
+\tikzstyle{activation}=[draw]
+\tikzstyle{layer}=[draw,minimum size=1cm]
+\tikzstyle{delay}=[draw,minimum size=0.5cm,fill=black]
+\tikzstyle{neuron missing}=[draw=none, scale=4,text height=0.333cm,execute at begin node=\color{black}$\vdots$]
+\tikzstyle{vmissing}=[draw=none, scale=4,text height=0.333cm,execute at begin node=\color{black}$\vdots$]
+\tikzstyle{hmissing}=[draw=none, scale=4,text width=0.41cm,execute at
+begin node=\color{black}$\cdots$]
+\tikzstyle{line}=[]
+\tikzstyle{arrow}=[->, >=stealth]
+\tikzstyle{arrowInverse}=[<-, >=stealth]
+\tikzstyle{vectorLine}=[line width=0.6mm]
+\tikzstyle{vectorArrow}=[->, >=stealth, line width=0.6mm]
+\tikzstyle{border}=[draw]
