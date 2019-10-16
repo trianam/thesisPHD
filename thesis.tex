@@ -1,0 +1,225 @@
+\documentclass[a4paper,12pt]{memoir}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EDIT HERE!!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\candidate{First Last} % Your name
+\def\thesistitle{A Very Very Long Title of the Super-Wonderful PhD Thesis Should Be Avoided If Possible} % Be as short as you can!! No more than 10 words
+\def\keywords{Subject 1, Subject 2}
+\def\advisor{Prof. First Last} 
+\def\headphdprogram{Prof. First Last}
+\def\refereeone{\textnormal{Prof. First Last}, \textit{institution}}
+\def\refereetwo{\textnormal{Prof. First Last}, \textit{institution}}
+\def\ciclo{XXXII}
+% End EDIT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[utf8]{inputenc}
+
+\addtolength{\textwidth}{40pt}
+\addtolength{\foremargin}{-40pt}
+\addtolength{\spinemargin}{-40pt}
+\setlrmarginsandblock{2.8cm}{2.8cm}{*}
+\setulmarginsandblock{2.8cm}{*}{1}
+\checkandfixthelayout%
+\headsep=30pt
+\linespread{1.1}
+
+\usepackage[draft,inline,nomargin]{fixme}
+\usepackage[round]{natbib}
+\usepackage{graphicx}
+\graphicspath{{./Figures/}}
+\usepackage{xcolor}
+\usepackage[pdftex]{hyperref}
+\hypersetup{
+  hidelinks,
+  linkbordercolor=white,
+  citebordercolor=white,
+  urlbordercolor=white,
+  filebordercolor=white}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\fontfamily{phv}\selectfont\thepage}
+\fancyhead[LO]{\rightmark}
+\fancyhead[RE]{\fontfamily{phv}\selectfont\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{hyphenat}
+
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{latexsym}
+\usepackage{array}
+\usepackage{tocbibind}
+\usepackage{listings}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithmic}
+\usepackage{algorithm2e}
+\usepackage{color}
+\usepackage{textcomp}
+
+\hypersetup{ 
+  pdfpagelayout=SinglePage, % default
+  pdfpagemode=UseOutlines, % default
+  bookmarksopen, % default
+  bookmarksopenlevel=2, % default;
+  pdftitle={\candidate's PhD thesis},
+  pdfauthor={\candidate},
+  pdfsubject={\thesistitle},
+  pdfkeywords={PhD Program in Smart Computing, \keywords}
+}
+
+\usepackage[english]{babel}
+\usepackage{blindtext}
+
+\usepackage[sc]{mathpazo} % for maths
+\usepackage{tgpagella} % as main font
+\usepackage{nimbussans} % Helvetica
+
+%\usepackage{makeidx}
+%\makeindex
+
+\definecolor{UFblue}{RGB}{12, 71, 123}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\thispagestyle{empty}
+\pagenumbering{gobble}
+
+{
+  \fontfamily{phv}\selectfont
+
+  \noindent
+  \hspace*{-2.5cm}\includegraphics[height=4cm]{firenze}
+  \vskip 1.6ex
+
+  \noindent
+  \hspace*{1.3cm}{\large \textsc{PhD Program in Smart Computing}}
+
+  \noindent
+  \hspace*{1.3cm}{\textsc{Dipartimento di Ingegneria dell'Informazione (DINFO)}}
+
+  \vfill
+  \noindent
+  \hspace*{1.3cm}
+  \parbox{1.0\textwidth}{
+    {\fontsize{30}{38}\selectfont \color{UFblue} \textbf{\nohyphens{\thesistitle}}\par}
+    \vspace{6cm}
+    \begin{flushright}
+      \LARGE \textbf{\candidate}\\
+      \vspace{8mm}
+      \small Dissertation presented in partial fulfillment of the
+      requirements\\
+      for the degree of Doctor of Philosophy in Smart
+      Computing
+    \end{flushright}
+  }
+}
+
+\newpage
+\setulmarginsandblock{3.5cm}{3.5cm}{1}
+{%
+  \fontfamily{phv}
+  \noindent
+  \textit{PhD Program in Smart Computing}\\
+  \textit{University of Florence, University of Pisa, University of Siena}
+
+  \vfill
+  \noindent
+  % {\HUGE \textbf{\nohyphens{\thesistitle}}}
+  {\fontsize{32}{38}\selectfont \textbf{\nohyphens{\thesistitle}}\par}
+  \vfill
+  \noindent
+  {\Large \textbf{\candidate}}
+}
+\vfill
+{
+  % These are the required signatures according to unifi regulations
+  \noindent
+  \begin{minipage}{0.4\linewidth}
+    \noindent
+    {\fontfamily{phv}\textbf{Advisor:}}\\
+    \vspace{7mm}
+    \hrule
+    \vspace{2mm}
+    \advisor
+  \end{minipage}
+
+  \vspace{15mm}
+  \noindent
+  \begin{minipage}{0.4\linewidth}
+    \noindent
+    {\fontfamily{phv}\textbf{Head of the PhD Program:}}\\
+    \vspace{7mm}
+    \hrule
+    \vspace{2mm}
+    \headphdprogram
+  \end{minipage}
+
+  \vspace{15mm}
+
+  % No signatures required here
+  \noindent
+  {\fontfamily{pag}\textbf{Evaluation Committee:}}\\
+  \refereeone\\
+  \refereetwo
+}
+
+\begin{center}
+  \rule{\linewidth}{0.5mm}
+  \fontfamily{pag}
+  \ciclo\ ciclo --- October \number\the\year
+  % \noindent Copyright~\copyright~\number\the\year~by \candidate.
+\end{center}
+\thispagestyle{empty}\null\vfil
+
+\frontmatter
+\newpage
+\thispagestyle{empty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% EDIT HERE!!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\begin{flushright}
+  \textit{To XXXXX} % Optional dedication
+\end{flushright}
+\null\vfil
+% End EDIT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\input{acknowledgments}
+\newpage
+\begin{abstract}
+  \blindtext % Put your abstract here - don't exceed one page
+\end{abstract}
+\newpage
+
+\pagenumbering{arabic}
+\hypersetup{pageanchor=true}
+
+\mainmatter
+\tableofcontents
+% \newpage\listoffigures% optional
+% \newpage\listoftables% optional
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EDIT HERE!!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{introduction}
+% \include{background}
+% \include{.. add your chapters}
+% \include{conclusions}
+\appendix{
+  \include{appendix1}  % Optional, for details that cannot fit the main body
+  \include{publications} % Mandatory
+}
+% End EDIT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{apalike}
+\bibliography{thesis}
+\end{document}
