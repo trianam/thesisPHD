@@ -2,6 +2,65 @@
 \label{ch:introduction}
 
 \section{Machine Learning}
+\ac{ml} is a branch of \ac{ai}
+where the focus is to develop systems that learn from the
+data. Machine Learning is a field that is located in the intersection
+of different disciplines:
+\begin{description}
+\item[statistics] deal with the uncertainty of the world and, as we
+  will see, ML can be framed as a probability estimation;
+\item[data science] is the science that interpretes and study the
+  information contained in the data and how can be used;
+\item[optimization theory] is the mathematical branch that define
+  methods to optimize functions, ML can be seen as an optimization
+  problem;
+\item[computer science] is the science that studies algorithms and
+  their complexity;
+\item[computer engineering] focuses in the development of efficient
+  software.
+\end{description}
+
+In order to learn we must provide some data. The data can be of
+different kinds. We can denote three different types of \ac{ml}, based
+on the type of data and problem that we need to resolve: supervised,
+unsupervised, and reinforcement learning.
+
+In supervised learning we posses a dataset $S$ of samples $\vect{x}_i$
+each one labeled with $\vect{y}_i$:
+\begin{equation*}
+  S=\left((\vect{x}_1,\vect{y}_1),\dots,(\vect{x}_n,\vect{y}_n)\right),
+\end{equation*}
+where each $\vect{x}_i\in\XSet$ and $\vect{y}_i\in\YSet$. Usually the
+data is prepared such that $\XSet$ is a space of integer or real
+tensors of certain dimensionality, and $\YSet$ is a space of integer
+vectors for classification tasks and real vectors for regression
+tasks. In binary classification tasks $\YSet={0,1}$, in multilabel
+classification $\YSet={0,1}^k$ with $k$ possible labels, and in
+multiclass classification $\YSet={0,1}^k$ with only one value equal to
+$1$ and the rest $0$. The samples $\vect{x}_i$ of a dataset must be
+drawn from the same unknown distribution $\vect{x}_i\sim\dist{D}$. The
+relationship between the samples and the labels is defined by an unknown
+labeling function $f:\XSet\rightarrow\YSet$ such that for each sample
+$\vect{y}_i=f(\vect{x}_i)$.
+
+A learning algorithm receives as input a training set $S$, and should
+output a predictor $h_S:\XSet\rightarrow\YSet$ that minimize the
+\emph{prediction error}. For a generic predictor $h$, the prediction
+error is:
+\begin{equation*}
+  \loss_{\dist{D},f}\define\prob_{\vect{x}\sim\dist{D}}[h(\vect{x})\neq
+  f(\vect{x})]\define\dist{D}(\{\vect{x}:h(\vect{x})\neq
+  f(\vect{x})\}),
+\end{equation*}
+where for $A\subset\XSet$, the probability $\dist{D}$ assign a
+likelihood $\dist{D}(A)$ of observing a value $\vect{x}\in A$. Given
+that both $\dist{D}$ and $f$ are unknown, to find $h_S$ the learning
+algorithm minimizes the \emph{empirical prediction error} (or
+empirical risk):
+\begin{equation*}
+  \loss_S(h_S)\define\frac{|i\in\{1,\dots,n\}:h_S(\vect{x}_i)\neq\vect{y}_i|}{n}.
+\end{equation*}
+This learning paradigm of finding $h_S$ is called \ac{erm}
 
 \section{Neural Networks}
 In our work we used a specific kind of \ac{rnn}: \ac{lstm}.

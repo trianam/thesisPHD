@@ -37,6 +37,8 @@
   urlbordercolor=white,
   filebordercolor=white}
 
+\let\footruleskip\undefined %correct bug in footruleskip definition in
+                            %memoir and fancyhdr
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \renewcommand{\chaptermark}[1]{\markboth{#1}{}}
