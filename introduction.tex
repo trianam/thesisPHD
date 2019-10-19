@@ -25,6 +25,7 @@ different kinds. We can denote three different types of \ac{ml}, based
 on the type of data and problem that we need to resolve: supervised,
 unsupervised, and reinforcement learning.
 
+\subsection{Supervised Learning}
 In supervised learning we posses a dataset $S$ of samples $\vect{x}_i$
 each one labeled with $\vect{y}_i$:
 \begin{equation*}
@@ -60,7 +61,28 @@ empirical risk):
 \begin{equation*}
   \loss_S(h_S)\define\frac{|i\in\{1,\dots,n\}:h_S(\vect{x}_i)\neq\vect{y}_i|}{n}.
 \end{equation*}
-This learning paradigm of finding $h_S$ is called \ac{erm}
+This learning paradigm of finding $h_S$ is called \ac{erm}.
+
+\ac{erm} rule might lead to \emph{overfitting} if not restricted. A predictor
+can performs well over the training set $S$ --- having a low empirical
+error --- but it can performs badly over the entire distribution
+$\dist{D}$ with an high prediction error. A solution is to apply
+\ac{erm} over a restricted search space. We denote with $\HSet$ the
+\emph{hypothesis class} of the possible predictors
+$h\in{HSet}:\XSet\rightarrow\YSet$. For a given class $\HSet$ and a
+training sample $S$, the $ERM_\HSet$ learner uses the \ac{erm} rule to
+choose a predictor $h\in\HSet$ with the lowest possible empirical
+error over $S$:
+\begin{equation*}
+  ERM_\HSet(S)\in \argmin_{h\in\HSet} \loss_S(h).
+\end{equation*}
+
+We induce an \emph{inductive bias} introducing restrictions over
+$\HSet$. Intuitively, choosing a more restricted hypothesis class
+better protect us against overfitting but at the same time might cause
+a stronger bias.
+
+
 
 \section{Neural Networks}
 In our work we used a specific kind of \ac{rnn}: \ac{lstm}.
