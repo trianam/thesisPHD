@@ -71,16 +71,18 @@ $\dist{D}$ with an high prediction error. A solution is to apply
 \emph{hypothesis class} of the possible predictors
 $h\in{HSet}:\XSet\rightarrow\YSet$. For a given class $\HSet$ and a
 training sample $S$, the $ERM_\HSet$ learner uses the \ac{erm} rule to
-choose a predictor $h\in\HSet$ with the lowest possible empirical
+choose a predictor $h_S\in\HSet$ with the lowest possible empirical
 error over $S$:
 \begin{equation*}
-  ERM_\HSet(S)\in \argmin_{h\in\HSet} \loss_S(h).
+  h_S=ERM_\HSet(S)\in \argmin_{h\in\HSet} \loss_S(h).
 \end{equation*}
 
 We induce an \emph{inductive bias} introducing restrictions over
 $\HSet$. Intuitively, choosing a more restricted hypothesis class
 better protect us against overfitting but at the same time might cause
-a stronger bias.
+a stronger bias. The simplest kind of restriction on $\HSet$ is
+imposing an upper bound on its dimension.
+
 
 
 
