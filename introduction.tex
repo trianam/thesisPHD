@@ -80,8 +80,31 @@ error over $S$:
 We induce an \emph{inductive bias} introducing restrictions over
 $\HSet$. Intuitively, choosing a more restricted hypothesis class
 better protect us against overfitting but at the same time might cause
-a stronger bias. The simplest kind of restriction on $\HSet$ is
-imposing an upper bound on its dimension.
+a stronger bias.
+
+\subsubsection{Finite hypothesis classes}
+The simplest kind of restriction on $\HSet$ is
+imposing an upper bound on its dimension. We make the two following
+assumptions: 
+\begin{definition}
+  (Realizability assumption). $\exists h^*\in\HSet : \loss_{(\dist{D},f)}(h^*)=0$.
+\end{definition}
+\begin{definition}
+  (\ac{iid} examples). $S\sim\dist{D}^m$, with $m=|S|$ and $\dist{D}^m$ the
+  probability over $m$-tuples induced by applying $\dist{D}$ to pick
+  each element of the tuple independently from the others elements of
+  the same tuple.
+\end{definition}
+
+$\loss_{(\dist{D},f)}(h_S)$ depends on the choice of $S$, that is a
+random variable. To address the probability to sample $S$ such that
+the prediction error is not too large, we denote with $\delta$ the
+probability of getting a nonrepresentative sample, and $(1-\delta)$
+the \emph{confidence parameter} of the prediction. Furthermore we
+introduce the \emph{accuracy parameter} $\varepsilon$ of the quality
+of the prediction. $\loss_{(\dist{D},f)}(h_S)>\varepsilon$ represents
+a failure of the learner.
+
 
 
 
