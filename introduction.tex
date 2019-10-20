@@ -48,19 +48,19 @@ A learning algorithm receives as input a training set $S$, and should
 output a predictor $h_S:\XSet\rightarrow\YSet$ that minimize the
 \emph{prediction error}. For a generic predictor $h$, the prediction
 error is:
-\begin{equation*}
-  \loss_{\dist{D},f}\define\prob_{\vect{x}\sim\dist{D}}[h(\vect{x})\neq
+\begin{equation}\label{predictionError}
+  L_{\dist{D},f}(h)\define\prob_{\vect{x}\sim\dist{D}}[h(\vect{x})\neq
   f(\vect{x})]\define\dist{D}(\{\vect{x}:h(\vect{x})\neq
   f(\vect{x})\}),
-\end{equation*}
+\end{equation}
 where for $A\subset\XSet$, the probability $\dist{D}$ assign a
 likelihood $\dist{D}(A)$ of observing a value $\vect{x}\in A$. Given
 that both $\dist{D}$ and $f$ are unknown, to find $h_S$ the learning
 algorithm minimizes the \emph{empirical prediction error} (or
 empirical risk):
-\begin{equation*}
-  \loss_S(h_S)\define\frac{|i\in\{1,\dots,n\}:h_S(\vect{x}_i)\neq\vect{y}_i|}{n}.
-\end{equation*}
+\begin{equation}\label{empiricalError}
+  L_S(h)\define\frac{|i\in\{1,\dots,n\}:h(\vect{x}_i)\neq\vect{y}_i|}{n}.
+\end{equation}
 This learning paradigm of finding $h_S$ is called \ac{erm}.
 
 \ac{erm} rule might lead to \emph{overfitting} if not restricted. A predictor
@@ -74,7 +74,7 @@ training sample $S$, the $ERM_\HSet$ learner uses the \ac{erm} rule to
 choose a predictor $h_S\in\HSet$ with the lowest possible empirical
 error over $S$:
 \begin{equation*}
-  h_S=ERM_\HSet(S)\in \argmin_{h\in\HSet} \loss_S(h).
+  h_S=ERM_\HSet(S)\in \argmin_{h\in\HSet} L_S(h).
 \end{equation*}
 
 We induce an \emph{inductive bias} introducing restrictions over
@@ -86,8 +86,8 @@ a stronger bias.
 The simplest kind of restriction on $\HSet$ is
 imposing an upper bound on its dimension. We make the two following
 assumptions: 
-\begin{definition}
-  (Realizability assumption). $\exists h^*\in\HSet : \loss_{(\dist{D},f)}(h^*)=0$.
+\begin{definition}\label{realizability}
+  (Realizability assumption). $\exists h^*\in\HSet : L_{(\dist{D},f)}(h^*)=0$.
 \end{definition}
 \begin{definition}
   (\ac{iid} examples). $S\sim\dist{D}^m$, with $m=|S|$ and $\dist{D}^m$ the
@@ -96,18 +96,111 @@ assumptions:
   the same tuple.
 \end{definition}
 
-$\loss_{(\dist{D},f)}(h_S)$ depends on the choice of $S$, that is a
+$L_{(\dist{D},f)}(h_S)$ depends on the choice of $S$, that is a
 random variable. To address the probability to sample $S$ such that
 the prediction error is not too large, we denote with $\delta$ the
 probability of getting a nonrepresentative sample, and $(1-\delta)$
 the \emph{confidence parameter} of the prediction. Furthermore we
 introduce the \emph{accuracy parameter} $\varepsilon$ of the quality
-of the prediction. $\loss_{(\dist{D},f)}(h_S)>\varepsilon$ represents
+of the prediction. $L_{(\dist{D},f)}(h_S)>\varepsilon$ represents
 a failure of the learner.
+We are interested in upper bounding the probability to sample
+$m$-tuple that lead to the learner failure. If $S|_x=(\vect{x}_1,\dots,\vect{x}_m)$
+are instances of the training set, we want to upper bound
+\begin{equation*}
+  \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}).
+\end{equation*}
+It is possible to prove that for a finite hypotesis class $\HSet$:
+\begin{equation*}
+  \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}) \leq
+  |\HSet|e^{-\varepsilon m},
+\end{equation*}
+and for $m$ an integer that satisfies
+\begin{equation*}
+  m\geq\frac{\log(|\HSet|/\delta)}{\varepsilon},
+\end{equation*}
+then for any $f$ and $\dist{D}$, with probability at least $1-\sigma$,
+for every $h_S$ holds:
+\begin{equation*}
+  L_{(\dist{D},f)}(h_S)\leq\varepsilon.
+\end{equation*}
+This means that for sufficiently large $m$, the $ERM_\HSet$ rule over
+a finite hypothesis class will be probably (with confidence
+$1-\delta$) approximately (up to an error $\varepsilon$) correct.
 
+\subsubsection{\ac{pac} learning}
+\begin{definition}\label{pacLearnability}
+A hypothesis class $\HSet$ is \ac{pac} learnable if there exist a
+function $m_\HSet:(0,1)^2\rightarrow\NSet$ and a learning algorithm
+with the following property: for every $\varepsilon,\sigma\in(0,1)$,
+for every $\dist{D}$ and $f$, if \cref{realizability} holds, then when
+running the algorithm on $m\geq m_\HSet(\varepsilon,\sigma)$ \ac{iid}
+examples, it returns a hypothesis $h$ such that
+$L_{(\dist{D},f)}(h)\leq\varepsilon$, with probability of at least
+$1-\sigma$ over the choice of the examples.
+\end{definition}
 
+The function $m_\HSet$ determines the \emph{sample complexity} of
+learning $\HSet$, that is the number of samples to guarantee a
+\ac{pac} solution. The finite hypotesis class of
+is \ac{pac} learnable with sample complexity
+\begin{equation*}
+  m_\HSet(\varepsilon,\delta)\leq\left\lceil\frac{\log(|\HSet|/\delta}{\varepsilon}\right\rceil
+\end{equation*}
 
+\subsubsection{Agnostic \ac{pac} learning}
+To develop a more realistic model, we relax the \cref{realizability}
+and we substitute the notion of $\dist{D}$ over $\XSet$ and
+$f:\XSet\rightarrow\YSet$ with a single data generating
+distribution. From now, $\dist{D}$ is defined as a probability
+distribution over $\XSet\times\YSet$, and can be seen as being
+composed by a \emph{marginal distribution} $\dist{D}_x$ over $\XSet$
+and a \emph{conditional probability} $\dist{D}((\vect{x},\vect{y})|\vect{x})$ over label
+for each example. The true error \cref{predictionError} is redefined as:
+\begin{equation*}
+  L_{\dist{D},f}(h)\define\prob_{(\vect{x},\vect{y})\sim\dist{D}}[h(\vect{x})\neq
+  f(\vect{x})]\define\dist{D}(\{(\vect{x},\vect{y}):h(\vect{x})\neq
+  f(\vect{x})\}),  
+\end{equation*}
+while the empirical error \cref{empiricalError} remains the same.
 
+We introduce the concept of \emph{loss function} as a function
+$\loss:\HSet\times(\XSet\times\YSet)\rightarrow\RSet^+$, and the true
+and empirical risks are defined in term of $\loss$ as:
+\begin{align*}
+  L_\dist{D}(h)&\define\expect_{(\vect{x},\vect{y})\sim\dist{D}}[\loss(h,(\vect{x},\vect{y}))],\\
+  L_S(h)&\define\frac{1}{m}\sum_{i=2}^m\loss(h,(\vect{x}_i,\vect{y}_i))].
+\end{align*}
+Two common loss are:
+\paragraph{0-1 loss}
+\begin{equation*}
+  \loss_{0-1}(h,(\vect{x},\vect{y}))\define\begin{cases}
+    0\quad\mathrm{if}\ h(\vect{x}) = \vect{y},\\
+    1\quad\mathrm{if}\ h(\vect{x}) \neq \vect{y}.
+  \end{cases}
+\end{equation*}
+\paragraph{Square loss}
+\begin{equation*}
+  \loss_{sq}(h,(\vect{x},\vect{y}))\define(h(\vect{x})-\vect{y})^2.
+\end{equation*}
+
+Is it possible now to define the concept of agnostic \ac{pac}
+learnability.
+\begin{definition}\label{agnosticPacLearnability}
+A hypothesis class $\HSet$ is agnostic \ac{pac}
+learnable, respect $(\XSet\times\YSet)$ and $\loss$, if there exist a
+function $m_\HSet:(0,1)^2\rightarrow\NSet$ and a learning algorithm
+with the following property: for every $\varepsilon,\delta\in(0,1)$
+and for every $\dist{D}$, when running the algorithm on $m\geq
+m_\HSet(\varepsilon,\delta)$ \ac{iid} examples, it returns $h$ such
+that
+$L_\dist{D}(h)\leq\min_{h'\in\HSet}L_\dist{D}(h')+\varepsilon$. 
+\end{definition}
+
+Contrarily to \cref{pacLearnability}, \cref{agnosticPacLearnability}
+cannot guarantee an arbitrarily small error. It still guarantee that
+a learner can have success if its error is not too much larger than
+the one of the best achievable predictor for class $\HSet$.
 
 \section{Neural Networks}
 In our work we used a specific kind of \ac{rnn}: \ac{lstm}.
