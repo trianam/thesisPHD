@@ -110,7 +110,7 @@ are instances of the training set, we want to upper bound
 \begin{equation*}
   \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}).
 \end{equation*}
-It is possible to prove that for a finite hypotesis class $\HSet$:
+It is possible to prove that for a finite hypothesis class $\HSet$:
 \begin{equation*}
   \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}) \leq
   |\HSet|e^{-\varepsilon m},
@@ -142,7 +142,7 @@ $1-\sigma$ over the choice of the examples.
 
 The function $m_\HSet$ determines the \emph{sample complexity} of
 learning $\HSet$, that is the number of samples to guarantee a
-\ac{pac} solution. The finite hypotesis class of
+\ac{pac} solution. The finite hypothesis class of
 is \ac{pac} learnable with sample complexity
 \begin{equation*}
   m_\HSet(\varepsilon,\delta)\leq\left\lceil\frac{\log(|\HSet|/\delta}{\varepsilon}\right\rceil
@@ -171,7 +171,7 @@ and empirical risks are defined in term of $\loss$ as:
   L_\dist{D}(h)&\define\expect_{(\vect{x},\vect{y})\sim\dist{D}}[\loss(h,(\vect{x},\vect{y}))],\\
   L_S(h)&\define\frac{1}{m}\sum_{i=2}^m\loss(h,(\vect{x}_i,\vect{y}_i))].
 \end{align*}
-Two common loss are:
+Two common losses are:
 \paragraph{0-1 loss}
 \begin{equation*}
   \loss_{0-1}(h,(\vect{x},\vect{y}))\define\begin{cases}
@@ -201,6 +201,106 @@ Contrarily to \cref{pacLearnability}, \cref{agnosticPacLearnability}
 cannot guarantee an arbitrarily small error. It still guarantee that
 a learner can have success if its error is not too much larger than
 the one of the best achievable predictor for class $\HSet$.
+
+The \ac{erm} learning paradigm works by finding an hypothesis that
+minimize the empirical 
+risk. This means that an $h$ that minimizes the empirical risk needs
+to be a good true risk minimizer also. We need that uniformly over all
+hypothesis, the empirical risk needs to be close to the real risk. To
+asses this we introduce the concept of
+\emph{$\varepsilon$-representative sample}: 
+\begin{definition}
+  ($\varepsilon$-representative sample). A training set $S$ is called
+  $\varepsilon$-representative with regard to $\HSet$, $\loss$, and
+  $\dist{D}$, if
+  \begin{equation*}
+    \forall h\in\HSet,\quad |L_S(h)-L_\dist{D}(h)|\leq\varepsilon.
+  \end{equation*}
+\end{definition}
+It is possible to prove that if the sample is
+$\frac{\varepsilon}{2}$-representative, then the \ac{erm} learning
+rule is guaranteed to return a good hypothesis. Formally:
+\begin{lemma}\label{ermgood}
+  Assuming $S$ is $\frac{\varepsilon}{2}$-representative, then any
+  output $ERM_\HSet(S)=h_S\in\argmin_{h\in\HSet}L_S(h)$ satisfy:
+  \begin{equation*}
+    L_\dist{D}(h_S)\leq\min_{h\in\HSet}L_\dist{D}(h)+\varepsilon.
+  \end{equation*}
+\end{lemma}
+
+To ensure that the \ac{erm} rule is an agnostic \ac{pac} learner, it
+suffices to show that with probability of at least $1-\delta$ over the
+choice of $S$, it will be an $\varepsilon$-representative training
+set. Formally, given the property:
+\begin{definition}
+  (Uniform Convergence). $\HSet$ has the uniform convergence property
+  if there exists a function $m_\HSet^{UC}:(0,1)^2\rightarrow\NSet$
+  such that for every $\varepsilon,\delta\in(0,1)$ and for every
+  $\dist{D}$, if $S$ is a sample of $m\geq
+  m_\HSet^{UC}(\varepsilon,\delta)$ examples drawn \ac{iid} from
+  $\dist{D}$, then $S$ is $\varepsilon$-representative with
+  probability of at least $1-\delta$.
+\end{definition}
+We have the corollary of \cref{ermgood}:
+\begin{corollary}
+  If a class $\HSet$ has the uniform convergence property, then the
+  class is agnostically \ac{pac} learnable with sample complexity
+  $m_\HSet(\varepsilon,\delta)\leq
+  m_\HSet^{UC}(\varepsilon/2,\delta)$. In that case the $ERM_\HSet$
+  paradigm is a successful agnostic \ac{pac} learner for $\HSet$.
+\end{corollary}
+
+It is possible to prove (we skip the proof here) that the uniform convergence
+holds for a finite
+hypothesis class, and then that every finite hypothesis class is
+agnostic \ac{pac} learnable using \ac{erm} algorithm with sample
+complexity
+\begin{equation*}
+  m_\HSet(\varepsilon, \delta)\leq
+  m_\HSet^{UC}\left(\frac{\varepsilon}{2},\delta\right)\leq\left\lceil\frac{2\log\left(\frac{2|\HSet|}{\delta}\right)}{\varepsilon^2}\right\rceil.
+\end{equation*}
+
+\subsubsection{Bias-complexity trade-off}
+Choosing a hypothesis class $\HSet$ represents a prior
+knowledge related to the data distribution $\dist{D}$. One can argue
+if this prior knowledge is really necessary, or 
+if it is possible to have a learning algorithm $A$ and a size $m$ such
+that for every $\dist{D}$, if $A$ receives $m$ \ac{iid} samples from
+$\dist{D}$, it outputs a predictor $h$ that have a low risk with high
+chance. The \emph{no-free-lunch} theorem proves that having such a
+universal learner is impossible:
+
+One can avoid the limits imposed by the no-free-lunch theorem using
+the prior knowledge of the learning task to restrict the hypothesis
+class $\HSet$. To choose a good hypothesis class we need to set a
+large enough class such that it includes the hypothesis with no error
+(for \ac{pac} learnability), or at least that the smallest error
+achievable by a hypothesis from the class is small enough (for
+agnostic \ac{pac} learnability). On the other hand we cannot choose
+the richest class. We can decompose the error of an $ERM_\HSet$
+hypothesis $h_S$ into the component:
+\begin{equation*}
+  L_\dist{D}(h_S)=\varepsilon_{app}+\varepsilon_{est}.
+\end{equation*}
+where
+\begin{equation*}
+  \varepsilon_{app}=\min_{h\in\HSet}L_\dist{D}(h)
+\end{equation*}
+is the \emph{approximation error} that measures how much inductive
+bias we 
+introduce restricting $\HSet$ and do not depends on the sample size.
+\begin{equation*}
+  \varepsilon_{est}=L_\dist{D}(h_S)-\varepsilon_{app}
+\end{equation*}
+is the \emph{estimation error} that depends on the training set size
+and on the complexity of $\HSet$.
+
+To minimize the total risk, we face a \emph{bias-complexity
+  tradeoff}. Choosing $\HSet$ to be rich, decreases the approximation
+error, but increases the estimation error because it may lead to
+overfitting. Choosing a small $\HSet$ reduces the estimation error,
+but can increases the approximation error, in other words it might
+lead to \emph{underfitting}.
 
 \section{Neural Networks}
 In our work we used a specific kind of \ac{rnn}: \ac{lstm}.
