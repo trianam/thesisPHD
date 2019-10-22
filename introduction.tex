@@ -1,7 +1,7 @@
 \chapter{Introduction}
 \label{ch:introduction}
 
-\section{Machine Learning}
+\section{Machine Learning Theory}
 \ac{ml} is a branch of \ac{ai}
 where the focus is to develop systems that learn from the
 data. Machine Learning is a field that is located in the intersection
@@ -301,6 +301,71 @@ error, but increases the estimation error because it may lead to
 overfitting. Choosing a small $\HSet$ reduces the estimation error,
 but can increases the approximation error, in other words it might
 lead to \emph{underfitting}.
+
+\subsubsection{\ac{vcd}}
+The finitess of $\HSet$ is a sufficient condition for learnability,
+but it is not a necessary condition. A property called \ac{vcd} gives
+a correct characterization of learnability. Considering only binary
+classifiers where $\YSet=\{0,1\}$, to define \ac{vcd}, we
+must define before the concept of \emph{class restriction} and
+\emph{shattering}:
+\begin{definition}
+  (Restriction of $\HSet$ to $C$). $\HSet$ is a class of function
+  $h:\XSet\rightarrow\{0,1\}$, and
+    $C=\{c_1,\dots,c_m\}\subset\XSet$. The restriction of $\HSet$ to
+    $C$ is the set of function from $C$ to $\{0,1\}$ that can be
+    derived from $\HSet$:
+    \begin{equation*}
+      \HSet_C=\{(h(c_1),\dots,h(c_m)):h\in\HSet\},
+    \end{equation*}
+    where each function is represented as a vector in
+    $\{0,1\}^{|C|}$.
+\end{definition}
+\begin{definition}
+  (Shattering). A hypothesis class $\HSet$ shatters a finite set
+  $C\subset\XSet$, if $\HSet_C$ is the set of all functions from $C$
+  to $\{0,1\}$:
+  \begin{equation*}
+    |\HSet_C|=2^{|C|}.
+  \end{equation*}
+\end{definition}
+
+Relating to the free-lunch-theorem, whenever some set $C$ is shattered
+by $\HSet$, an adversary can 
+construct a distribution over $C$ based on any function from $C$ to
+$\{0,1\}$ maintaining the realizability assumption. Thus, for any
+learning algorithm $A$ there exist a distribution $\dist{D}$ and a
+predictor $h$
+(both constructed from an adversary) such that $L_D(h)=0$, but with a
+sufficiently high probability over the choice of $S$,
+$L_\dist{D}(A(S))\geq\varepsilon$. The \ac{vcd} is defined:
+\begin{definition}
+  (\ac{vcd}). The \ac{vcd} $VCdim(\HSet)$ of an hypothesis class
+  $\HSet$, is the maximal size of a set $C\subset\XSet$ that can be
+  shattered by $\HSet$. If $\HSet$ can shatter arbitrarily large sets,
+  then $VCdim(\HSet)=\infty$.
+\end{definition}
+
+If a certain hypothesis class $\HSet$ has infinite \ac{vcd}, then
+$\HSet$ is not \ac{pac} learnable. Conversely, a finite \ac{vcd}
+guarantees learnability. To prove that $VCdim(\HSet)=d$ finite, we
+need to show
+\begin{itemize}
+\item $\exists C$ such that $|C|=d$ and it is shattered by $\HSet$;
+\item $\forall C$ such that $|C|=d+1$, $C$ is not shattered by
+  $\HSet$. 
+\end{itemize}
+
+\subsubsection{\ac{srm}}
+Until now the prior knowledge was encoded specifying a hypothesis
+class $\HSet$ that is believed to include a good predictor for the
+learning task. Another way to express the prior knowledge is by
+specifying preferences over hypotheses within $\HSet$. The \ac{srm}
+implement this assuming $\HSet=\bigcup_{n\in\NSet}\HSet_n$ and
+defining a weight function $w:\NSet\rightarrow[0,1]$ that assign a
+preference for each class $\HSet_n$. The \ac{srm} rule follows a
+\emph{bound minimization} approach. The goal is to find a hypothesis
+that minimizes a certain upper bound on the true risk.
 
 \section{Neural Networks}
 In our work we used a specific kind of \ac{rnn}: \ac{lstm}.
