@@ -65,6 +65,7 @@
 \usepackage{algorithm2e}
 \usepackage{color}
 \usepackage{textcomp}
+\usepackage{stackengine}
 
 \hypersetup{ 
   pdfpagelayout=SinglePage, % default
@@ -230,16 +231,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{introduction}
 \include{background}
+\include{icdo}
 % \include{.. add your chapters}
 % \include{conclusions}
 \appendix{
-  \include{appendix1}  % Optional, for details that cannot fit the main body
+%  \include{appendix1}  % Optional, for details that cannot fit the main body
   \include{publications} % Mandatory
 }
 % End EDIT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{apalike}
-\bibliography{thesis}
+\bibliography{Oncology,more}
 \end{document}
 
 %%% Local Variables:

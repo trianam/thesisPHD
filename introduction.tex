@@ -944,7 +944,63 @@ Also precision-recall curves can be calculated only for binary
 classifiers. In order to generalise them to multiclass problem it is
 necessary to micro or macro average.
 
+\section{Cancer registries}
+Cancer is a major concern worldwide, as it decreases the quality of
+life and leads to premature mortality. In addition it is one of the
+most complex and difficult-to-treat
+diseases, with significant social implications, both in terms of
+mortality rate and in terms of costs associated with treatment and
+disability~\cite{sullivan_delivering_2011,b._stewart_world_2014,desantis_cancer_2014,siegel_cancer_2016}.
+Measuring the burden of disease is one of the main concerns of public
+healthcare operators. Suitable measures are necessary to describe the general state
+of population’s health, to establish public health goals and to
+compare the national health status and performance of health systems
+across countries. Furthermore, such studies are needed to assess the
+allocation of health care and health research resources across disease
+categories and to evaluate the potential costs and benefits of public
+health interventions~\cite{brown_burden_2001}.
 
+Cancer registries emerged during the last few decades as a strategic
+tool to quantify the impact of the disease and to provide analytic
+data to healthcare operators and decision makers.  Cancer registries
+use administrative and clinical data sources in order to identify all
+the new cancer diagnoses in a specific area and time period and
+collect incidence records that provide details on the diagnosis and
+the outcome of treatments.  Mining cancer registry datasets can help
+towards the development of global surveillance
+programs~\cite{tourassi_deep_2017} and can provide important insights
+such as survivability~\cite{delen_predicting_2005}.  Although data
+analysis software would best operate on structured representations of
+the reports, pathologists normally enter data items as free text in
+the local country language. This requires intelligent algorithms for
+medical document information extraction, retrieval, and
+classification, an area that has received significant attention in the
+last few years (see, e.g.,~\cite{mujtaba_clinical_2019} for a recent
+account and \cite{yim_natural_2016} for the specific case of cancer).
+
+\section{\ac{icdo}}
+Pathology reports can be classified according
+to codes defined in the \ac{icdo3}
+system~\cite{fritz_international_2000}, a specialization of the ICD
+for the cancer domain which is internationally adopted as the standard
+classification for topography and
+morphology~\cite{airtum_handbook_2008}.  The development of text
+analysis tools specifically devoted to the automatic classification of
+incidence records according to ICD-O3 codes has been addressed in a
+number of previous papers. These
+works, however, have either focused on reasonably large datasets but
+using simple linear classifiers based on bag-of-words representations
+of text~\cite{jouhet_automated_2011,kavuluru_automatic_2013}, or have
+applied recent state-of-the-art deep learning
+techniques~\cite{gao_hierarchical_2018,qiu_deep_2018} but using
+smaller datasets and restricted to a partial set of
+tumors. Additionally, the use of deep learning techniques usually
+requires accurate domain-specific word vectors (embeddings of words in
+a vector space) that can be derived from word co-occurrences in large
+corpora of unlabeled
+text~\cite{mikolov_linguistic_2013,pennington_glove:_2014,devlin2018bert}. Large
+medical corpora are easily available for English (e.g. PubMed) but not
+necessarily for other languages.
 
 
 %%% Local Variables:
