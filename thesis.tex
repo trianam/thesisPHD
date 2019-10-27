@@ -98,8 +98,8 @@
 \usepackage{subfig}
 \usepackage{cleveref}
 \usepackage{tikz}
-\usetikzlibrary{positioning}
-\usetikzlibrary{calc}
+\usepackage{pgf}
+\usetikzlibrary{positioning, calc, chains, decorations.pathmorphing, shadows}
 
 
 \definecolor{UFblue}{RGB}{12, 71, 123}
@@ -231,6 +231,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{introduction}
 \include{background}
+\include{icdoFirst}
 \include{icdo}
 % \include{.. add your chapters}
 % \include{conclusions}

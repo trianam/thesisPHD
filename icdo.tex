@@ -1,29 +1,9 @@
-\chapter{\ac{icdo} classification}
+\chapter{\ac{icdo} classification improved}
 \label{ch:icdo}
 
 \section{Dataset}
-We collected a set of $1\,592\,385$ anatomopathological exam results
-from Tuscany region in the period 2004-2013. About $6\%$
-of these records refer to a positive tumor
-diagnosis and have topological and morphological ICD-O3 labels,
-determined by tumor registry experts. Other reports are associated
-with non-cancerous tissues and with unlabeled records. When multiple
-pathological records for the
-same patient existed for the same tumor, experts selected the most
-informative report in order to assign the ICD-O3 code to that tumor
-case, leaving a set of $94\,524$ labeled tumor cases.
-
-Histological exam records consist of three free-text fields (not all
-of them always filled-in), reporting tissue macroscopy, diagnosis,
-and, in some cases, the patient's anamnesis. We found that field
-semantics was not always used consistently and that the amount of
-provided details varied significantly from extremely synthetic to very
-detailed assessments of the morphology and the diagnosis. Field length
-ranged from $0$ to $1\,368$ words, with first quartile, median and
-third quartile respectively 34, 62, 134. For these reasons we merged
-the three text fields
-into a single text document, did not apply any conflation (except for
-case normalization) kept punctuation. We finally removed duplicate
+For the experiments in this chapter, we further refined the dataset
+explained in \cref{sec:dataset}. We removed duplicate
 reports and reports labeled with extremely rare (1048
 samples that not
 appear in either training, validation, and test sets) ICD-O3 codes. We
@@ -33,18 +13,6 @@ labeled records over $203$ morphological classes and $68$
 topological classes (see below).
 
 \section{Prediction tasks}
-A topographical \ac{icdo3} code is structured as \emph{Cmm.s} where
-\emph{mm} and \emph{s} represent the main site and the subsite,
-respectively. For example, \emph{C50.2}
-is the code for the upper-inner quadrant (\emph{2}) of breast (\emph{50}).
-
-A morphological \ac{icdo3} code is structured as \emph{tttt/b}
-where \emph{tttt} and \emph{b} represent the cell type and the tumor
-behavior (benign, uncertain, in-situ, malignant primary site,
-malignant metastatic site), respectively. For example, \emph{8140/3}
-is the code for an adenocarcinoma (\emph{adeno 8140};
-\emph{carcinoma 3}).
-
 We defined two multi-class classification tasks: (1) main tumor site
 prediction ($68$ mutually exclusive classes) and (2) morphology
 prediction ($203$ mutually exclusive
@@ -52,14 +20,7 @@ classes). Although the two tasks maybe somewhat correlated, we did not
 attempt multi-task approaches given the small number of tasks and
 large enough size of the dataset.
 
-As shown in \cref{fig:classDist}, the dataset is highly unbalanced.
-\begin{figure}
-  \centering
-  \includegraphics[width=\floatwidth]{img/classDist-icdo3-site.pdf}
-  \caption{Documents in classes (ordered by
-    frequency).}
-  \label{fig:classDist}
-\end{figure}
+As in \cref{ch:icdoFirst}, the dataset is highly unbalanced.
 
 \subsection{Recurrent Neural Networks}
 \label{sec:rnn}
@@ -81,10 +42,10 @@ this work compute their predictions $f(\vect{x})$ as follows:
 \end{align}
 $E$ is an embedding function mapping words into $p$-dimensional real
 vectors (where embedding parameters $\theta_e$ can be either
-pretrained and adjustable or fixed, see Section~\ref{sec:word-vectors}
-below.  Functions $F$ and $R$ corresponds to (forward and reverse)
+pretrained and adjustable or fixed, see word vectors in \cref{sec:word-vectors}.
+Functions $F$ and $R$ corresponds to (forward and reverse)
 dynamics that can be described in term of several (possibly layered)
-recurrent cells. In this work we focus on gated recurrent unit (GRU)
+recurrent cells. In this work we focus on \ac{gru}
 cells~\cite{cho2014properties} for their simplicity and because
 preliminary experiments revealed no advantages over long-short term
 memory cells~\cite{hochreiter1997long} on our data. Each vector $h_t$,
@@ -177,31 +138,31 @@ probability). After the pre-training, the model is fine-tuned to the
 specific task.
 
 
-\subsection{Hyperparameters}
-The hyperparameters $\xi=\xi^l\cup\xi^r\cup\xi^h\cup\xi^c$ define the
-structure of the model. Regarding $\xi^l=\xi^r$ they define the type
-of \ac{rnn} that in our experiments can be \ac{lstm} or \ac{gru}, the
-number of stacked \ac{rnn} layers and the dimension of each
-layer. $\xi^h$ defines the number of layers in the first
-\ac{mlp} and their
-dimensions, moreover it defines the type of aggregating function $f$
-that in our experiments can be one of
-\begin{align}
-  f(\vect{a},\vect{b}) &= \left[\max(a_1,b_1),\dots,\max(a_l,b_l)\right];\\
-  f(\vect{a},\vect{b}) &= \left[\frac{a_1+b_1}{2},\dots,\frac{a_l+b_l}{2}\right];\\
-  f(\vect{a},\vect{b}) &= \left[a_1,\dots,a_l,b_1,\dots,b_l\right].\label{eq:aggregation}
-\end{align}
-$\xi^c$ defines the number of layers and their dimensions of the
-final classifier. The number of layers defined in $\xi^h$ can be
-equal to $0$. In such case, $\vect{h}_{i,j}$ is calculated:
-\begin{equation*}
-  \vect{h}_{i,j} = f(\vect{h}^l_{i,j},\vect{h}^r_{i,j}).
-\end{equation*}
-Also the number of layers defined in $\xi^c$ can be equal to $0$. In
-such case $\vect{\hat{y}}_i$ is calculated:
-\begin{equation*}
-  \vect{\hat y}_i = \max_j(\vect{h}_{i,j}).
-\end{equation*}
+% \subsection{Hyperparameters}
+% The hyperparameters $\xi=\xi^l\cup\xi^r\cup\xi^h\cup\xi^c$ define the
+% structure of the model. Regarding $\xi^l=\xi^r$ they define the type
+% of \ac{rnn} that in our experiments can be \ac{lstm} or \ac{gru}, the
+% number of stacked \ac{rnn} layers and the dimension of each
+% layer. $\xi^h$ defines the number of layers in the first
+% \ac{mlp} and their
+% dimensions, moreover it defines the type of aggregating function $f$
+% that in our experiments can be one of
+% \begin{align}
+%   f(\vect{a},\vect{b}) &= \left[\max(a_1,b_1),\dots,\max(a_l,b_l)\right];\\
+%   f(\vect{a},\vect{b}) &= \left[\frac{a_1+b_1}{2},\dots,\frac{a_l+b_l}{2}\right];\\
+%   f(\vect{a},\vect{b}) &= \left[a_1,\dots,a_l,b_1,\dots,b_l\right].\label{eq:aggregation}
+% \end{align}
+% $\xi^c$ defines the number of layers and their dimensions of the
+% final classifier. The number of layers defined in $\xi^h$ can be
+% equal to $0$. In such case, $\vect{h}_{i,j}$ is calculated:
+% \begin{equation*}
+%   \vect{h}_{i,j} = f(\vect{h}^l_{i,j},\vect{h}^r_{i,j}).
+% \end{equation*}
+% Also the number of layers defined in $\xi^c$ can be equal to $0$. In
+% such case $\vect{\hat{y}}_i$ is calculated:
+% \begin{equation*}
+%   \vect{\hat y}_i = \max_j(\vect{h}_{i,j}).
+% \end{equation*}
 
 \section{Results}
 \subsection{Artificial dataset}\label{sec:experiments}

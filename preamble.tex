@@ -93,6 +93,9 @@
 \setfloatlocations{figure}{htbp}
 \setfloatlocations{table}{htbp}
 
+\newcommand{\dataLabelScale}{0.6}
+\newcommand{\schemeNodeDistance}{0.5cm}
+
 \tikzstyle{every neuron}=[circle, draw, minimum size=1cm]
 \tikzstyle{bias}=[circle,draw]
 \tikzstyle{operation}=[circle,draw]
@@ -109,6 +112,51 @@ begin node=\color{black}$\cdots$]
 \tikzstyle{vectorLine}=[line width=0.6mm]
 \tikzstyle{vectorArrow}=[->, >=stealth, line width=0.6mm]
 \tikzstyle{border}=[draw]
+\tikzstyle{dataBlock}=[draw,minimum size=1cm, minimum height=2cm, double copy shadow={shadow xshift=-0.5ex, shadow yshift=-0.5ex}, fill=white]
+\tikzstyle{layer}=[draw,minimum height=2cm]
+\tikzstyle{joined}=[join=by {->}]
+\tikzstyle{support}=[coordinate,join=by {-}]
+\tikzstyle{dataLabel}=[scale=\dataLabelScale]
+
+\newcommand\nodeInput{} % just for safety
+\def\nodeInput(#1){%
+  \node[dataBlock,joined,scale=\dataLabelScale] (#1) {$200$};
+}
+
+\newcommand\nodeEmbedding{} % just for safety
+\def\nodeEmbedding(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Embed}};
+}
+
+\newcommand\nodeGlove{} % just for safety
+\def\nodeGlove(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{GloVe}};
+}
+
+\newcommand\nodeConv{} % just for safety
+\def\nodeConv(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Conv 2}};
+}
+
+\newcommand\nodeLstm{} % just for safety
+\def\nodeLstm(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Bi. LSTM}};
+}
+
+\newcommand\nodeAvg{} % just for safety
+\def\nodeAvg(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Avg pool}};
+}
+
+\newcommand\nodeRelu{} % just for safety
+\def\nodeRelu(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{ReLU}};
+}
+
+\newcommand\nodeSoftmax{} % just for safety
+\def\nodeSoftmax(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Softmax}};
+}
 
 %%% Local Variables:
 %%% mode: latex
