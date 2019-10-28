@@ -831,7 +831,8 @@ $i$ for the first and second classifier. They are defined as:
 \end{eqnarray*}
 
 \subsection{\acf{map}} is a measure used in information
-retrieval. It expresses how well the true classification can be retrieved in
+retrieval \cite{manning_introduction_2008}. It expresses how well the
+true classification can be retrieved in 
 the first results of the classifier. We define two variants of
 \ac{map}, one (MAPc) to state how well all records for a specific class are
 retrieved, the other (MAPs) to asses how well the correct class is retrieved
@@ -1014,6 +1015,122 @@ malignant metastatic site), respectively. For example, \emph{8140/3}
 is the code for an adenocarcinoma (\emph{adeno 8140};
 \emph{carcinoma 3}).
 
+\section{\ac{nlp}}
+\ac{nlp} is the field of designing methods that take as input or
+produce as output natural language data. Natural language is
+ambiguous and variable, for instance the sentence ``i saw a woman on a
+hill with a binocular'' can means that I had a binocular and with
+those I saw a
+woman on a hill, or that a woman was on a hill using the
+binocular. This ambiguity can also be the source of problems in
+specific context as the medical text, where specific countermeasures
+can be adopted \cite{zhao_clinical_2019,codish2005model}.
+
+Language is
+\emph{symbolic} and \emph{discrete}, the relationship between different words,
+i.e. symbols, can not be inferred from the symbols
+themselves. It is possible to easily compare concepts that have a
+continuous representation, e.g. two different colors in an image,
+while it cannot be done easily with words without using large lookup
+table or advanced methods. Language is also \emph{compositional},
+letters form words, and words form sentences. Language is also
+\emph{sparse}, the way in which words can be combined to form meanings
+is practically infinite.
+
+\subsection{\ac{ann} in \ac{nlp}}
+\ac{ml} approaches are characterized by learning to make predictions
+based on past observations. \ac{ann} approaches work by learning not
+only to predict, but also to correctly represent data. A common
+component of \ac{ann} applied to \ac{nlp} is the embedding layer,
+i.e. a mapping from discrete symbols to continuous vectors in a
+relatively low dimensional space. This representation allows to
+transform the isolated symbols into mathematical objects that can be
+operated on.
+
+The principal model that is used in \ac{nlp} are \ac{rnn}. They are
+capable of producing a vector that summarize the entire input
+sequence. They allow abandoning the \emph{markov} assumption that was
+prevalent in \ac{nlp} for decades, and designing models that can
+condition on entire sentences or documents. This capability leads to
+impressive gains in \emph{language-modeling}, the task of predicting
+the probability of the next word in a sequence.
+
+\subsection{Features}
+The mapping from textual data to real valued vector that can be used
+as input for \ac{ann} models, is called \emph{features extraction}.
+
+When the focus entity is a word outside of a context, the main source
+of information is the letters. We can look at \emph{lemma},
+i.e. dictionary entry of the word, e.g. words such as ``booking'',
+``booked'', ``books'' to their common lemma ``book''. This mapping is
+usually performed using lemma lexicons or morphological analyzers. It
+is a linguistically defined process and may not work well for forms
+that are not in the lexicon or for mis-pelling. a coarser process is
+called \emph{stemming}. A stemmer maps words to shorter words that are
+not necessarily grammatically valid. E.g. ``picture'', ``pictures'',
+and ``pictured'' will be stemmed to ``pictur''. \emph{Lexical
+  resources} are dictionary that are meant to be accessed by machine
+rather than by humans. They tipically contain information about words,
+e.g. there are lexicons that map inflected word forms to their
+possible morphological analyses, telling that a certain word may be a
+singular masculine noun or a past-perfect verb.
+
+When the focus entity is text, i.e. sentences, paragraphs documents,
+the features are the count and the order of the letters and words
+within the text. \emph{Bag of words} is a very common feature
+extraction procedure. We look at the histogram of the words within the
+text. We can also compute quantities that are directly derived from
+the words and the letters such as the length of the sentence. We can
+also integrate statistics based on external information. When using
+bag of words, it is common to use \ac{tfidf} weighting
+\cite{manning_introduction_2008}. A word $w$ in a document $d$ that is
+part of a large corpus $D$ of documents is represented by:
+\begin{equation*}
+  \frac{\#_d(w)}{\sum_{w'\in d}\#_d(w')}\cdot\log\frac{|D|}{|d\in
+    D:w\in d|},
+\end{equation*}
+where $\#_d(w)$ is the number of times that $w$ appears in
+$d$. Besides words, one may also look at consecutive pairs or triplets
+of words. These are called \emph{ngrams}. A bag of ngrams
+representation is much more informative than a bag of words.
+
+When considering a word within a sentence or a document, the features
+of a word are its position within the sentence and the words or
+letters surrounding it. It is common to focus on the immediate context
+of a word by considering a \emph{window} surrounding it (with tipical
+values of 2,5, and 10 words to each side). We may also be interested
+in the absolute position of a word inside a sentence, having features
+such as ``the word is the 5th in the sentence'' or ``the word appear
+within the first 10 of the sentence''.
+
+When considering more than a word within a context, we can also look
+at the text \emph{distance} between them or the identities of the
+words that appear between them.
+
+Sentences in natural language have structures beyond the linear order
+of their words. The structure is not directly observable and are
+referred to as \emph{sintax}. While it is not observable it can be
+inferred from the sentence. Specialized systems exist for the
+prediction of parts of speech, syntactic trees, semantic roles,
+discourse relations, and other linguistic properties. These prediction
+often serve as good features for classification problems.
+
+Different features can also be combined together. Instead of combining
+them manually, we can provide a set of core features to an \ac{ann}
+model and rely on the training procedure to pick up important
+combinations of them.
+Core features can also be learned by \ac{ann}, but enough data is
+needed. The distributional hypothesis of language states that the
+meaning of a word can be inferred from the contexts in which it is
+used. By observing co-occurrence patterns of words across a large body
+of text, it is possible to infer that a word is similar to another
+word. Many algorithms were derived to make use of this property. They
+can be categorized into clustering-based methods, with assign similar
+words to the same cluster and represent each word by its cluster
+membership \cite{miller2004name}, and embedding-based methods which
+represent each word as a 
+vector such that similar words (with similar distribution) have
+similar vectors \cite{pennington_glove:_2014,mikolov_linguistic_2013}.
 
 %%% Local Variables:
 %%% mode: latex
