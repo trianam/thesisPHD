@@ -22,8 +22,8 @@ large enough size of the dataset.
 
 As in \cref{ch:icdoFirst}, the dataset is highly unbalanced.
 
-\subsection{Recurrent Neural Networks}
-\label{sec:rnn}
+\subsection{Plain model}
+\label{sec:model}
 In our setting, a dataset $\mathcal{D}=\{(\vect{x}^{(i)},y^{(i)})\}$
 consists of variable length sequence vectors $\vect{x}^{(i)}$, where
 $x^{(i)}_t$, for $t=1,\dots,T^{(i)}$ is the $t$-th word in the $i$-th
@@ -33,25 +33,25 @@ superscript in the following to keep notation simple.  Sequences will
 be denoted in boldface. The RNN-based sequence classifiers used in
 this work compute their predictions $f(\vect{x})$ as follows:
 \begin{align}
-  e_t &=& E(\vect{x};\theta^e),\label{eq:embed}\\
+  e_t &=& E(x_t;\theta^e),\label{eq:embed}\\
   h^f_t &=& F(e_t,h^f_{t-1};\theta^f),\label{eq:maxModelRL}\\  
-  h^b_t &=& R(e_t,h^r_{t+1};\theta^r),\label{eq:maxModelRR}\\
+  h^r_t &=& R(e_t,h^r_{t+1};\theta^r),\label{eq:maxModelRR}\\
   u_t &=& G(h_t;\theta^h),\label{eq:maxModelF}\\
   \phi & =& A(\vect{h},\vect{u};\theta^a),\label{eq:aggregation}\\
   f(\vect{x}) &=& g(\phi;\theta^c).\label{eq:maxModelC}
 \end{align}
 $E$ is an embedding function mapping words into $p$-dimensional real
 vectors (where embedding parameters $\theta_e$ can be either
-pretrained and adjustable or fixed, see word vectors in \cref{sec:word-vectors}.
-Functions $F$ and $R$ corresponds to (forward and reverse)
+pretrained and adjustable or fixed, see Section~\ref{sec:word-vectors}
+below.  Functions $F$ and $R$ corresponds to (forward and reverse)
 dynamics that can be described in term of several (possibly layered)
 recurrent cells. In this work we focus on \ac{gru}
 cells~\cite{cho2014properties} for their simplicity and because
 preliminary experiments revealed no advantages over long-short term
 memory cells~\cite{hochreiter1997long} on our data. Each vector $h_t$,
-the concatenation of $h^l_t$ and $h^r_t$, can be interpreted as latent
+the concatenation of $h^f_t$ and $h^r_t$, can be interpreted as latent
 representations of the information contained at position $t$ in the
-document. $G$ is an additional layer mapping each latent vector into a
+document. $G$ is an additional \ac{mlp} mapping each latent vector into a
 vector $u_t$ that can be seen as contextualized representation of the
 word at position $t$. $A$ is an aggregation function that creates a
 single $d$-dimensional representation vector for the entire sequence
@@ -64,13 +64,24 @@ function include:
   bidirectional dynamics; note however that this approach may require
   long-term dependencies to be effectively learned.
 \item
-  $\phi = \sum_t a_t(\vect{u};\theta^a) h_t$,
+  % $\phi = \sum_t a_t(\vect{u};\theta^a) h_t$,
+  $\phi = \sum_t a_t(\vect{u};\theta^a) u_t$,
   using an attention mechanism as in~\cite{yang_hierarchical_2016}; in
   this case, (scalar) attention weights are computed as
-  $$
-  a_t(\vect{u};\theta^a) = \frac{e^{\langle \theta^a, u_t\rangle}}
-  {\sum_s{e^{\langle \theta^a, u_s\rangle}}}
-  $$
+  \begin{align*}
+    c_t&=&C(\vect{u};\theta^a),\\
+    a_t(\vect{u};\theta^a) &=& \frac{e^{\langle c, c_t\rangle}}
+    {\sum_i{e^{\langle c, c_i\rangle}}},\\
+  \end{align*}
+  %$$
+  %a_t(\vect{u};\theta^a) = \frac{e^{\langle \theta^a, u_t\rangle}}
+  %{\sum_s{e^{\langle \theta^a, u_s\rangle}}}
+  %$$
+  where $C$ is a single layer that map the representation $u_t$ of the
+  word to a hidden representation $c_t$, then the importance of the word is
+  measured as a similarity with a context vector $c$ that is learned
+  with the model and can be seen as an embedded representation of an
+  high level query as in memory networks \cite{sukhbaatar2015end}.
 \item $\phi = \max_t u_t$ where the maximum is taken element-wise
   along the sequence; this approach can be interpreted either as a
   simplified (parameter-less) attention mechanism or a bag-layer as
@@ -91,6 +102,45 @@ present) are determined by minimizing a loss function $\loss$
   \hat \theta = \mathrm{arg}\min_\theta\sum_{(\vect{x},y)\in\mathcal{D}}\loss\left(y,f(\vect{x})\right).
 \end{equation}
 
+% $e:\XSet\rightarrow\RSet^k$ is an embedding function that transforms
+% sequence elements in tensors $\vect{x}_{i,j}=e(x_{i,j})$ of
+% dimension $k$ that can be parsed by the
+% model. $g:\YSet\rightarrow[0,1]^q$ is an embedding function that
+% transforms sequences labels in one-hot encodings of a coherent
+% dimension $q$.
+\subsection{Hierarchical model}
+\label{sec:modelh}
+We compared the model of \cref{sec:model} with a hierarchical setting,
+similarly to other works \cite{yang_hierarchical_2016}. In this
+setting our dataset $\mathcal{D}=\{\vect{x}^{(i)},y^{(i)}\}$
+consists of variable length sequence of sequence vectors
+$\vect{x}^{(i)}$, where $x_{s,t}^{(i)}$, for $s=1,\dots,S^{(i)}$ and
+$t=1,\dots,T^{(i,s)}$ is the $t$-th word of the $s$-th sentence in the
+$i$-th document, and associated target classes
+$y^{(i)}\in\{1,\dots,K\}$. The prediction $f(\vect{x})$ is calculated:
+\begin{align}
+  e_{s,t} &=& E(x_{s,t};\theta^e),\label{eq:embedH}\\
+  h^f_{s,t} &=& F(e_{s,t},h^f_{s,t-1};\theta^{f}),\label{eq:maxModelRLH}\\  
+  h^r_{s,t} &=& R(e_{s,t},h^r_{s,t+1};\theta^{r}),\label{eq:maxModelRRH}\\
+  u_{s,t} &=& G(h_{s,t};\theta^{h}),\label{eq:maxModelFH}\\
+  \phi_s & =& A(\vect{h}_s,\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
+  w^f_{s} &=& F(\phi_{s},w^f_{s-1};\theta^{fs}),\label{eq:maxModelRLHS}\\  
+  w^r_{s} &=& R(\phi_{s},w^r_{s+1};\theta^{rs}),\label{eq:maxModelRRHS}\\
+  \psi & =& A(\vect{s},\vect{w};\theta^{a}),\label{eq:aggregationHS}\\
+  f(\vect{x}) &=& g(\psi;\theta^c).\label{eq:maxModelCH}
+\end{align}
+As in \cref{sec:model}, $E$ is an embedding function, $F$ and $R$
+corresponds to forward and reverse dynamics,
+$h_{s,t}=h_{s,t}^f\oplus h_{s,t}^r$ is the latent representation of
+the information contained at position $t$ of the $s$-th sentence,
+$u_{s,t}$ is the contextualized representation of the word at position
+$t$ of the $s$-th sentence, and $A$ is an aggregation function that
+creates a single representation for the entire sequence (of words in a
+sentence for \eqref{eq:aggregationH}, of sentences in a document for
+\eqref{eq:aggregationHS}). Furthermore, $w_s=w_s^f\oplus w_s^r$
+can be interpreted as the
+latent representation of the information contained in the sentence $s$
+for the document
 
 \section{Baseline}
 
@@ -138,7 +188,126 @@ probability). After the pre-training, the model is fine-tuned to the
 specific task.
 
 
-% \subsection{Hyperparameters}
+\subsection{Hyperparameters}
+The hyperparameters defined in \eqref{eq:embed}~-~\eqref{eq:maxModelC}
+and \eqref{eq:embedH}~-~\eqref{eq:maxModelCH} control the structure of
+the model. $\theta^e$ refers to \ac{glove}
+hyperparameters~\cite{pennington_glove:_2014}, we found with an
+intrinsic evaluation the better configuration was $60$ for the vector
+size, $15$ for the window size, and $50$ iterations. $\theta^f$,
+$\theta^r$, $\theta^{fs}$, and $\theta^{rs}$ set the number of
+\ac{gru} layers ($\theta_{(l)}$) and the number of unit per each layer
+($\theta_{(d)}$). 
+layer. $G$ is a \ac{mlp}, thus $\theta^h$ controls the number of
+layers and the dimension. To limit the
+hyperparameters space, we decided to
+make equal-dimension stacked layers in case of more than one,
+regarding $F$, $R$, and $G$. $\theta^a$ controls the
+kind of aggregating function of $A$, and in case of \emph{attention}
+it controls the dimension of the attention layer. Finally $\theta^c$ controls the
+data-dependent output dimension.
+
+In our experiments we defined five different settings that we named
+with acronyms. In \ac{max} we used the \emph{max} aggregation function
+in the plain model of \cref{sec:modelh}. We determined the
+hyperparameters evaluating the validation set in the space (with the
+better configuration underlined):
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1},2],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
+\end{align*}
+for the \emph{main site} task, and:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
+\end{align*}
+for the \emph{morphology} task.
+
+In \ac{softmax} we used the \emph{attention} aggregation function in the
+plain model. The hyperparameters
+space was:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,\underline{128},256],\\
+  \theta_{(l)}^h&\in&[0,\underline{1}],\\
+  \theta_{(d)}^h&\in&[256,\underline{512},1024],\\
+  \theta_{(d)}^a&\in&[128,\underline{256},512,1024],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,128,\underline{256}],\\
+  \theta_{(l)}^h&\in&[0,\underline{1}],\\
+  \theta_{(d)}^h&\in&[64,\underline{128},256],\\
+  \theta_{(d)}^a&\in&[128,\underline{256},512,1024],
+\end{align*}
+for the morphology.
+
+In \ac{maxh} we used the \emph{max} aggregation in the hierarchical
+model of \cref{sec:modelh}. The hyperparameters space was:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
+  \theta_{(l)}^h&\in&[0,1,\underline{2},4],\\
+  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+\end{align*}
+for the site, and:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
+  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+\end{align*}
+for the morphology.
+
+In \ac{softmaxh} we used the \emph{attention} aggregation in the
+hierarchical model. The hyperparameters space was:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,64,\underline{128},256],\\
+  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \theta_{(d)}^a&\in&[64,\underline{128},256,512],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
+  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
+  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \theta_{(d)}^a&\in&[64,\underline{128},256,512],
+\end{align*}
+for the morphology.
+
+In \ac{maxi} we used the \emph{max} aggregation in the plain
+model. Also we set the model to be interpretable (see
+\cref{sec:interpretability}). The hyperparameters space was:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[1,\underline{2},4],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
+  \theta_{(d)}^h&\in&[2,4,8,16,32,64,128,256,512,1024,2048],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \theta_{(l)}^f=\theta_{(l)}^r&\in&[1,\underline{2},4],\\
+  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,128,\underline{256},512],\\
+  \theta_{(l)}^h&\in&[\underline{1}],\\
+  \theta_{(d)}^h&\in&[],
+\end{align*}
+for the morphology. Note that in this setting the dimension of the
+last layer of $G$ must be equal to the output dimension of the model
+(and the softmax is applied directly after the aggregation $A$,
+without any layer). Thus, $\theta_{(d)}^h$ refers only to the
+layers before the last one, if they exists.
+
+
+
+
 % The hyperparameters $\xi=\xi^l\cup\xi^r\cup\xi^h\cup\xi^c$ define the
 % structure of the model. Regarding $\xi^l=\xi^r$ they define the type
 % of \ac{rnn} that in our experiments can be \ac{lstm} or \ac{gru}, the
@@ -164,13 +333,14 @@ specific task.
 %   \vect{\hat y}_i = \max_j(\vect{h}_{i,j}).
 % \end{equation*}
 
+
 \section{Results}
 \subsection{Artificial dataset}\label{sec:experiments}
 Classic \ac{rnn} approaches exhibit some limits related to
 memory. We designed an artificial experiment in
 order to investigate how \ac{rnn} and \ac{max} address those
 problems. The dataset 
-$D=(\vect{X}\in [0,\dots,9]^{n\times m},\vect{y}\in [0,1]^n)$ is
+$\mathcal{D}=(\vect{X}\in [0,\dots,9]^{n\times m},\vect{y}\in [0,1]^n)$ is
 composed of $n$ sequences of length
 $m$ of digits $x_{i,j}\in[0,\dots,9]$. If the $i$-th sequence contains
 at least three consecutive digits
@@ -180,67 +350,57 @@ sample is positive and labeled with $y_i=1$, otherwise is negative and
 $y_i=0$.
 
 We realized a series
-$D^{(m)}=(\vect{X}^{(m)},\vect{y}^{(m)})$ of balanced
-datasets of increasing complexity. Each $D^{(m)}$ has $100\ 000$
+$\mathcal{D}^{(m)}=(\vect{X}^{(m)},\vect{y}^{(m)})$ of balanced
+datasets of increasing complexity. Each $\mathcal{D}^{(m)}$ has $100\ 000$
 samples with 
 sequence lengths of $m\in
 [100,200,300,400,500,600,700,800,900,1000]$. We trained two models on
 all the datasets: a plain \ac{gru} with hidden dimension $32$ and a
-\ac{max} with same hidden dimension $32$. 
+our model with max aggregation with same hidden dimension $32$. 
 
 \begin{figure}
   \centering
   \includegraphics[width=\floatwidth]{imgMax/accuracy-base.eps}
-  \caption{Accuracy of plain \ac{gru} on $D^{(m)}$ for different dimensions of $m$.}
+  \caption{Accuracy of plain \ac{gru} on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
   \label{fig:testAccBase}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\floatwidth]{imgMax/accuracy-max.eps}
-  \caption{Accuracy of \ac{max} on $D^{(m)}$ for different dimensions of $m$.}
+  \caption{Accuracy of our model with max aggregation on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
   \label{fig:testAccMax}
 \end{figure}
 
 In \cref{fig:testAccBase} and \cref{fig:testAccMax} we compare
-the learning curves of the base model with \ac{max}. The \ac{gru}
-model degrades rapidly respect \ac{max}, under the assumption of
+the learning curves of the base model with the ours. We can conclude
+that our model degrades less than the baseline under the assumption of
 having the same number of parameters.
 
 \subsection{Interpretability}
-\ac{max} is flexible enough to gain interpretability under certain
-assumptions. Setting in $\xi^c$ in \eqref{eq:maxModelC} the number of
-layers to 0 implies that 
-the dimension of the last layer in $\xi^h$ in \eqref{eq:maxModelF}
+\label{sec:interpretability}
+The model is flexible enough to gain interpretability under certain
+assumptions. If we remove the last layer in \eqref{eq:maxModelC},
+the dimension of last layer in \eqref{eq:maxModelF}
 needs to be equal to the
-output dimension. We hypothesize that in this setting, the values of
-$\vect{h}_{i,j}$ collect information on the importance of the area
-around $x_{i,j}$ for the purpose of classification task. This
+output dimension ($1$ for the artificial dataset, $68$ for the site
+task, and $203$ for the 
+morphology).
+We hypothesize that in this case, the values of
+$u_t$ (or the weighted values $a_t(\vect{u};\sigma^a)u_t$ if we use the
+attention as aggregator) collect information on the importance of the
+area 
+around $x_t$ for the purpose of classification task. This
 information can be
 used to interpret the model decision. To validate the
 hypothesis we performed the same experiment of \cref{sec:experiments}
-with an interpretable model with a comparable number of parameters. We
-set to 0 the number of layers in \eqref{eq:maxModelC} and to 1 with an
-output dimension of 1  in
-\eqref{eq:maxModelF}. 
+with an interpretable model with a comparable number of parameters.
 
 \begin{figure}
   \centering
   \includegraphics[width=\floatwidth]{imgMax/accuracy-int.eps}
-  \caption{Accuracy of interpretable \ac{max} on $D^{(m)}$ for different dimensions of $m$.}
+  \caption{Accuracy of interpretable model with max aggregation on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
   \label{fig:testAccInt}
-\end{figure}
-\begin{figure}
-  \centering
-  \includegraphics[width=\floatwidth]{imgMax/maxBaseDiff.eps}
-  \caption{Max reached accuracy of \ac{max} and \ac{gru} models on $D^{(m)}$ for different dimensions of $m$.}
-  \label{fig:testAccDiff}
-\end{figure}
-\begin{figure}
-  \centering
-  \includegraphics[width=\floatwidth]{img/plotSintex.eps}
-  \caption{.}
-  \label{fig:sintex}
 \end{figure}
 
 \begin{figure}
@@ -263,10 +423,19 @@ output dimension of 1  in
   \end{tabular}
   \caption{Visualization of outputs prior to the max pooling for some
     samples. Red boxes represent the prime numbers ground
-    truth, green highlighting represents the values of $h_{i,j}$ in
+    truth, green highlighting represents the values of $u_t$ in
     \eqref{eq:maxModelF}.}
   \label{fig:testAttention}
 \end{figure}
+
+The degradation of the base \ac{gru} model in fig. \ref{fig:testAccInt} is worst
+compared with the model with max aggregation in fig. \ref{fig:testAccMax},
+but is still better compared with the baseline in
+fig. \ref{fig:testAccBase}. Conversely the interpretable model gain
+some insights on the decisions. As visible in
+fig. \ref{fig:testAttention}, the model performs the classification
+task focusing on 
+the part of the sequences where the prime numbers are present.
 
 \begin{figure}
   \centering
@@ -282,19 +451,31 @@ output dimension of 1  in
   \end{tabular}
   \caption{Visualization of weighted features after softmax for some
     positive samples. Red boxes represent the prime numbers ground
-    truth, green highlighting represents the values of $h_{i,j}$ in
-    \eqref{eq:softModelF}.}
+    truth, green highlighting represents the values of
+    $a_t(\vect{u};\theta^a)u_t$ in
+    \eqref{eq:aggregation}.}
   \label{fig:testAttentionSoft}
 \end{figure}
+We compared also the difference of the max vs attention aggregation. In
+\cref{fig:testAttentionSoft} we have empirical evidence that the
+attention aggregation is not sufficient to guarantee the model
+interpretability (for this artificial task). The softmax function do
+not avoid the learning of 
+distribute representations. The effects on the loss calculation of a
+distribution with high variance before the aggregation, are the 
+same of as a distribution with lower variance.
 
-The degradation of the model in fig. \ref{fig:testAccInt} is worst
-compared with the full \ac{max} model in fig. \ref{fig:testAccMax},
-but is still better compared with the baseline in
-fig. \ref{fig:testAccBase}. Conversely the interpretable model gain
-some insights on the decisions. As visible in
-fig. \ref{fig:testAttention}, the model performs the classification
-task focusing on 
-the part of the sequences where the prime numbers are present.
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{imgMax/maxBaseDiff.eps}
+  \caption{Max reached accuracy of model with max, attention, and base \ac{gru} on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
+  \label{fig:testAccDiff}
+\end{figure}
+In \cref{fig:testAccDiff} we show the maximum reached accuracy for the
+models, summarizing
+\cref{fig:testAccBase,fig:testAccMax,fig:testAccInt} and adding the
+model with the attention aggregator. The latter degrades faster than the
+one with the max aggregation.
 
 \subsection{Cancer register data}
 Machine learning models need a training dataset in order to learn how
@@ -315,15 +496,15 @@ $17\,034$, and $17\,035$ records.
 We used the text in the $1.5$ millions unlabeled records, plus the
 text in training datasets to train \ac{glove} word
 vectors representations. We trained two different \ac{max} models, one
-in an interpretable configuration that we call \maxi{} and one not
+in an interpretable configuration that we call \ac{maxi} and one not
 interpretable with 
-best configuration that we call \maxb{}. We found the hyperparameters
+best configuration that we call \ac{max}. We found the hyperparameters
 configuration with grid search. 
-\maxi{} have one \ac{gru} layer of dimension $256$
+\ac{maxi} have one \ac{gru} layer of dimension $256$
 for \eqref{eq:maxModelRL} and \eqref{eq:maxModelRR}, 1 layer of
 output dimension $68$ with aggregating function \eqref{eq:aggregation}
 for \eqref{eq:maxModelF}, and zero layers for \eqref{eq:maxModelC}. 
-\maxb{} have
+\ac{max} have
 one \ac{gru} layer with
 dimension $128$ for \eqref{eq:maxModelRL} and \eqref{eq:maxModelRR},
 one \ac{mlp} layer of dimension $512$ with aggregating function
@@ -336,7 +517,7 @@ experiments were performed in \emph{PyTorch} on machines with
 \emph{GeForce RTX 2080 Ti} 
 GPU using batches of $32$ samples.
 
-We compared \maxb{} and \maxi{} with a baseline of two stacked
+We compared \ac{max} and \ac{maxi} with a baseline of two stacked
 bidirectional 
 \ac{gru} layer of dimension $256$ and with \ac{bert} pretrained on the
 same data where \ac{glove} where trained for the other models, and
@@ -346,25 +527,29 @@ fine-tuned on the training set.
   \centering
   \caption{Results on cancer data}
   \label{tab:results}
-  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \begin{tabular}{|c|c|c|c|c|c|}
     \hline
-    &baseline&\ac{bert}&\maxi{}&\softmax{}&\maxb{}\\
+    &Acc.&Acc. T3&Acc. T5&MAP&K\\
     \hline
     \hline
     \textbf{Site}&&&&&\\
-    Acc.&0.8977&0.8980&0.8792&0.9008&\textbf{0.9024}\\
-    Acc. top3&0.9636&0.9623&0.9533&0.9607&\textbf{0.9658}\\
-    Acc. top5&0.9764&0.9768&0.9610&0.9749&\textbf{0.9797}\\
-    MAP &0.9331&0.9330&0.9190&0.9341&\textbf{0.9369}\\
-    K&0.8848&0.8852&0.8637&0.8883&\textbf{0.8901}\\
+    base&0.8977&0.9636&0.9764&0.9331&0.8848\\
+    \acs{bert}&0.8980&0.9623&0.9768&0.9330&0.8852\\
+    \acs{maxi}&0.8792&0.9533&0.9610&0.9190&0.8637\\
+    \acs{maxh}&0.8980&0.9611&0.9773&0.9329&0.8851\\
+    \acs{softmaxh}&0.8983&0.9617&0.9760&0.9329&0.8855\\
+    \acs{softmax}&0.9008&0.9607&0.9749&0.9341&0.8883\\
+    \acs{max}&\textbf{0.9024}&\textbf{0.9658}&\textbf{0.9797}&\textbf{0.9369}&\textbf{0.8901}\\
     \hline
     \hline
     \textbf{Morpho.}&&&&&\\
-    Acc.&0.8266&0.8367&0.7317&\textbf{0.8424}&0.8394 \\
-    Acc. top3&0.9402&0.9267&0.9012&0.9445&\textbf{0.9452} \\
-    Acc. top5&0.9602&0.9439&0.9305&0.9632&\textbf{0.9634} \\
-    MAP&0.8881&0.8870&0.8169&\textbf{0.8973}&0.8962 \\
-    K&0.8064&0.8178&0.6964&\textbf{0.8240}&0.8207 \\
+    base&0.8266&0.9402&0.9602&0.8881&0.8064\\
+    \acs{bert}&0.8367&0.9267&0.9439&0.8870&0.8178\\
+    \acs{maxi}&0.7317&0.9012&0.9305&0.8169&0.6964\\
+    \acs{maxh}&0.8313&0.9382&0.9582&0.8894&0.8117\\
+    \acs{softmaxh}&&&&&\\
+    \acs{softmax}&\textbf{0.8424}&0.9445&0.9632&\textbf{0.8973}&\textbf{0.8240}\\
+    \acs{max}&0.8394&\textbf{0.9452}&\textbf{0.9634}&0.8962&0.8207\\
     \hline
   \end{tabular}
 \end{table}
@@ -400,7 +585,7 @@ mitigate the bias caused by the unbalanced data set.
     \hline
   \end{tabular}
 \end{table}
-The interpretable model is not powerful as \maxb{}, and in this task
+The interpretable model is not powerful as \ac{max}, and in this task
 is not even as the baseline, but it can be used as a
 classification support and to 
 gain insight in the classification process. In
@@ -438,7 +623,7 @@ For this sample, the model propose the three classification codes \emph{18},
 \emph{intestinal tubular adenoma} and \emph{pedunculated polypus} are
 related to colon, \emph{polypus} can be related also to rectum, and
 \emph{anal orifice} is related to rectum and anus. Note that this
-record was labeled with the code for rectum, while in the text it
+record was labeled with the code for rectum, while the medical report
 explicitly mention that the fragments have been extracted at 20 cm
 from the anal orifice (the human rectum is long approximately 12 cm
 and the anal canal 3-5 cm \cite{greene2006ajcc}).
@@ -477,6 +662,21 @@ It is interesting to note also that \emph{pleuric} is
 suggested to be related to ovary cancer, in fact the pleural cavity
 constitutes the most frequently extra abdominal metastatic site in
 ovarian carcinoma \cite{porcel2012pleural}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{img/plotSintex.eps}
+  \caption{.}
+  \label{fig:sintex}
+\end{figure}
+To quantify the effectiveness of the interpretability, we designed an
+experiment where the dataset is created taking for each document the
+first $k$ words selected by  
+ordering the results of the aggregator, $u_t$ in case of max,
+$a_t(\vect{u};\theta^a)u_t$ in case of attention. In \cref{fig:sintex}
+we plot the accuracy obtained training a plain \ac{gru} model on the
+cleaned datasets, increasing $k$. 
+
 
 
 %%% Local Variables:

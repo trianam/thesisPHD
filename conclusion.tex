@@ -1,0 +1,62 @@
+\section{Conclusions}
+Since the cancer registration process is partially based on manual
+revision, including also the interpretation of the free text in
+pathological reports, significant delays in data production and
+publication may occur. This weakens data relevance for the purpose of
+assessing compliance with updated regional recommended integrated case
+pathways, as well as for public health purposes. Improving automated
+methods to generate a list of putative incident cases and to
+automatically estimate process indicators is thus an opportunity to
+perform an up-to-date evaluation of cancer-care quality. In
+particular, machine learning techniques like the ones presented in
+this paper could overcome the delay in cancer case definition by the
+cancer registry and allow a powerful tool for timely indicators
+computation. The implementation of this procedure could guarantee an
+automated and validated instrument to monitor and evaluate diagnostic
+and therapeutic pathways.
+
+We analyzed the available data and created different models in order
+to implement an automated classification system. We obtained very
+encouraging results in classifying cancer cases based on the
+interpretation of free text in the data-flow of pathology
+reports. This suggests that machine learning methods can be usefully
+leveraged in this context.  We have also shown that unlabeled data can
+be effectively used to construct useful word vectors and improve
+classification accuracy. 
+
+We also took advantage from the unlabeled data in order to improve
+the classification. Ours models have also the added value that can be
+utilized to retrieve records adjusting the precision-recall trade-off.
+
+The use of administrative data sources that are up to date combined
+with powerful machine learning techniques to automate text
+classification is in the interest of the development of a standardized
+surveillance system at Regional and National level. Stakeholders and
+decision makers need timely and updated indicators to evaluate and
+plan healthcare activities. The availability of timely indicators,
+routinely and automatically produced, is technically possible. The
+main novelty of this work is to show the power of machine learning
+techniques applied to the classification of free text pathological
+records. This was not yet been systematically implemented in other
+Italian cancer registries. This provides a useful monitor tool for
+cancer patients pathways, allowing to describe population’s general
+health state and to establish public health goals.
+
+The results of the interpretable models can be used to
+assist the human classification process on simple records. It can be
+used as
+a form of text compression, highlighting the most important terms. On
+more complex records it can be used to leverage the knowledge of the
+model to gain insight on the decision process. To overcome the
+limitations of the interpretable
+model respect to the general model, in terms of
+classification metrics, is it possible to combine the two variants. The
+general model can be used to give a more
+authoritative classification on the samples while at the same time,
+the interpretable model can highlight the same samples.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "thesis"
+%%% End:
