@@ -99,8 +99,9 @@ The parameters $\theta^f,\theta^r,\theta^h$ and $\theta^a$ (if
 present) are determined by minimizing a loss function $\loss$
 (categorical cross-entropy in our case) on training data:
 \begin{equation}
-  \hat \theta = \mathrm{arg}\min_\theta\sum_{(\vect{x},y)\in\mathcal{D}}\loss\left(y,f(\vect{x})\right).
+  \hat \theta = \mathrm{arg}\min_\theta\sum_{(\vect{x},y)\in\mathcal{D}}\loss\left(y,f(\vect{x})\right),
 \end{equation}
+where $\theta=\theta^f\cup\theta^r\cup\theta^h\cup\theta^a$.
 
 % $e:\XSet\rightarrow\RSet^k$ is an embedding function that transforms
 % sequence elements in tensors $\vect{x}_{i,j}=e(x_{i,j})$ of
@@ -124,106 +125,69 @@ $y^{(i)}\in\{1,\dots,K\}$. The prediction $f(\vect{x})$ is calculated:
   h^r_{s,t} &=& R(e_{s,t},h^r_{s,t+1};\theta^{r}),\label{eq:maxModelRRH}\\
   u_{s,t} &=& G(h_{s,t};\theta^{h}),\label{eq:maxModelFH}\\
   \phi_s & =& A(\vect{h}_s,\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
-  w^f_{s} &=& F(\phi_{s},w^f_{s-1};\theta^{fs}),\label{eq:maxModelRLHS}\\  
-  w^r_{s} &=& R(\phi_{s},w^r_{s+1};\theta^{rs}),\label{eq:maxModelRRHS}\\
-  \psi & =& A(\vect{s},\vect{w};\theta^{a}),\label{eq:aggregationHS}\\
-  f(\vect{x}) &=& g(\psi;\theta^c).\label{eq:maxModelCH}
+  h'^{f}_{s} &=& F'(\phi_{s},h'^{f}_{s-1};\theta'^{f}),\label{eq:maxModelRLHS}\\  
+  h'^{r}_{s} &=& R'(\phi_{s},h'^{r}_{s+1};\theta'^{r}),\label{eq:maxModelRRHS}\\
+  \phi' & =& A'(\vect{s},\vect{h}';\theta'^{a}),\label{eq:aggregationHS}\\
+  f(\vect{x}) &=& g(\phi';\theta^c).\label{eq:maxModelCH}
 \end{align}
 As in \cref{sec:model}, $E$ is an embedding function, $F$ and $R$
-corresponds to forward and reverse dynamics,
+corresponds to forward and reverse dynamics that process word
+representations,
 $h_{s,t}=h_{s,t}^f\oplus h_{s,t}^r$ is the latent representation of
 the information contained at position $t$ of the $s$-th sentence,
 $u_{s,t}$ is the contextualized representation of the word at position
 $t$ of the $s$-th sentence, and $A$ is an aggregation function that
-creates a single representation for the entire sequence (of words in a
-sentence for \eqref{eq:aggregationH}, of sentences in a document for
-\eqref{eq:aggregationHS}). Furthermore, $w_s=w_s^f\oplus w_s^r$
+creates a single representation for the sentence. Furthermore $F'$ and
+$R'$ corresponds to 
+forward and reverse dynamics that process sentence representations,
+and $A'$ is the aggregation function that creates a single
+representation for the entire document. $h'_s=h'^f_s\oplus h'^r_s$
 can be interpreted as the
 latent representation of the information contained in the sentence $s$
 for the document
 
-\section{Baseline}
-
-\subsubsection{Linear classifiers}
-The classic approach is to employ bag-of-words
-representations of textual documents.
-%In this approach, a document is 
-%described by a \textit{set} or a \textit{multiset} of words.
-%Multisets allow one to take into account the number of occurrences of
-%a word in the document.
-Vector representations of documents are easily
-derived from bags-of-words either by using indicator vectors or taking
-into account the number of occurrences of each word using the
-\ac{tfidf}\cite{manning_introduction_2008}. In those representations,
-frequent and non-specific terms receive a lower weight.
-
-Bag-of-words representations (including those employing bigrams or
-trigrams) enable the application of very simple text classifiers such
-as \ac{nb} or \ac{svm} \cite{cortes-support-1995}, but they
-suffer two fundamental problems. First, the relative order of terms in
-the documents is lost, making it impossible to take advantage of the
-syntactic structure of the sentences. Second, distinct words have an
-orthogonal representation even when they are semantically
-close. As detailed in the next section, word vectors can be used to
-address the second limitation and also allow us to take advantage of
-unlabeled data, which can be typically be obtained in large amounts
-and with little cost.
-
-\subsubsection{\acs{bert}}
-\ac{bert} \cite{devlin2018bert} is a recent model that represents the
-state of the art in many \ac{nlp} related tasks
-\cite{chatterjee2019semeval,hu2019introductory,lee2019biobert,tshitoyan2019unsupervised}.
-It is a
-bi-directional pre-training model backboned by the Transformer Encoder
-\cite{vaswani2017attention}. It is an attention-based technique that
-learns context-dependent word representation on large unlabeled
-corpora, and then the model is fine tuned end to end on specific labeled
-tasks. During pre-training, the model is trained
-on unlabeled data over two different tasks. In \ac{mlm} some tokens
-are masked and the model is trained to predict those token based on
-the context. In \ac{nsp} the model is trained to understand the
-relationship between sentences predicting if two sentences are actually
-consecutive or if they where randomly replaced (with 50\%
-probability). After the pre-training, the model is fine-tuned to the
-specific task.
-
-
 \subsection{Hyperparameters}
-The hyperparameters defined in \eqref{eq:embed}~-~\eqref{eq:maxModelC}
+The hyperparameters of \eqref{eq:embed}~-~\eqref{eq:maxModelC}
 and \eqref{eq:embedH}~-~\eqref{eq:maxModelCH} control the structure of
-the model. $\theta^e$ refers to \ac{glove}
+the model.
+
+$\xi^e$ is associated with the embedding layer $E$ and in our case
+refers to \ac{glove} 
 hyperparameters~\cite{pennington_glove:_2014}, we found with an
-intrinsic evaluation the better configuration was $60$ for the vector
-size, $15$ for the window size, and $50$ iterations. $\theta^f$,
-$\theta^r$, $\theta^{fs}$, and $\theta^{rs}$ set the number of
-\ac{gru} layers ($\theta_{(l)}$) and the number of unit per each layer
-($\theta_{(d)}$). 
-layer. $G$ is a \ac{mlp}, thus $\theta^h$ controls the number of
-layers and the dimension. To limit the
+intrinsic evaluation that the better configuration was $60$ for the vector
+size, $15$ for the window size, and $50$ iterations. $\xi^f$,
+$\xi^r$, $\xi'^{f}$, and $\xi'^{r}$ define the number of
+\ac{gru} layers ($\xi_{(l)}$) and the number of unit per each layer
+($\xi_{(d)}$) respectively for $F$, $R$, $F'$, $R'$. 
+$G$ is a \ac{mlp}, $\xi^h$ controls the number of
+layers and their dimension. To limit the
 hyperparameters space, we decided to
 make equal-dimension stacked layers in case of more than one,
-regarding $F$, $R$, and $G$. $\theta^a$ controls the
-kind of aggregating function of $A$, and in case of \emph{attention}
-it controls the dimension of the attention layer. Finally $\theta^c$ controls the
-data-dependent output dimension.
+regarding $F$, $R$, and $G$. $\xi^a$ and $\xi'^a$ controls the
+kind of aggregating function of $A$ and $A'$ respectively, and in case
+of \emph{attention} 
+it controls the dimension of the attention layer. Finally $\xi^c$ controls the
+data-dependent output dimension of $g$.
 
 In our experiments we defined five different settings that we named
-with acronyms. In \ac{max} we used the \emph{max} aggregation function
+with acronyms. For each one of them we explored a portion of the
+hyperparameters space. In \ac{max} we used the \emph{max} aggregation
+function 
 in the plain model of \cref{sec:modelh}. We determined the
 hyperparameters evaluating the validation set in the space (with the
 better configuration underlined):
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1},2],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1},2],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
 \end{align*}
 for the \emph{main site} task, and:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
 \end{align*}
 for the \emph{morphology} task.
 
@@ -231,55 +195,55 @@ In \ac{softmax} we used the \emph{attention} aggregation function in the
 plain model. The hyperparameters
 space was:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,\underline{128},256],\\
-  \theta_{(l)}^h&\in&[0,\underline{1}],\\
-  \theta_{(d)}^h&\in&[256,\underline{512},1024],\\
-  \theta_{(d)}^a&\in&[128,\underline{256},512,1024],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,\underline{128},256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1}],\\
+  \xi_{(d)}^h&\in&[256,\underline{512},1024],\\
+  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,128,\underline{256}],\\
-  \theta_{(l)}^h&\in&[0,\underline{1}],\\
-  \theta_{(d)}^h&\in&[64,\underline{128},256],\\
-  \theta_{(d)}^a&\in&[128,\underline{256},512,1024],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256}],\\
+  \xi_{(l)}^h&\in&[0,\underline{1}],\\
+  \xi_{(d)}^h&\in&[64,\underline{128},256],\\
+  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
 \end{align*}
 for the morphology.
 
 In \ac{maxh} we used the \emph{max} aggregation in the hierarchical
 model of \cref{sec:modelh}. The hyperparameters space was:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
-  \theta_{(l)}^h&\in&[0,1,\underline{2},4],\\
-  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,1,\underline{2},4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
 \end{align*}
 for the site, and:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
-  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
 \end{align*}
 for the morphology.
 
 In \ac{softmaxh} we used the \emph{attention} aggregation in the
 hierarchical model. The hyperparameters space was:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,64,\underline{128},256],\\
-  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
-  \theta_{(d)}^a&\in&[64,\underline{128},256,512],
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,64,\underline{128},256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r=\theta_{(l)}^{fs}=\theta_{(l)}^{rs}&\in&[\underline{1}],\\
-  \theta_{(d)}^f=\theta_{(d)}^r=\theta_{(d)}^{fs}=\theta_{(d)}^{rs}&\in&[32,\underline{64},128,256],\\
-  \theta_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
-  \theta_{(d)}^a&\in&[64,\underline{128},256,512],
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
 \end{align*}
 for the morphology.
 
@@ -287,22 +251,22 @@ In \ac{maxi} we used the \emph{max} aggregation in the plain
 model. Also we set the model to be interpretable (see
 \cref{sec:interpretability}). The hyperparameters space was:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[1,\underline{2},4],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \theta_{(l)}^h&\in&[\underline{1},2,4],\\
-  \theta_{(d)}^h&\in&[2,4,8,16,32,64,128,256,512,1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,512,1024,2048],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \theta_{(l)}^f=\theta_{(l)}^r&\in&[1,\underline{2},4],\\
-  \theta_{(d)}^f=\theta_{(d)}^r&\in&[64,128,\underline{256},512],\\
-  \theta_{(l)}^h&\in&[\underline{1}],\\
-  \theta_{(d)}^h&\in&[],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256},512],\\
+  \xi_{(l)}^h&\in&[\underline{1}],\\
+  \xi_{(d)}^h&\in&[],
 \end{align*}
 for the morphology. Note that in this setting the dimension of the
 last layer of $G$ must be equal to the output dimension of the model
 (and the softmax is applied directly after the aggregation $A$,
-without any layer). Thus, $\theta_{(d)}^h$ refers only to the
+without any layer). Thus, $\xi_{(d)}^h$ refers only to the
 layers before the last one, if they exists.
 
 
@@ -353,8 +317,10 @@ We realized a series
 $\mathcal{D}^{(m)}=(\vect{X}^{(m)},\vect{y}^{(m)})$ of balanced
 datasets of increasing complexity. Each $\mathcal{D}^{(m)}$ has $100\ 000$
 samples with 
-sequence lengths of $m\in
-[100,200,300,400,500,600,700,800,900,1000]$. We trained two models on
+sequence lengths of
+$$
+m\in[100,200,300,400,500,600,700,800,900,1000].$$
+We trained two models on
 all the datasets: a plain \ac{gru} with hidden dimension $32$ and a
 our model with max aggregation with same hidden dimension $32$. 
 
@@ -547,7 +513,7 @@ fine-tuned on the training set.
     \acs{bert}&0.8367&0.9267&0.9439&0.8870&0.8178\\
     \acs{maxi}&0.7317&0.9012&0.9305&0.8169&0.6964\\
     \acs{maxh}&0.8313&0.9382&0.9582&0.8894&0.8117\\
-    \acs{softmaxh}&&&&&\\
+    \acs{softmaxh}&0.8318&0.9388&0.9566&0.8894&0.8119\\
     \acs{softmax}&\textbf{0.8424}&0.9445&0.9632&\textbf{0.8973}&\textbf{0.8240}\\
     \acs{max}&0.8394&\textbf{0.9452}&\textbf{0.9634}&0.8962&0.8207\\
     \hline
@@ -677,6 +643,58 @@ $a_t(\vect{u};\theta^a)u_t$ in case of attention. In \cref{fig:sintex}
 we plot the accuracy obtained training a plain \ac{gru} model on the
 cleaned datasets, increasing $k$. 
 
+\section{Conclusions}
+Since the cancer registration process is partially based on manual
+revision, including also the interpretation of the free text in
+pathological reports, significant delays in data production and
+publication may occur. This weakens data relevance for the purpose of
+assessing compliance with updated regional recommended integrated case
+pathways, as well as for public health purposes. Improving automated
+methods to generate a list of putative incident cases and to
+automatically estimate process indicators is thus an opportunity to
+perform an up-to-date evaluation of cancer-care quality. In
+particular, machine learning techniques like the ones presented in
+this paper could overcome the delay in cancer case definition by the
+cancer registry and allow a powerful tool for timely indicators
+computation. The implementation of this procedure could guarantee an
+automated and validated instrument to monitor and evaluate diagnostic
+and therapeutic pathways.
+
+We analyzed the available data and created different models in order
+to implement an automated classification system. We obtained very
+encouraging results in classifying cancer cases based on the
+interpretation of free text in the data-flow of pathology
+reports. This suggests that machine learning methods can be usefully
+leveraged in this context.  We have also shown that unlabeled data can
+be effectively used to construct useful word vectors and improve
+classification accuracy. 
+
+The use of administrative data sources that are up to date combined
+with powerful machine learning techniques to automate text
+classification is in the interest of the development of a standardized
+surveillance system at Regional and National level. Stakeholders and
+decision makers need timely and updated indicators to evaluate and
+plan healthcare activities. The availability of timely indicators,
+routinely and automatically produced, is technically possible. The
+main novelty of this work is to show the power of machine learning
+techniques applied to the classification of free text pathological
+records. This was not yet been systematically implemented in other
+Italian cancer registries. This provides a useful monitor tool for
+cancer patients pathways, allowing to describe population’s general
+health state and to establish public health goals.
+
+The results of the interpretable \ac{max} model can be used to
+assist the human classification process on simple records. It can be
+used as
+a form of text compression, highlighting the most important terms. On
+more complex records it can be used to leverage the knowledge of the
+model to gain insight on the decision process. To overcome the
+limitations of the interpretable
+model respect to the general \ac{max} model, in terms of
+classification metrics, is possible to combine the two variants. The
+general model can be used to give a more
+authoritative classification on the samples while at the same time,
+the interpretable model can highlight the same samples.
 
 
 %%% Local Variables:

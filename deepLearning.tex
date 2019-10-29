@@ -1,0 +1,956 @@
+\chapter{Deep learning}
+\section{Machine Learning Theory}
+\ac{ml} is a branch of \ac{ai}
+where the focus is to develop systems that learn from the
+data. Machine Learning is a field that is located in the intersection
+of different disciplines:
+\begin{description}
+\item[statistics] deal with the uncertainty of the world and, as we
+  will see, ML can be framed as a probability estimation;
+\item[data science] is the science that interpretes and study the
+  information contained in the data and how can be used;
+\item[optimization theory] is the mathematical branch that define
+  methods to optimize functions, ML can be seen as an optimization
+  problem;
+\item[computer science] is the science that studies algorithms and
+  their complexity;
+\item[computer engineering] focuses in the development of efficient
+  software.
+\end{description}
+
+In order to learn we must provide some data. The data can be of
+different kinds. We can denote three different types of \ac{ml}, based
+on the type of data and problem that we need to resolve: supervised,
+unsupervised, and reinforcement learning.
+
+\subsection{Supervised Learning}\label{sec:supervisedTheory}
+In supervised learning we posses a dataset $S$ of samples $\vect{x}_i$
+each one labeled with $\vect{y}_i$:
+\begin{equation*}
+  S=\left((\vect{x}_1,\vect{y}_1),\dots,(\vect{x}_n,\vect{y}_n)\right),
+\end{equation*}
+where each $\vect{x}_i\in\XSet$ and $\vect{y}_i\in\YSet$. Usually the
+data is prepared such that $\XSet$ is a space of integer or real
+tensors of certain dimensionality, and $\YSet$ is a space of integer
+vectors for classification tasks and real vectors for regression
+tasks. In binary classification tasks $\YSet={0,1}$, in multilabel
+classification $\YSet={0,1}^k$ with $k$ possible labels, and in
+multiclass classification $\YSet={0,1}^k$ with only one value equal to
+$1$ and the rest $0$. The samples $\vect{x}_i$ of a dataset must be
+drawn from the same unknown distribution $\vect{x}_i\sim\dist{D}$. The
+relationship between the samples and the labels is defined by an unknown
+labeling function $f:\XSet\rightarrow\YSet$ such that for each sample
+$\vect{y}_i=f(\vect{x}_i)$.
+
+A learning algorithm receives as input a training set $S$, and should
+output a predictor $h_S:\XSet\rightarrow\YSet$ that minimize the
+\emph{prediction error}. For a generic predictor $h$, the prediction
+error is:
+\begin{equation}\label{predictionError}
+  L_{\dist{D},f}(h)\define\prob_{\vect{x}\sim\dist{D}}[h(\vect{x})\neq
+  f(\vect{x})]\define\dist{D}(\{\vect{x}:h(\vect{x})\neq
+  f(\vect{x})\}),
+\end{equation}
+where for $A\subset\XSet$, the probability $\dist{D}$ assign a
+likelihood $\dist{D}(A)$ of observing a value $\vect{x}\in A$. Given
+that both $\dist{D}$ and $f$ are unknown, to find $h_S$ the learning
+algorithm minimizes the \emph{empirical prediction error} (or
+empirical risk):
+\begin{equation}\label{empiricalError}
+  L_S(h)\define\frac{|i\in\{1,\dots,n\}:h(\vect{x}_i)\neq\vect{y}_i|}{n}.
+\end{equation}
+This learning paradigm of finding $h_S$ is called \ac{erm}.
+
+\ac{erm} rule might lead to \emph{overfitting} if not restricted. A predictor
+can performs well over the training set $S$ --- having a low empirical
+error --- but it can performs badly over the entire distribution
+$\dist{D}$ with an high prediction error. A solution is to apply
+\ac{erm} over a restricted search space. We denote with $\HSet$ the
+\emph{hypothesis class} of the possible predictors
+$h\in{HSet}:\XSet\rightarrow\YSet$. For a given class $\HSet$ and a
+training sample $S$, the $ERM_\HSet$ learner uses the \ac{erm} rule to
+choose a predictor $h_S\in\HSet$ with the lowest possible empirical
+error over $S$:
+\begin{equation*}
+  h_S=ERM_\HSet(S)\in \argmin_{h\in\HSet} L_S(h).
+\end{equation*}
+
+We induce an \emph{inductive bias} introducing restrictions over
+$\HSet$. Intuitively, choosing a more restricted hypothesis class
+better protect us against overfitting but at the same time might cause
+a stronger bias.
+
+\subsubsection{Finite hypothesis classes}
+The simplest kind of restriction on $\HSet$ is
+imposing an upper bound on its dimension. We make the two following
+assumptions: 
+\begin{definition}\label{realizability}
+  (Realizability assumption). $\exists h^*\in\HSet : L_{(\dist{D},f)}(h^*)=0$.
+\end{definition}
+\begin{definition}
+  (\ac{iid} examples). $S\sim\dist{D}^m$, with $m=|S|$ and $\dist{D}^m$ the
+  probability over $m$-tuples induced by applying $\dist{D}$ to pick
+  each element of the tuple independently from the others elements of
+  the same tuple.
+\end{definition}
+
+$L_{(\dist{D},f)}(h_S)$ depends on the choice of $S$, that is a
+random variable. To address the probability to sample $S$ such that
+the prediction error is not too large, we denote with $\delta$ the
+probability of getting a nonrepresentative sample, and $(1-\delta)$
+the \emph{confidence parameter} of the prediction. Furthermore we
+introduce the \emph{accuracy parameter} $\varepsilon$ of the quality
+of the prediction. $L_{(\dist{D},f)}(h_S)>\varepsilon$ represents
+a failure of the learner.
+We are interested in upper bounding the probability to sample
+$m$-tuple that lead to the learner failure. If $S|_x=(\vect{x}_1,\dots,\vect{x}_m)$
+are instances of the training set, we want to upper bound
+\begin{equation*}
+  \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}).
+\end{equation*}
+It is possible to prove that for a finite hypothesis class $\HSet$:
+\begin{equation*}
+  \dist{D}^m(\{S|_x:L_{(\dist{D},f)}(h_S)>\varepsilon\}) \leq
+  |\HSet|e^{-\varepsilon m},
+\end{equation*}
+and for $m$ an integer that satisfies
+\begin{equation*}
+  m\geq\frac{\log(|\HSet|/\delta)}{\varepsilon},
+\end{equation*}
+then for any $f$ and $\dist{D}$, with probability at least $1-\sigma$,
+for every $h_S$ holds:
+\begin{equation*}
+  L_{(\dist{D},f)}(h_S)\leq\varepsilon.
+\end{equation*}
+This means that for sufficiently large $m$, the $ERM_\HSet$ rule over
+a finite hypothesis class will be probably (with confidence
+$1-\delta$) approximately (up to an error $\varepsilon$) correct.
+
+\subsubsection{\ac{pac} learning}
+\begin{definition}\label{pacLearnability}
+A hypothesis class $\HSet$ is \ac{pac} learnable if there exist a
+function $m_\HSet:(0,1)^2\rightarrow\NSet$ and a learning algorithm
+with the following property: for every $\varepsilon,\sigma\in(0,1)$,
+for every $\dist{D}$ and $f$, if \cref{realizability} holds, then when
+running the algorithm on $m\geq m_\HSet(\varepsilon,\sigma)$ \ac{iid}
+examples, it returns a hypothesis $h$ such that
+$L_{(\dist{D},f)}(h)\leq\varepsilon$, with probability of at least
+$1-\sigma$ over the choice of the examples.
+\end{definition}
+
+The function $m_\HSet$ determines the \emph{sample complexity} of
+learning $\HSet$, that is the number of samples to guarantee a
+\ac{pac} solution. The finite hypothesis class of
+is \ac{pac} learnable with sample complexity
+\begin{equation*}
+  m_\HSet(\varepsilon,\delta)\leq\left\lceil\frac{\log(|\HSet|/\delta}{\varepsilon}\right\rceil
+\end{equation*}
+
+\subsubsection{Agnostic \ac{pac} learning}
+To develop a more realistic model, we relax the \cref{realizability}
+and we substitute the notion of $\dist{D}$ over $\XSet$ and
+$f:\XSet\rightarrow\YSet$ with a single data generating
+distribution. From now, $\dist{D}$ is defined as a probability
+distribution over $\XSet\times\YSet$, and can be seen as being
+composed by a \emph{marginal distribution} $\dist{D}_x$ over $\XSet$
+and a \emph{conditional probability} $\dist{D}((\vect{x},\vect{y})|\vect{x})$ over label
+for each example. The true error \cref{predictionError} is redefined as:
+\begin{equation*}
+  L_{\dist{D},f}(h)\define\prob_{(\vect{x},\vect{y})\sim\dist{D}}[h(\vect{x})\neq
+  f(\vect{x})]\define\dist{D}(\{(\vect{x},\vect{y}):h(\vect{x})\neq
+  f(\vect{x})\}),  
+\end{equation*}
+while the empirical error \cref{empiricalError} remains the same.
+
+We introduce the concept of \emph{loss function} as a function
+$\loss:\HSet\times(\XSet\times\YSet)\rightarrow\RSet^+$, and the true
+and empirical risks are defined in term of $\loss$ as:
+\begin{align*}
+  L_\dist{D}(h)&\define\expect_{(\vect{x},\vect{y})\sim\dist{D}}[\loss(h,(\vect{x},\vect{y}))],\\
+  L_S(h)&\define\frac{1}{m}\sum_{i=2}^m\loss(h,(\vect{x}_i,\vect{y}_i))].
+\end{align*}
+Two common losses are:
+\paragraph{0-1 loss}
+\begin{equation*}
+  \loss_{0-1}(h,(\vect{x},\vect{y}))\define\begin{cases}
+    0\quad\mathrm{if}\ h(\vect{x}) = \vect{y},\\
+    1\quad\mathrm{if}\ h(\vect{x}) \neq \vect{y}.
+  \end{cases}
+\end{equation*}
+\paragraph{Square loss}
+\begin{equation*}
+  \loss_{sq}(h,(\vect{x},\vect{y}))\define(h(\vect{x})-\vect{y})^2.
+\end{equation*}
+
+Is it possible now to define the concept of agnostic \ac{pac}
+learnability.
+\begin{definition}\label{agnosticPacLearnability}
+A hypothesis class $\HSet$ is agnostic \ac{pac}
+learnable, respect $(\XSet\times\YSet)$ and $\loss$, if there exist a
+function $m_\HSet:(0,1)^2\rightarrow\NSet$ and a learning algorithm
+with the following property: for every $\varepsilon,\delta\in(0,1)$
+and for every $\dist{D}$, when running the algorithm on $m\geq
+m_\HSet(\varepsilon,\delta)$ \ac{iid} examples, it returns $h$ such
+that
+$L_\dist{D}(h)\leq\min_{h'\in\HSet}L_\dist{D}(h')+\varepsilon$. 
+\end{definition}
+
+Contrarily to \cref{pacLearnability}, \cref{agnosticPacLearnability}
+cannot guarantee an arbitrarily small error. It still guarantee that
+a learner can have success if its error is not too much larger than
+the one of the best achievable predictor for class $\HSet$.
+
+The \ac{erm} learning paradigm works by finding an hypothesis that
+minimize the empirical 
+risk. This means that an $h$ that minimizes the empirical risk needs
+to be a good true risk minimizer also. We need that uniformly over all
+hypothesis, the empirical risk needs to be close to the real risk. To
+asses this we introduce the concept of
+\emph{$\varepsilon$-representative sample}: 
+\begin{definition}
+  ($\varepsilon$-representative sample). A training set $S$ is called
+  $\varepsilon$-representative with regard to $\HSet$, $\loss$, and
+  $\dist{D}$, if
+  \begin{equation*}
+    \forall h\in\HSet,\quad |L_S(h)-L_\dist{D}(h)|\leq\varepsilon.
+  \end{equation*}
+\end{definition}
+It is possible to prove that if the sample is
+$\frac{\varepsilon}{2}$-representative, then the \ac{erm} learning
+rule is guaranteed to return a good hypothesis. Formally:
+\begin{lemma}\label{ermgood}
+  Assuming $S$ is $\frac{\varepsilon}{2}$-representative, then any
+  output $ERM_\HSet(S)=h_S\in\argmin_{h\in\HSet}L_S(h)$ satisfy:
+  \begin{equation*}
+    L_\dist{D}(h_S)\leq\min_{h\in\HSet}L_\dist{D}(h)+\varepsilon.
+  \end{equation*}
+\end{lemma}
+
+To ensure that the \ac{erm} rule is an agnostic \ac{pac} learner, it
+suffices to show that with probability of at least $1-\delta$ over the
+choice of $S$, it will be an $\varepsilon$-representative training
+set. Formally, given the property:
+\begin{definition}
+  (Uniform Convergence). $\HSet$ has the uniform convergence property
+  if there exists a function $m_\HSet^{UC}:(0,1)^2\rightarrow\NSet$
+  such that for every $\varepsilon,\delta\in(0,1)$ and for every
+  $\dist{D}$, if $S$ is a sample of $m\geq
+  m_\HSet^{UC}(\varepsilon,\delta)$ examples drawn \ac{iid} from
+  $\dist{D}$, then $S$ is $\varepsilon$-representative with
+  probability of at least $1-\delta$.
+\end{definition}
+We have the corollary of \cref{ermgood}:
+\begin{corollary}
+  If a class $\HSet$ has the uniform convergence property, then the
+  class is agnostically \ac{pac} learnable with sample complexity
+  $m_\HSet(\varepsilon,\delta)\leq
+  m_\HSet^{UC}(\varepsilon/2,\delta)$. In that case the $ERM_\HSet$
+  paradigm is a successful agnostic \ac{pac} learner for $\HSet$.
+\end{corollary}
+
+It is possible to prove (we skip the proof here) that the uniform convergence
+holds for a finite
+hypothesis class, and then that every finite hypothesis class is
+agnostic \ac{pac} learnable using \ac{erm} algorithm with sample
+complexity
+\begin{equation*}
+  m_\HSet(\varepsilon, \delta)\leq
+  m_\HSet^{UC}\left(\frac{\varepsilon}{2},\delta\right)\leq\left\lceil\frac{2\log\left(\frac{2|\HSet|}{\delta}\right)}{\varepsilon^2}\right\rceil.
+\end{equation*}
+
+\subsubsection{Bias-complexity trade-off}
+Choosing a hypothesis class $\HSet$ represents a prior
+knowledge related to the data distribution $\dist{D}$. One can argue
+if this prior knowledge is really necessary, or 
+if it is possible to have a learning algorithm $A$ and a size $m$ such
+that for every $\dist{D}$, if $A$ receives $m$ \ac{iid} samples from
+$\dist{D}$, it outputs a predictor $h$ that have a low risk with high
+chance. The \emph{no-free-lunch} theorem proves that having such a
+universal learner is impossible:
+
+One can avoid the limits imposed by the no-free-lunch theorem using
+the prior knowledge of the learning task to restrict the hypothesis
+class $\HSet$. To choose a good hypothesis class we need to set a
+large enough class such that it includes the hypothesis with no error
+(for \ac{pac} learnability), or at least that the smallest error
+achievable by a hypothesis from the class is small enough (for
+agnostic \ac{pac} learnability). On the other hand we cannot choose
+the richest class. We can decompose the error of an $ERM_\HSet$
+hypothesis $h_S$ into the component:
+\begin{equation*}
+  L_\dist{D}(h_S)=\varepsilon_{app}+\varepsilon_{est}.
+\end{equation*}
+where
+\begin{equation*}
+  \varepsilon_{app}=\min_{h\in\HSet}L_\dist{D}(h)
+\end{equation*}
+is the \emph{approximation error} that measures how much inductive
+bias we 
+introduce restricting $\HSet$ and do not depends on the sample size.
+\begin{equation*}
+  \varepsilon_{est}=L_\dist{D}(h_S)-\varepsilon_{app}
+\end{equation*}
+is the \emph{estimation error} that depends on the training set size
+and on the complexity of $\HSet$.
+
+To minimize the total risk, we face a \emph{bias-complexity
+  tradeoff}. Choosing $\HSet$ to be rich, decreases the approximation
+error, but increases the estimation error because it may lead to
+overfitting. Choosing a small $\HSet$ reduces the estimation error,
+but can increases the approximation error, in other words it might
+lead to \emph{underfitting}.
+
+\subsubsection{\ac{vcd}}
+The finitess of $\HSet$ is a sufficient condition for learnability,
+but it is not a necessary condition. A property called \ac{vcd} gives
+a correct characterization of learnability. Considering only binary
+classifiers where $\YSet=\{0,1\}$, to define \ac{vcd}, we
+must define before the concept of \emph{class restriction} and
+\emph{shattering}:
+\begin{definition}
+  (Restriction of $\HSet$ to $C$). $\HSet$ is a class of function
+  $h:\XSet\rightarrow\{0,1\}$, and
+    $C=\{c_1,\dots,c_m\}\subset\XSet$. The restriction of $\HSet$ to
+    $C$ is the set of function from $C$ to $\{0,1\}$ that can be
+    derived from $\HSet$:
+    \begin{equation*}
+      \HSet_C=\{(h(c_1),\dots,h(c_m)):h\in\HSet\},
+    \end{equation*}
+    where each function is represented as a vector in
+    $\{0,1\}^{|C|}$.
+\end{definition}
+\begin{definition}
+  (Shattering). A hypothesis class $\HSet$ shatters a finite set
+  $C\subset\XSet$, if $\HSet_C$ is the set of all functions from $C$
+  to $\{0,1\}$:
+  \begin{equation*}
+    |\HSet_C|=2^{|C|}.
+  \end{equation*}
+\end{definition}
+
+Relating to the free-lunch-theorem, whenever some set $C$ is shattered
+by $\HSet$, an adversary can 
+construct a distribution over $C$ based on any function from $C$ to
+$\{0,1\}$ maintaining the realizability assumption. Thus, for any
+learning algorithm $A$ there exist a distribution $\dist{D}$ and a
+predictor $h$
+(both constructed from an adversary) such that $L_D(h)=0$, but with a
+sufficiently high probability over the choice of $S$,
+$L_\dist{D}(A(S))\geq\varepsilon$. The \ac{vcd} is defined:
+\begin{definition}
+  (\ac{vcd}). The \ac{vcd} $VCdim(\HSet)$ of an hypothesis class
+  $\HSet$, is the maximal size of a set $C\subset\XSet$ that can be
+  shattered by $\HSet$. If $\HSet$ can shatter arbitrarily large sets,
+  then $VCdim(\HSet)=\infty$.
+\end{definition}
+
+If a certain hypothesis class $\HSet$ has infinite \ac{vcd}, then
+$\HSet$ is not \ac{pac} learnable. Conversely, a finite \ac{vcd}
+guarantees learnability. To prove that $VCdim(\HSet)=d$ finite, we
+need to show
+\begin{itemize}
+\item $\exists C$ such that $|C|=d$ and it is shattered by $\HSet$;
+\item $\forall C$ such that $|C|=d+1$, $C$ is not shattered by
+  $\HSet$. 
+\end{itemize}
+
+\subsubsection{\ac{srm}}
+Until now the prior knowledge was encoded specifying a hypothesis
+class $\HSet$ that is believed to include a good predictor for the
+learning task. Another way to express the prior knowledge is by
+specifying preferences over hypotheses within $\HSet$. The \ac{srm}
+implement this assuming $\HSet=\bigcup_{n\in\NSet}\HSet_n$ and
+defining a weight function $w:\NSet\rightarrow[0,1]$ that assign a
+preference for each class $\HSet_n$. The \ac{srm} rule follows a
+\emph{bound minimization} approach. The goal is to find a hypothesis
+that minimizes a certain upper bound on the true risk.
+
+\section{Neural Networks}
+In our work we used mainly a specific kind of \ac{rnn}: \ac{lstm}.
+\acp{rnn} are a class of \acp{ann} where the connections are not only
+sequential from one layer to the subsequent, but instead they form
+loops. 
+
+\subsection{\acf{ann}}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+    \node [] (input-1) at (0,0.5) {$x_1$};
+    \node [] (input-2) at (0,0) {$x_2$};
+    \node [] (input-3) at (0,-0.5) {$x_3$};
+    \node [] (input-missing) at (0,-0.9) {$\vdots$};
+    \node [] (input-n) at (0,-1.4) {$x_n$};
+
+    \node [every neuron] (neuron) at (2,-0.5) {$\Sigma$};
+    \node [bias] (bias) at (2,-1.3) {$b$};
+
+    \node [activation] (act) at (3,-0.5) {$f$};
+    \node [] (output) at (4,-0.5) {$y$};
+    
+    \foreach \i in {1,...,3,n}
+    \draw [arrow] (input-\i) -- (neuron)
+    node [above=-0.05, pos=0.3, sloped] {$w_\i$};
+
+    \draw [arrow] (bias) -- (neuron);
+
+    \draw [arrow] (neuron) -- (act);
+    \draw [arrow] (act) -- (output);
+  \end{tikzpicture}
+  \caption{Artificial neuron.}
+  \label{fig:neuron}
+\end{figure}
+An \ac{ann} is a model that performs elaboration in a way that
+mimics the brain functioning. The base unit is the \ac{an}, also called
+perceptron, of
+\cref{fig:neuron}. It performs the weighted sum of the inputs
+$x_1,\dots,x_n$, shifted by a bias $b$, followed by an activation
+function $f$. If we add a dummy input $x_0=1$ and rename the bias
+$b=w_0$, we can express the computation of the \ac{an} as in
+\cref{eq:anComp}:
+\begin{equation}\label{eq:anComp}
+  y = f(\sum_{i=0}^n w_i x_i).
+\end{equation}
+
+The activation function $f$ can be of different types, the most common are:
+\begin{itemize}
+\item Softmax;
+\item ReLU;
+\item TanH;
+\item Sigmoid;
+\item Linear;
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+    \foreach \m/\l [count=\y] in {1,2,3,missing,4}
+    \node [every neuron/.try, neuron \m/.try] (input-\m) at (0,2.5-\y) {};
+
+    \foreach \m [count=\y] in {1,missing,2}
+    \node [every neuron/.try, neuron \m/.try ] (hidden-\m) at (2,2-\y*1.25) {};
+
+    \foreach \m [count=\y] in {1,missing,2}
+    \node [every neuron/.try, neuron \m/.try ] (output-\m) at (4,1.5-\y) {};
+
+    \foreach \l [count=\i] in {1,2,3,n}
+    \node[] (x-\i) at ($(input-\i)-(1,0)$) {$x_\l$};
+
+    \foreach \l [count=\i] in {1,2,3,n}
+    \draw [arrow] (x-\i) -- (input-\i);
+    %\draw [arrowInverse] (input-\i) -- ++(-1,0)
+    %node [above, midway] {$I_\l$};
+
+    %\foreach \l [count=\i] in {1,n}
+    %\node [above] at (hidden-\i.north) {$H_\l$};
+
+    \foreach \l [count=\i] in {1,m}
+    \node[] (y-\i) at ($(output-\i)+(1,0)$) {$y_\l$};
+    
+    \foreach \l [count=\i] in {1,n}
+    \draw [arrow] (output-\i) -- (y-\i);
+    %\draw [arrow] (output-\i) -- ++(1,0)
+    %node [above, midway] {$O_\l$};
+
+    \foreach \i in {1,...,4}
+    \foreach \j in {1,...,2}
+    \draw [arrow] (input-\i) -- (hidden-\j);
+
+    \foreach \i in {1,...,2}
+    \foreach \j in {1,...,2}
+    \draw [arrow] (hidden-\i) -- (output-\j);
+
+    \foreach \l [count=\x from 0] in {Input, Hidden, Ouput}
+    \node [align=center, above] at (\x*2,2) {\l \\ layer};
+
+  \end{tikzpicture}
+  \caption{\acf{mlp} with one hidden layer.}
+  \label{fig:ann}
+\end{figure}
+\acp{an} are organized in network structures. The basic layout of
+an  \ac{ann} is the \acf{mlp} structured in layers like in
+\cref{fig:ann}. Each \ac{an} of each layer is connected to all the
+outputs of the previous layer. The first layer is connected to the
+inputs of the \ac{ann} and the output of the last layer is also the
+output of the network. The execution of the \ac{mlp} is feed forward:
+\begin{enumerate}
+\item the input values $x_{0,1},\dots x_{0,n}$ are presented to the
+  network and it is the input of the first layer;
+\item  the computation is 
+  carried one layer at a time, where each neuron $i$ of the layer $l$
+  calculates the value $y_{l,i}$ of the intermediate output
+  $y_{l,1},\dots,y_{l,m}$;
+\item the intermediate output $y_{l,1},\dots,y_{l,m}$ of the layer $l$
+  becomes the 
+  input $x_{l+1,1},\dots,x_{l+1,m}$ of the subsequent layer $l+1$,
+  unless $l$ is the last layer - in that case the output of $l$ is the
+  output $y_1,\dots,y_m$ of the \ac{mlp}.
+\end{enumerate}
+
+The weights of the \acp{an} are initialized to random values and, in order
+to have meaningful outputs, the \ac{ann} needs to be trained. In a
+supervised learning framework the dataset is composed of the matrices
+$\matr{X}$ ($N\times n$) of the $N$ inputs $x_{i,j}$, and $\matr{Y}$
+($N\times m$) of 
+the corresponding outputs $y_{i,j}$. The
+training process is called \emph{backpropagation} and it is organized in a
+succession of phases. For each phase $p$ there are two steps:
+\begin{description}
+\item[execution] where an input $x_{p,1},\dots x_{p,n}$ is given to
+  the network and an output $\hat{y}_{p,1},\dots,\hat{y}_{p,m}$ is calculated;
+\item[weight update] where is calculated the error between
+  $\hat{y}_{p,1},\dots,\hat{y}_{p,m}$ and the correct output
+  $y_{p,1},\dots,y_{p,m}$, this error is back propagated through all
+  the layers and a correction $\Delta w_i$ is calculated for each weight $w_i$ of
+  the network, in
+  order to minimize the error surface in the space of the weights.
+\end{description}
+In detail, to calculate the weights $\vect{w}^{(p+1)}$ for the next
+phase $p+1$, it is 
+sufficient to determine the gradient of 
+the error surface in the current point $\vect{w}^{(t)}$ in order to
+apply an optimization method like \ac{sgd}.
+
+\subsection{Loss}
+The goal of the lerning algorithm is to learn a function $f$ such that
+predictions $\hat{\vect{y}}=f(\vect{x})$ over the training set are accurate respect
+to the correct labels $\vect{y}$. The \emph{loss} function quantifying
+the prediction error. Formally a loss function
+$\loss(\hat{\vect{y}},\vect{y})$ assign a scalar to a predicted output
+given the true expected output, it should be lower bounded with the
+minimum attained only for cases where the prediction is correct. The
+parameters of the learned function, i.e. the weights $\vect{w}$, are
+set in order to minimize the loss over the training examples. Given a
+labeled training set $\mathcal{D}=(\vect{x}_{1:n},\vect{y}_{1:n})$ and a
+parameterized model $f(\vect{x};\theta)$, the goal of the training
+algorithm is then to set the values of the parameters $\theta$
+such that the value of the loss is minimized:
+\begin{equation}\label{eq:lossmin}
+  \hat\theta=\argmin_\theta\frac{1}{n}\sum_{i=1}^n\loss(f(\vect{x}_i;\theta),\vect{y}_i).
+\end{equation}
+
+The parameters $\theta$ represents the set of all the weights $w$ of
+the \ac{ann}. 
+We proceed to describe common losses functions.
+
+\subsubsection{Hinge loss}
+Hinge loss, also known as margin loss is used in binary classification
+problems, when the classifier output $\tilde{y}$ is a single scalar, and
+$y\in\{+1,-1\}$. The classification rule is $\hat{y}=sign(\tilde{y})$
+and the classification is considered correct if
+$y\cdot\tilde{y}>0$. The hinge loss is defined as:
+\begin{equation*}
+  \loss_{hinge}(\tilde{y},y)=\max(0,1-y\cdot\tilde{y}).
+\end{equation*}
+It is $0$ when $\tilde{y}$ and $y$ share the same sign and
+$|\tilde{y}|\geq 1$, otherwise the loss is linear. It attempts to
+achieve a correct classification with a margin of at least 1.
+
+Hinge loss can be also extended to multi-class settings, where
+$\hat{\vect{y}}=\hat{y}_1,\dots,\hat{y}_n$ are the classifier's
+output, and $\vect{y}$ the one-hot vector of correct output
+classes. The classification rule is defined as selecting the class
+with the highest score $\argmax_i\hat{\vect{y}}_i$. denoting by
+$t=\argmax_iy_i$ the correct class index, and by $k=\argmax_{i\neq
+  t}\hat{y}_i$ the highest scoring class such that $k\neq t$. The
+multi-class hinge loss is defined as:
+\begin{equation*}
+  \loss_{hinge}(\hat{\vect{y}},
+  \vect{y})=\max(0,1-(\hat{y}_t-\hat{y}_k)).
+\end{equation*}
+It attempts to score the correct class above all other classes with a
+margin of at least 1.
+
+\subsubsection{Log loss}
+The log loss is a common variation of the hinge loss, it can be seen
+as a soft version with an infinite margin \cite{lecun2006tutorial}. It
+is defined as:
+\begin{equation*}
+  \loss_{log}(\hat{\vect{y}}, \vect{y}) =
+  \log(1+\exp(-(\hat{\vect{y}}_t-\hat{\vect{y}}_k)). 
+\end{equation*}
+
+\subsubsection{Binary cross-entropy loss}
+The binary cross-entropy loss, also called logistic loss, is used in
+binary classification with conditional probability outputs. We have a
+set of two target classes labeled with $y\in\{0,1\}$. The classifier's
+output $\tilde{y}$ is transformed using the sigmoid (also logistic)
+function $\sigma(x)=1/(1+e^{-x})$ to the range $[0,1]$. It can be
+interpreted as the conditional probability
+$\hat{y}=\sigma(\tilde{y})=\prob(y=1|\vect{x})$. The prediction rule is:
+\begin{equation*}
+  \begin{cases}
+    0\quad\hat{y}<0.5,\\
+    1\quad\hat{y}\geq 0.5.
+  \end{cases}
+\end{equation*}
+
+The network is trained to maximize the log conditional probability for
+each training example $(\vect{x},y)$. The logistic loss is defined as:
+\begin{equation*}
+  \loss_{logistic}(\hat{y},y)=-y\log\hat{y}-(1-y)\log(1-\hat{y}).
+\end{equation*}
+
+While the hinge loss is preferred when we require a hard decision
+rule, the binary cross-entropy is useful when we want the network to
+produce class conditional probability.
+
+\subsubsection{Categorical cross-entropy loss}
+The categorical cross-entropy, also called negative log likelihood, is
+used when a probabilistic interpretation of the scores is desired. Let
+$\vect{y}=y_1,\dots,y_n$ be a vector representing the true multinomial
+distribution over the labels $1,\dots,n$, and let
+$\hat{\vect{y}}=\hat{y}_1,\dots,\hat{y}_n$ be the classifier's output
+transformed by a \emph{softmax} function:
+\begin{equation*}
+  softmax(\vect{x})_i=\frac{e^{x_i}}{\sum_j e^x_j}.
+\end{equation*}
+$\hat{\vect{y}}$ represent the class membership conditional
+distribution $\hat{y}_i=\prob(y=i|\vect{x})$. The categorical cross
+entropy loss measures the dissimilarity between the true label
+distribution $\vect{y}$ and the predicted label distribution
+$\hat{\vect{y}}$. It is defined:
+\begin{equation*}
+  \loss_{cross-entropy}(\hat{\vect{y}},\vect{y})=-\sum_i y_i\log(\hat{y}_i).
+\end{equation*}
+
+For hard classification problems in which each training example has a
+single correct class assignment, $\vect{y}$ is the one-hot vector of
+the true class. In such cases the cross-entropy loss can be simplified
+to:
+\begin{equation*}
+  L_{cross-entropy}(\hat{\vect{y}},\vect{y}) = -\log(\hat{\vect{y}}_t),
+\end{equation*}
+where $t$ is the correct class.
+
+\subsection{Regularization}
+The attempt to minimize the loss with \eqref{eq:lossmin} may results 
+in overfitting the training data, i.e. the model loose the capability
+to generalize to new data, and the loss evaluates poorly on new data
+that is not present in $\mathcal{D}$. To counter that, we often pose
+soft restrictions on the form of the solution. This is done using a
+\emph{regularization}
+function $R(\theta)$ over the parameters returning a scalar that
+reflect their \emph{complexity}. This is equivalent to introduce a
+restriction over the hypothesis space as seen in
+\cref{sec:supervisedTheory}. We want to keep the model complexity low,
+thus we add the regularizer to \eqref{eq:lossmin} and we let the
+optimization problem to balance between low loss and low complexity:
+\begin{equation}\label{eq:lossminReg}
+  \hat\theta=\argmin_\theta\left\{\frac{1}{n}\sum_{i=1}^n\loss(f(\vect{x}_i;\theta),\vect{y}_i)+\lambda
+    R(\theta)\right\}.
+\end{equation}
+
+Different combinations of loss function and regularization criteria
+result in different learning algorithms, with different inductive
+biases.
+
+In practice regularizers works penalizing high values for \ac{ann}
+weights, thus avoiding that the network concentrates only on few
+features. In \eqref{eq:lossminReg}, $R$ is applied to all the
+parameters, in the practice it can be applied on the single layers.
+
+We proceed to describe common regularization functions.
+
+\subsubsection{$L_2$ regularization}
+In $L_2$ regularization, also called \emph{gaussian prior} or
+\emph{weight decay}, $R$ takes the form of the squared $L_2$ norm
+of the parameters:
+\begin{equation*}
+  R_{L_2}(\matr{W})=||\matr{W}||_2^2=\sum_{i,j}(\matr{W}_{i,j})^2.
+\end{equation*}
+
+$L_2$ regularization penalizes high parameters, but when their values
+becomes near to $0$ their effect is negligible.
+
+\subsubsection{$L_1$ regularization}
+In $L_1$ regularization, also called \emph{sparse prior} or
+\emph{lasso}, $R$ takes the form of the $L_1$ norm of the parameters:
+\begin{equation*}
+  R_{L_1}(\matr{W})=||\matr{W}||_1=\sum_{i,j}|\matr{W}_{i,j}|.
+\end{equation*}
+
+In contrast to $L_2$, $L_1$ regularization penalizes uniformly low and
+high parameters. This has the effect of encouraging a sparse solution
+\cite{tibshirani1996regression}.
+
+\subsubsection{Elastic-net}
+The elastic-net regularizer \cite{zou2005regularization} combines both
+$L_1$ and $L_2$ regularization:
+\begin{equation*}
+  R_{elastic-net}(\matr{W})=\lambda_1R_{L_1}(\matr{W})+\lambda_2R_{L_2}(\matr{W}).
+\end{equation*}
+
+\subsubsection{Dropout}
+
+\subsection{\acf{sgd}}
+
+\subsection{\acf{rnn}}
+\acp{rnn} are specialized versions of \ac{ann} for sequences. They
+exhibit an
+internal state $\vect{h}$ that changes during the training and that
+recursively depends on the state of the previous phase. Precisely we
+have \cref{eq:rnnState}:
+\begin{equation}\label{eq:rnnState}
+  \vect{h}^{(t)} = f(\vect{h}^{(t-1)}, \vect{x}^{(t)}; \vect{\theta}),
+\end{equation}
+where $\vect{h}$ is the state vector, $\vect{x}$ is the input vector
+and $\vect{\theta}$ are the parameters of the state-function
+$f$. The index $t$ indicates 
+the iteration number, and can be interpreted as a discrete time or
+more in general as the progressive number of the sequence that is
+presented as
+input.
+
+\begin{figure}
+  \centering
+  % \subfigure[]{
+  \subfloat[\label{fig:rnn1}]{
+    \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+      \node [] (input) at (0,0) {$\vect{x}$};
+
+      \node [layer] (state) at (0,1) {$\vect{h}$};
+      \node [delay] (delay) at (1,1) {};
+
+      \node [] (output) at (0,2) {$\vect{y}$};
+      
+      \draw [arrow] (input) -- (state);
+      \draw [arrow] (state) -- (output);
+      \draw (state) edge[arrow, bend left=60] (delay.north);
+      \draw (delay.south) edge[arrow, bend left=60] (state);
+    \end{tikzpicture}
+  }\hfill
+  % \subfigure[]{
+  \subfloat[\label{fig:rnn2}]{
+    \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+      \foreach \l [count=\i] in {t-1,t,t+1}{
+        \node [] (input-\i) at (\i*1.2,0) {$\vect{x}^{(\l)}$};
+        \node [layer] (state-\i) at (\i*1.2,1) {$\vect{h}^{(\l)}$};
+        \node [] (output-\i) at (\i*1.2,2) {$\vect{y}^{(\l)}$};
+
+        \draw [arrow] (input-\i) -- (state-\i);
+        \draw [arrow] (state-\i) -- (output-\i);
+      }
+      \node [layer, dashed] (state-l) at (0,1) {$\vect{h}^{(t-2)}$};
+      \node [layer, dashed] (state-r) at (4*1.2,1) {$\vect{h}^{(t+2)}$};
+
+      \draw [arrow] (state-l) -- (state-1);
+      \draw [arrow] (state-1) -- (state-2);
+      \draw [arrow] (state-2) -- (state-3);
+      \draw [arrow] (state-3) -- (state-r);
+    \end{tikzpicture}
+  }
+  \caption{\acf{rnn}, folded (a) and unfolded (b) models.}
+  \label{fig:rnn}
+\end{figure}
+In order to express a compact visualisation of \acp{rnn} it is
+possible to use the computational graph in \cref{fig:rnn1} where the
+black box is a 
+delay of one iteration. An extract of the unfolding of the computation
+graph is 
+shown in \cref{fig:rnn2}. 
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+    \foreach \l [count=\i] in {t,t+1,missing,\tau}{
+      \ifthenelse{\equal{\l}{missing}}{
+        \node [vmissing] (state-\i) at (\i*1.2,1) {};
+        \node [hmissing] (state-\i) at (\i*1.2,0) {};
+      }{
+        \node [] (input-\i) at (\i*1.2,0) {$\vect{x}^{(\l)}$};
+        \node [layer] (state-\i) at (\i*1.2,1) {$\vect{h}^{(\l)}$};
+        \draw [arrow] (input-\i) -- (state-\i);
+        \ifthenelse{\equal{\l}{\tau}}{
+          \node [] (output-\i) at (\i*1.2,2) {$\vect{y}^{(\l)}$};
+          \draw [arrow] (state-\i) -- (output-\i);
+        }
+      }
+    }
+
+    \node [layer, dashed] (state-l) at (0,1) {$\vect{h}^{(t-1)}$};
+    \node [layer, dashed] (state-r) at (5*1.2,1) {$\vect{h}^{(\tau+1)}$};
+
+    \draw [arrow] (state-l) -- (state-1);
+    \draw [arrow] (state-1) -- (state-2);
+    \draw [arrow,dashed] (state-2) -- ++(0.8,0);
+    \draw [arrowInverse,dashed] (state-4) -- ++(-0.8,0);
+    \draw [arrow] (state-4) -- (state-r);
+  \end{tikzpicture}
+  \caption{\ac{rnn} with single output after a sequence of inputs.}
+  \label{fig:rnnSO}
+\end{figure}
+The model in \cref{fig:rnn} provides an output $\vect{y}^{(t)}$ for every
+input $\vect{x}^{(t)}$. An alternative is the model of
+\cref{fig:rnnSO} where an output $\vect{y}^{(\tau)}$ is provided only
+after a sequence $\vect{x}^{(t)},\dots,\vect{x}^{(\tau)}$ of inputs.
+
+In order to train a \ac{rnn}, it is sufficient to apply the
+backpropagation to the entire unfolded model.
+
+\subsection{\acf{gru}}
+
+\subsection{\acf{lstm}}
+The major drawback of \acp{rnn} is the \emph{vanishing
+  gradient} problem during the backpropagation. The gradient
+for long-term associations, propagated through many stages, tends to
+become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter_1997_lstm}.
+
+\begin{figure}
+  \centering
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+      \node at (1,-0.5) {};
+
+      \node[delay] (delay1) at (1.6,0.8) {};
+      \coordinate (input1) at (2.5,0.5);
+      \coordinate (input2) at (3.5,0.5);
+      \node[] (input01) at (2.5,0) {$in_1$};
+      \node[] (input02) at (3.5,0) {$in_m$};
+      \node[] at (3,0.2) {$\cdots$};
+      \node[every neuron, label={[xshift=-2mm]input}] (inputN) at (1,2) {};
+      \node[every neuron, label={[xshift=2mm, align=left, font=\tiny] input\\gate}] (inputGate) at (2,2) {};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] forget\\gate}] (forgetGate) at (3,2) {};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] output\\gate}] (outputGate) at (4,2) {};
+      \node[operation] (inputTimes) at (1.5, 3) {$\times$};
+      \node[operation, label={[xshift=-3mm]state}] (state) at (2, 4) {$+$};
+      \node[delay] (delay2) at (2.7,3.7) {};
+      \node[operation] (forgetTimes) at (2.5, 3) {$\times$};
+      \node[operation] (outputTimes) at (3, 5) {$\times$};
+      \coordinate (output1) at (3,5.5);
+      \node (output2) at (3,6) {$out_i$};
+      \node at (0.7,5.3) {$cell_i$};
+
+      \fill[black] (input1) circle (1mm);
+      \fill[black] (input2) circle (1mm);
+      \fill[black] (output1) circle (1mm);
+      
+      \foreach \n in {input1, input2}{
+        \foreach \m in {inputN, inputGate, forgetGate, outputGate}{
+          \draw[arrow] (\n) -- (\m);
+        }
+      }
+      \foreach \m in {inputGate, forgetGate, outputGate}{
+        \draw[arrow] (delay1) -- (\m);
+      }
+
+      \draw[arrow] (inputN) -- (inputTimes);
+      \draw[arrow] (inputGate) -- (inputTimes);
+      \draw[arrow] (forgetGate) -- (forgetTimes);
+      \draw[arrow] (inputTimes) -- (state);
+      \draw[arrow] (forgetTimes) -- (state);
+      \draw [arrow] (state) ..  controls  (0.15,4) and (0.15,1) ..  (delay1);
+      \draw[arrow] (state) -- (delay2);
+      \draw[arrow] (delay2) -- (forgetTimes);
+      \draw[arrow] (state) -- (outputTimes);
+      \draw[arrow] (outputGate) -- (outputTimes);
+      \draw[line] (outputTimes) -- (output1);
+      \draw[line] (output1) -- (output2);
+      \draw[line] (input01) -- (input1);
+      \draw[line] (input02) -- (input2);
+
+      \path[border] (0.4,0.5) -- (4.5,0.5) -- (4.5,5.5) -- (0.4,5.5) -- (0.4,0.5); 
+      
+
+    \end{tikzpicture}
+    \label{fig:lstm1}
+  }\hfill
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=0.8cm, y=0.8cm]
+      \node at (1,-2.5) {};
+
+      % \draw[step=1.0,black,thin] (0,3) grid (4,4);
+      \draw[step=1.0,black,thin] (0,3) grid (2,4);
+      \draw[step=1.0,black,thin] (3,3) grid (4,4);
+      \coordinate (input1) at (0.5,3);
+      \coordinate (input2) at (1.5,3);
+      \coordinate (input3) at (3.5,3);
+      \coordinate (inputM1) at (0.5,2.5);
+      \coordinate (inputM2) at (1.5,2.5);
+      \coordinate (inputM3) at (3.5,2.5);
+      \coordinate (output1) at (0.5,4);
+      \coordinate (output2) at (1.5,4);
+      \coordinate (output3) at (3.5,4);
+
+      \coordinate (outputM) at (2,6);
+      \coordinate (outputTM) at (1,6);
+      
+      \node at (0.5, 3.5) {$cell_1$};
+      \node at (1.5, 3.5) {$cell_2$};
+      \node at (2.5, 3.5) {$\cdots$};
+      \node at (3.5, 3.5) {$cell_n$};
+      \coordinate (pass) at (4.5, 3.5);
+      \node (inputT) at (1,0) {$\vect{x}$};
+      \coordinate (inputTM) at (1,1);
+      \node (outputT) at (1,7) {$\vect{y}$};
+
+      \node[delay] (delay) at (4,1) {};
+
+      \foreach \c in {input1, input2, input3, output1, output2, output3}{
+        \fill[black] (\c) circle (1mm);
+      }
+
+      \foreach \c in {inputM1, inputM2, inputM3}{
+        \draw [vectorLine] (delay) ..  controls
+        ($0.5*(delay)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+        \draw [vectorLine] (inputTM) ..  controls
+        ($0.5*(inputTM)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+      }
+
+      \foreach \c in {1, 2, 3}{
+        \draw[vectorArrow] (inputM\c) -- ($(input\c)-(0,0.1)$);
+      }
+
+      \foreach \c in {output1, output2, output3}{
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputM)-(0,0.5)$) ..  (outputM);
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputTM)-(0,0.5)$) ..  (outputTM);
+      }
+
+      %\draw [vectorArrow] (outputM) ..  controls  ($(outputM)+(1,2)$) and ($(delay)+(1,0)$) ..  (delay);
+      \draw [vectorArrow]
+      (outputM) ..
+      controls  ($(outputM)+(1,2)$) and ($(pass)+(0,1)$) ..
+      (pass) ..
+      controls  ($(pass)-(0,1)$) and ($(delay)+(1,0)$) ..
+      (delay);
+      \draw[vectorLine] (inputT) -- (inputTM);
+      \draw[vectorArrow] (outputTM) -- (outputT);
+    \end{tikzpicture}
+    \label{fig:lstm2}
+  }
+  \caption{\ac{lstm} model: detail of memory cell (a), and general
+    scheme (b). The black box is a delay of one iteration.}
+  \label{fig:lstm}
+\end{figure}
+The \ac{lstm} model is structured as in \cref{fig:lstm}. It is
+equivalent to a
+generic \ac{rnn} where the hidden state $\vect{h}$ is a
+layer of \emph{memory cells}.
+
+In detail a single
+memory cell (\cref{fig:lstm1}) has four \acf{an}. One is labelled \emph{input}
+and processes the cell's 
+inputs into an internal state. The other three \ac{an} are labelled as
+\emph{gates} and process the cell's inputs together with the previous-phase
+state in order to decide:
+\begin{itemize}
+\item how much of the current input must be learned
+  (\emph{input gate});
+\item how much of the previous-phase state must be forgotten
+  (\emph{forget gate});
+\item how much of the state constitutes the output (\emph{output gate}).
+\end{itemize}
+
+The memory-cells layer (\cref{fig:lstm2}) is composed of a number of
+cells equal to the dimension of the output. Each cell
+calculates one dimension of $\vect{y}$. The input $\vect{x}$ is copied
+for every cell and, together with the previous-phase
+output,
+constitutes the input $in_1,\dots,in_m$ of the single cells.
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "thesis"
+%%% End:
