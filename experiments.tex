@@ -1,0 +1,959 @@
+\chapter{Experiments}
+\fxnote*{Stefano}{metodologia adottata, perch'e ci sono, a cosa
+  servono, cosa interessa vedere}
+With the experiments we want to show the feasibility of deep learning
+methods and more generally machine learning methods applied to large
+scale histological records. Moreover we want to compare classical
+bag-of-word techniques with recent deep learning methods. We want also
+to assess the effects of leveraging large corpora of unlabeled text
+that come from the same distribution, in the context of text
+classification. Finally we want to check if attention-based methods
+give an improvement, especially when used in a hierarchic way like
+previous works. Also we want to show some practical use cases and
+evaluate the interpretation of deep learning models.
+
+We start describing some useful metrics that can be used to assess the
+classifier behavior and also to use the classifiers in different use
+cases.
+
+In \cref{ch:icdoFirst} we organize a comparative study between
+\ac{svm} and deep learning techniques using both bag-of-words and word
+vectors. We train the models \svm, \svmb, \lstmng, \lstmc, and
+\lstmb in 10-fold cross validation. We calculate for all the model
+different metrics, and we summarize the average and standard deviation
+along the folds. In those 
+experiments we can appreciate the improvements of using word
+vectors. Furthermore we can notice that by using \ac{svm}, either on
+unigrams and bigrams, we got already good results.
+
+In \ref{ch:icdo} we changed the setting, instead of doing a 10-fold
+cross validation we adopt a temporal split. This decision was made to
+reflect a probable practical employment of the classifier, where it is
+being trained on the past data and evaluated on future data. In those
+experiments we are interested in evaluating the effects of the
+attention models, comparing them with a simpler form constituted by
+the max aggregation of \maxp{}. We focused on \ac{gru} because
+preliminary experiments do not show an improvement of using
+\ac{lstm}. With those experiments we want to show that in this context
+the adoption of hierarchical models is not beneficial. Moreover we
+want to evaluate how the interpretable models works respect to the
+others.
+
+\section{Metrics}
+We used different metrics in order to evaluate the models.
+All the metrics are defined between $0$ and $1$ or between $-1$ and $1$,
+higher is the value, better is the assessment.
+
+\subsection{Accuracy}
+is defined
+as the ratio between the correct-classified and all documents. If $\vect{y}$
+is the ground truth and $\vect{\hat y}$ is the predicted
+classification vectors for $n$ samples, then the accuracy is defined
+as:
+\begin{equation*}
+  accuracy\left(\vect{y}, \vect{\hat y}\right) \equiv
+  \frac{1}{n}\sum_{i=1}^{n} 1\left(\hat y_i = y_i\right),
+\end{equation*}
+Where
+\begin{equation*}
+  1(a = b)\equiv
+  \begin{cases}
+    1 & \text{if }a = b,\\
+    0 & \text{otherwise}.
+  \end{cases}
+\end{equation*}
+
+In an
+unbalanced dataset, like the one of this work, it is a biased score -
+a model that predicts well only the most frequent classes, and ignore
+the rest, achieve a good accuracy. To resolve this we considered also
+other metrics.
+
+\subsection{Cohen's kappa} score is usually used to asses
+the agreement of two annotators \cite{cohen_coefficient_1960}. It
+measures the difference between the observed agreement and the
+agreement that can happen by choosing randomly the class. It can then
+be used to mitigate the bias caused by the unbalanced dataset. Cohen's
+kappa is defined as:
+\begin{equation*}
+  \kappa(\vect{y}, \vect{\hat y})\equiv \frac{p_o(\vect{y}, \vect{\hat y}) -p_e(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})} = 1-\frac{1-p_o(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})},
+\end{equation*}
+where $p_o$ is the observed agreement that is equal to the accuracy
+and $p_e$ represents the probability of agreement by chance. For $n$
+samples and $k$ classes it is
+defined by:
+\begin{equation*}
+  p_e(\vect{y}, \vect{\hat y}) = \frac{1}{n^2}\sum_{i=1}^{k} \mu_{i}(\vect{y})\cdot\nu_{i}(\vect{\hat y}),
+\end{equation*}
+where $\mu_{i}$ and $\nu_{i}$ are the number of samples classified as
+$i$ for the first and second classifier. They are defined as:
+\begin{eqnarray*}
+  \mu_i(\vect{y}) &=& \sum_{j=1}^{n}1(y_j = i)\\
+  \nu_i(\vect{\hat y}) &=& \sum_{j=1}^{n}1(\hat y_j = i)
+\end{eqnarray*}
+
+\subsection{\acf{map}} is a measure used in information
+retrieval \cite{manning_introduction_2008}. It expresses how well the
+true classification can be retrieved in 
+the first results of the classifier. We define two variants of
+\ac{map}, one (MAPc) to state how well all records for a specific class are
+retrieved, the other (MAPs) to asses how well the correct class is retrieved
+for a specific sample. The first is defined for $n$ samples and $k$ classes,
+with $\vect{Y}=\vect{y}_1,\dots,\vect{y}_k$ and $\vect{\hat
+  Y}=\vect{\hat y}_1,\dots,\vect{\hat y}_k$ the ground truth and
+prediction $n\times k$ matrices. The formula is:
+\begin{equation*}
+  MAPc(\vect{Y}, \vect{\hat Y})\equiv
+  \frac{1}{k}\sum_{c=1}^{k}AveP(\vect{y}_c, \vect{\hat y}_c),
+\end{equation*}
+where $AveP$ is the average precision for class $c$:
+\begin{equation*}
+  AveP(\vect{y}, \vect{\hat y}) \equiv
+  \frac{1}{\sum_{i=1}^k 1(y_i)}\sum_{j=1}^k P_j(\vect{y}, \vect{\hat y})\cdot 1(y_{\sigma_{\vect{\hat y}}(j)}),
+\end{equation*}
+where $1(y)$ is an indicator
+function that is $1$ for the elements classified positively, $0$
+otherwise. $\sigma_{\vect{\hat y}}(j)$ is a function that returns the
+  index in $\vect{\hat y}$ of the $j$-th element in the ordered
+  version of $\vect{\hat y}$ . $P_j$ is defined as:
+\begin{equation*}
+P_j(\vect{y}, \vect{\hat y}) \equiv \frac{1}{j}\sum_{c=1}^j
+1(y_{\sigma_{\vect{\hat y}}(c)}).
+\end{equation*}
+
+MAPs is defined like MAPc, but on the transposed classification
+matrices
+\begin{equation*}
+  MAPs(\vect{Y}, \vect{\hat Y})\equiv
+  MAPc(\vect{Y}^T, \vect{\hat Y}^T)
+\end{equation*}
+
+\subsection{Precision} is defined for $n$ samples and binary
+classifications as:
+\begin{equation}\label{eq:precision}
+P(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(\hat y_s)}.
+\end{equation}
+It expresses the ratio of correct positive predictions over all the
+positive predictions.
+
+\subsection{Recall} conversely, is defined as:
+\begin{equation}\label{eq:recall}
+R(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(y_s)},
+\end{equation}
+and it is the ratio of correct predicted positive over all the positive
+classes.
+
+\subsection{F1-score} is the harmonic mean of precision and recall,
+combining the two measures:
+\begin{equation*}
+F_1(\vect{y}, \vect{\hat y}) \equiv 
+2\frac{P(\vect{y}, \vect{\hat y})\cdot R(\vect{y}, \vect{\hat y})}
+{P(\vect{y}, \vect{\hat y})+R(\vect{y}, \vect{\hat y})}.
+\end{equation*}
+
+Precision, recall, and thus $F_1$ score are defined only for binary
+classifiers. In order to use those metrics in a multi-class
+classification problem it is possible to average the measures for the
+different classes. We considered different methodologies of averaging:
+\begin{description}
+  \item[micro] averaging is performed flattening the array of truth
+    and prediction of the different classes and then appling the
+    scoring formula;
+  \item[macro] average is performed calculating the metrics on the
+    single classes and then averaging them:
+    \begin{equation*}
+      \frac{1}{k}\sum_{c=1}^k S(\vect{y}_c, \vect{\hat y}_c);
+    \end{equation*}
+  \item[weighted] average uses the normalized number of samples for
+    each class in order to give a weight to them:
+    \begin{equation*}
+      \frac{1}{\sum_{i=1}^k|\vect{\hat y}_i|}\sum_{c=1}^k|\vect{\hat y}_c|\cdot S(\vect{y}_c, \vect{\hat y}_c).
+    \end{equation*}
+\end{description}
+
+Micro average considers all the samples equally, regardless of the
+representativeness of classes in the dataset. Macro average takes
+into account the unbalancement and it is more sensible to few
+represented classes. Precision, recall, and $F_1$ score are
+equal to the accuracy when micro averaged in a multiclass
+environment. 
+
+\subsection{ROC curve} is a graph of \emph{true positive rate} versus
+\emph{false positive rate} with the change of the classifier threshold. The
+true positive rate is equal to the recall defined in
+\cref{eq:recall}. Conversely the false positive rate is defined as:
+\begin{equation}\label{eq:fpr}
+FPR(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and not }y_s)}{\sum_{s=1}^n 1(\text{not }y_s)}.
+\end{equation}
+
+ROC curves start from $(0,0)$ and end in $(1,1)$. The area under
+the curve can be used as a metric for the classifier, a perfect
+classifier has an area of $1$.
+
+The curves can be calculated only for binary classifiers. Like for the
+precision, recall and $F_1$ score, it is possible to generalise them to
+multiclass problems averaging micro or macro.
+
+\subsection{Precision-recall curve} is a graph of precision
+(\cref{eq:precision}) versus 
+recall (\cref{eq:recall}) with the change of the classifier
+threshold. The curves start from $(0,1)$ and end in $(1,0)$. A perfect
+classifier has an area under the curve of $1$.
+
+Also precision-recall curves can be calculated only for binary
+classifiers. In order to generalise them to multiclass problem it is
+necessary to micro or macro average.
+
+\subsection{Use cases}
+The different metrics are useful to assess models in different
+situations. In case you need to retrieve records of a specific
+cancer case from the register, MAPc assesses how
+well the task is executed.
+Conversely in case of an operator-assistance software, MAPs
+assess how the correct classification
+for a specific histological record is retrieved on top results. 
+
+Cohen's kappa measures the agreement of automatic
+and human annotators. Thus it is an indirect measure of the
+classification correctness.
+
+Precision and recall are two measures in trade off between them. The
+former is more significant when you need a list of
+correctly-classified records, at cost of not retrieving all of
+them. The latter is more
+meaningful when you need to retrieve the major number of cases at cost
+of retrieving also some false positives. A peculiarity of the
+automatic annotator is that you can change the threshold to support
+higher precision or recall depending on the specific retrieving
+task. Recall-precision
+curves can be used to assess the correct threshold.
+
+
+\section{Bag-of-words, word vectors, \ac{svm} and deep learning}
+\label{ch:icdoFirst}
+The focus of this section is to asses the improvement of employing
+word vectors respect to use bag-of-words. Moreover to evaluate the
+employment of deep learning techniques.
+
+\subsection{Classifiers}
+We realized four multiclass classifiers for the
+histological exams. Calling $X$ the distribution of texts, $Y^s$
+of site, $Y^f$ of full site (site plus subsite), $Y^t$ of type, and
+$Y^b$ of behavior:
+\begin{description}
+  \item[\site{}] estimates $P(Y^s|X)$;
+  \item[\fullSite{}] estimates $P(Y^f|X)$;
+  \item[\type{}] estimates $P(Y^t|X)$;
+  \item[\behaviour{}] estimates $P(Y^b|X)$.
+\end{description}
+
+% The different tasks are not fully independent: obviously \fullSite{}
+% classification depends on \site{} classification, but also \type{},
+% \behaviour{} and \site{} can be interdependent. Many types of tumor are
+% associated to a specific site, some types even indicates a
+% specific behavior. For instance, \type{} $8253$
+% corresponds to the definition of \emph{bronchio-alveolar carcinoma,
+%   mucinous}, and it can be only malignant (\behaviour{} $3$) and located in
+% bronchus and lungs (\site{} $34$). Thus, some configurations are impossible.
+
+% Every task is a multiclass classification problem because every
+% record is assigned to a single couple of \ac{icdo} codes,
+% topographical and morphological.
+
+% We considered the third \ac{icdo} version. There are
+% $94\,061$ records with \ac{icdo3} codes.
+The tasks have a variable number of represented classes, resumed in
+\cref{fig:numClasses}.
+\begin{table}
+  \center
+  \caption{Number of classes for different tasks.}
+  \label{fig:numClasses}
+  \begin{tabular}{|l|c|}
+    \hline
+    task & classes \\
+    \hline
+    \site{} & 70 \\
+    \fullSite{} & 284 \\
+    \type{} & 434 \\
+    \behaviour{} & 5 \\
+    \hline
+  \end{tabular}
+\end{table}
+Moreover, data is not balanced. As visible in \cref{fig:classDist},
+some classes are common, many are rare.
+% In order to collect more than the
+% $90\%$ of the 
+% records it is sufficient to take the most frequent classes: $17$ over $70$
+% for \site{}, $50$ over $284$ for \fullSite{},
+% $44$ over $434$ for \type{}, and $2$ over $5$ for \behaviour{}
+% classifications.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\textwidth]{img/classDist-icdo3-site.pdf}
+  \includegraphics[width=0.45\textwidth]{img/classDist-icdo3-fullSite.pdf}
+  \includegraphics[width=0.45\textwidth]{img/classDist-icdo3-type.pdf}
+  \includegraphics[width=0.45\textwidth]{img/classDist-icdo3-behaviour.pdf}
+  \caption{Documents in classes (ordered by
+    frequency).}
+  \label{fig:classDist}
+\end{figure}
+
+Frequency of words in text
+respects the typical Zipf's distribution with few words that cover the
+majority of text, and a long tail of infrequent words.
+% The $85\%$ of
+% the $9\,264\,143$ words in text is covered With $500$
+% over a total of $35\,216$ distinct words. 
+
+
+\subsection{Training word Vectors}
+
+\subsection{Experiments}
+\label{sec:experiments}
+Machine learning models need a training dataset in order to learn how
+to perform predictions. A second dataset — sampled from the same
+distribution — is needed to assess the performances of the
+classifier. We will use leave-one-out ten-folds cross validation
+to take advantage of all the available data. The whole
+pathological-record dataset is split in ten equal parts called
+folds. To preserve labels distribution, this is performed in a
+stratified way (all the folds have the same proportions of
+labels). Afterwards, each
+model is trained ten times, using one fold at a time as test
+dataset and the rests as training. For each metric we summarize the
+average and the standard deviation among the runs. Regarding the
+curves we calculated the cumulative for each 
+one, i.e.\ we concatenate the prediction for all the folds and
+calculate the curves on them. 
+
+\begin{table}
+  \centering
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{tabs/site.tex}
+  \caption{Results for \site{} task.}
+  \label{tab:resultsSite}
+\end{table}
+
+\begin{table}
+  \centering
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{tabs/fullSite.tex}
+  \caption{Results for \fullSite{} task.}
+  \label{tab:resultsFullSite}
+\end{table}
+
+\begin{table}
+  \centering
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{tabs/type.tex}
+  \caption{Results for \type{} task.}
+  \label{tab:resultsType}
+\end{table}
+
+\begin{table}
+  \centering
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{tabs/behaviour.tex}
+  \caption{Results for \behaviour{} task.}
+  \label{tab:resultsBehaviour}
+\end{table}
+
+The results are resumed in \cref{tab:resultsSite}, \cref{tab:resultsFullSite},
+\cref{tab:resultsType}
+and \cref{tab:resultsBehaviour}, one table for each task described
+in \cref{sec:dataset}, one column for each 
+model described in \cref{sec:models}. Rows specify the metrics
+described in \cref{sec:metrics}, with also macro and weighted average
+for precision, recall and $F_1$ score. Micro averages are not
+visualized because equivalent to accuracy. Values are expressed in
+percentage, indicating average and standard deviation among folds.
+%, furthermore for the model \lstmb{} we added another
+%task: \emph{full site stacked}. Such task is to classify the \emph{full site}
+%having already the \emph{site} code assigned.
+
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{img/plots/pr-curve-sede1-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \site{} task.}
+  \label{fig:curvesSite}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{img/plots/pr-curve-sede12-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \fullSite{} task.}
+  \label{fig:curvesFullSite}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{img/plots/pr-curve-morfo1-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \type{} task.}
+  \label{fig:curvesType}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{img/plots/pr-curve-morfo2-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \behaviour{} task.}
+  \label{fig:curvesBehaviour}
+\end{figure}
+
+Macro-averaged recall-precision curves for every method and task are
+resumed in \cref{fig:curvesSite}, \cref{fig:curvesFullSite},
+\cref{fig:curvesType} and
+\cref{fig:curvesBehaviour}. Areas under the curves are indicated in
+plot legends.
+
+\subsection{Discussion}
+The aim of this work was to investigate different machine learning
+models for cancer cases classification based on the interpretation
+of pathological-reports free text.
+
+Considering \ac{svm} models, the improvement of using
+bigrams respect monograms is not remarkable.
+
+The use of deep learning is not necessarily beneficial to the
+classification task. In fact \lstmng{}
+performs worst compared to \ac{svm} models. Instead, when we take
+advantage of the unlabeled data with \ac{glove}, we notice an
+improvement.
+
+\lstmb{} performs always better than the other models, except
+regarding macro-averaged precision, where \ac{svm} models are better.
+
+Since the cancer registration process is partially based on manual
+revision, including also the free text interpretation in pathological
+reports, a delay in data production and publication may occur. This
+weakens data relevance for the purpose of assessing compliance with
+regional updated recommended integrated case pathways, as well as for
+public health purposes.
+
+Improving automated methods to generate a list of putative incident
+cases and to automatically estimate process indicators is an
+opportunity to perform an up-to-date evaluation of cancer-care
+quality.
+
+This work demonstrated that the machine learning approaches can be
+used to provide an automated support in cancer classification based on
+the information contained in free-text pathology reports.
+
+Machine learning techniques overcome the previously mentioned
+delay in cancer case definition by cancer registry and allow a
+powerful tool for timely indicators computation. The implementation of
+this procedure guarantee an automated and validated instrument to
+monitor and evaluate diagnostic and therapeutic pathways in the
+health care context.
+
+\section{Hierarchical models, attention models, interpretability}
+\label{ch:icdo}
+
+\subsection{Prediction tasks}
+We defined two multi-class classification tasks: (1) main tumor site
+prediction ($68$ mutually exclusive classes) and (2) morphology
+prediction ($203$ mutually exclusive
+classes). Although the two tasks maybe somewhat correlated, we did not
+attempt multi-task approaches given the small number of tasks and
+large enough size of the dataset.
+
+
+\subsection{Hyperparameters}\label{sec:hyperparameters}
+The hyperparameters of \eqref{eq:embed}~-~\eqref{eq:maxModelC}
+and \eqref{eq:embedH}~-~\eqref{eq:maxModelCH} control the structure of
+the model.
+
+$\xi^e$ is associated with the embedding layer $E$ and in our case
+refers to \ac{glove} 
+hyperparameters~\cite{pennington_glove:_2014}, we found with an
+intrinsic evaluation that the better configuration was $60$ for the vector
+size, $15$ for the window size, and $50$ iterations. $\xi^f$,
+$\xi^r$, $\xi'^{f}$, and $\xi'^{r}$ define the number of
+\ac{gru} layers ($\xi_{(l)}$) and the number of unit per each layer
+($\xi_{(d)}$) respectively for $F$, $R$, $F'$, $R'$. 
+$G$ is a \ac{mlp}, $\xi^h$ controls the number of
+layers and their dimension. To limit the
+hyperparameters space, we decided to
+make equal-dimension stacked layers in case of more than one,
+regarding $F$, $R$, and $G$. $\xi^a$ and $\xi'^a$ controls the
+kind of aggregating function of $A$ and $A'$ respectively, and in case
+of \emph{attention} 
+it controls the dimension of the attention layer. Finally $\xi^c$ controls the
+data-dependent output dimension of $g$.
+
+In \maxp{} we used the \emph{max} aggregation
+function 
+in the plain model of \cref{sec:modelh}. We determined the
+hyperparameters evaluating the validation set in the space (with the
+better configuration underlined):
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1},2],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
+\end{align*}
+for the \emph{main site} task, and:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
+\end{align*}
+for the \emph{morphology} task.
+
+In \softmax{} we used the \emph{attention} aggregation function in the
+plain model. The hyperparameters
+space was:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,\underline{128},256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1}],\\
+  \xi_{(d)}^h&\in&[256,\underline{512},1024],\\
+  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256}],\\
+  \xi_{(l)}^h&\in&[0,\underline{1}],\\
+  \xi_{(d)}^h&\in&[64,\underline{128},256],\\
+  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
+\end{align*}
+for the morphology.
+
+In \maxh{} we used the \emph{max} aggregation in the hierarchical
+model of \cref{sec:modelh}. The hyperparameters space was:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,1,\underline{2},4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+\end{align*}
+for the site, and:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+\end{align*}
+for the morphology.
+
+In \softmaxh{} we used the \emph{attention} aggregation in the
+hierarchical model. The hyperparameters space was:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,64,\underline{128},256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
+\end{align*}
+for the morphology.
+
+In \maxi{} we used the \emph{max} aggregation in the plain
+model. Also we set the model to be interpretable (see
+\cref{sec:interpretability}). The hyperparameters space was:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,512,1024,2048],
+\end{align*}
+for the site, and:
+\begin{align*}
+  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256},512],\\
+  \xi_{(l)}^h&\in&[\underline{1}],\\
+  \xi_{(d)}^h&\in&[],
+\end{align*}
+for the morphology. Note that in this setting the dimension of the
+last layer of $G$ must be equal to the output dimension of the model
+(and the softmax is applied directly after the aggregation $A$,
+without any layer). Thus, $\xi_{(d)}^h$ refers only to the
+layers before the last one, if they exists.
+
+Regarding \gru{} we searched in a space of $[1,2,4]$ layers of
+dimension in $[128,256,512,1024]$.
+
+
+
+% The hyperparameters $\xi=\xi^l\cup\xi^r\cup\xi^h\cup\xi^c$ define the
+% structure of the model. Regarding $\xi^l=\xi^r$ they define the type
+% of \ac{rnn} that in our experiments can be \ac{lstm} or \ac{gru}, the
+% number of stacked \ac{rnn} layers and the dimension of each
+% layer. $\xi^h$ defines the number of layers in the first
+% \ac{mlp} and their
+% dimensions, moreover it defines the type of aggregating function $f$
+% that in our experiments can be one of
+% \begin{align}
+%   f(\vect{a},\vect{b}) &= \left[\max(a_1,b_1),\dots,\max(a_l,b_l)\right];\\
+%   f(\vect{a},\vect{b}) &= \left[\frac{a_1+b_1}{2},\dots,\frac{a_l+b_l}{2}\right];\\
+%   f(\vect{a},\vect{b}) &= \left[a_1,\dots,a_l,b_1,\dots,b_l\right].\label{eq:aggregation}
+% \end{align}
+% $\xi^c$ defines the number of layers and their dimensions of the
+% final classifier. The number of layers defined in $\xi^h$ can be
+% equal to $0$. In such case, $\vect{h}_{i,j}$ is calculated:
+% \begin{equation*}
+%   \vect{h}_{i,j} = f(\vect{h}^l_{i,j},\vect{h}^r_{i,j}).
+% \end{equation*}
+% Also the number of layers defined in $\xi^c$ can be equal to $0$. In
+% such case $\vect{\hat{y}}_i$ is calculated:
+% \begin{equation*}
+%   \vect{\hat y}_i = \max_j(\vect{h}_{i,j}).
+% \end{equation*}
+
+\subsection{Artificial dataset}\label{sec:experiments}
+Classic \ac{rnn} approaches exhibit some limits related to
+memory. We designed an artificial experiment in
+order to investigate how \ac{rnn} and \maxp{} address those
+problems. The dataset 
+$\mathcal{D}=(\vect{X}\in [0,\dots,9]^{n\times m},\vect{y}\in [0,1]^n)$ is
+composed of $n$ sequences of length
+$m$ of digits $x_{i,j}\in[0,\dots,9]$. If the $i$-th sequence contains
+at least three consecutive digits
+$x_{i,j-1},x_{i,j},x_{i,j+1}$ that concatenated represents a prime
+number then the
+sample is positive and labeled with $y_i=1$, otherwise is negative and
+$y_i=0$.
+
+We realized a series
+$\mathcal{D}^{(m)}=(\vect{X}^{(m)},\vect{y}^{(m)})$ of balanced
+datasets of increasing complexity. Each $\mathcal{D}^{(m)}$ has $100\ 000$
+samples with 
+sequence lengths of
+$$
+m\in[100,200,300,400,500,600,700,800,900,1000].$$
+We trained two models on
+all the datasets: a plain \ac{gru} with hidden dimension $32$ and a
+our model with max aggregation with same hidden dimension $32$. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{imgMax/accuracy-base.eps}
+  \caption{Accuracy of plain \ac{gru} on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
+  \label{fig:testAccBase}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{imgMax/accuracy-max.eps}
+  \caption{Accuracy of our model with max aggregation on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
+  \label{fig:testAccMax}
+\end{figure}
+
+In \cref{fig:testAccBase} and \cref{fig:testAccMax} we compare
+the learning curves of the base model with the ours. We can conclude
+that our model degrades less than the baseline under the assumption of
+having the same number of parameters.
+
+\subsection{Interpretability}
+\label{sec:interpretability}
+To validate the
+hypothesis that \maxi{} and \softmaxi{} are interpretable,
+we performed the same experiment of \cref{sec:experiments}
+with an interpretable model with a comparable number of parameters.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{imgMax/accuracy-int.eps}
+  \caption{Accuracy of interpretable model with max aggregation on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
+  \label{fig:testAccInt}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \footnotesize
+  \begin{tabular}{|p{\floatwidth}|}
+    \hline
+    \input{attentions/test1.tex}\\
+    \hline
+    \input{attentions/test2.tex}\\
+    \hline
+    \input{attentions/test3.tex}\\
+    \hline
+    \input{attentions/test4.tex}\\
+    \hline
+    \input{attentions/test5.tex}\\
+    \hline
+    \input{attentions/test6.tex}\\
+    \hline
+  \end{tabular}
+  \caption{Visualization of outputs prior to the max pooling for some
+    samples. Red boxes represent the prime numbers ground
+    truth, green highlighting represents the values of $u_t$ in
+    \eqref{eq:maxModelF}.}
+  \label{fig:testAttention}
+\end{figure}
+
+The degradation of the base \ac{gru} model in fig. \ref{fig:testAccInt} is worst
+compared with the model with max aggregation in fig. \ref{fig:testAccMax},
+but is still better compared with the baseline in
+fig. \ref{fig:testAccBase}. Conversely the interpretable model gain
+some insights on the decisions. As visible in
+fig. \ref{fig:testAttention}, the model performs the classification
+task focusing on 
+the part of the sequences where the prime numbers are present.
+
+\begin{figure}
+  \centering
+  \footnotesize
+  \begin{tabular}{|p{\floatwidth}|}
+    \hline
+    \input{attentions/testS1.tex}\\
+    \hline
+    \input{attentions/testS2.tex}\\
+    \hline
+    \input{attentions/testS3.tex}\\
+    \hline
+  \end{tabular}
+  \caption{Visualization of weighted features after softmax for some
+    positive samples. Red boxes represent the prime numbers ground
+    truth, green highlighting represents the values of
+    $a_t(\vect{u};\theta^a)u_t$ in
+    \eqref{eq:aggregation}.}
+  \label{fig:testAttentionSoft}
+\end{figure}
+We compared also the difference of the max vs attention aggregation. In
+\cref{fig:testAttentionSoft} we have empirical evidence that the
+attention aggregation is not sufficient to guarantee the model
+interpretability (for this artificial task). The softmax function do
+not avoid the learning of 
+distribute representations. The effects on the loss calculation of a
+distribution with high variance before the aggregation, are the 
+same of as a distribution with lower variance.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{imgMax/maxBaseDiff.eps}
+  \caption{Max reached accuracy of model with max, attention, and base \ac{gru} on $\mathcal{D}^{(m)}$ for different dimensions of $m$.}
+  \label{fig:testAccDiff}
+\end{figure}
+In \cref{fig:testAccDiff} we show the maximum reached accuracy for the
+models, summarizing
+\cref{fig:testAccBase,fig:testAccMax,fig:testAccInt} and adding the
+model with the attention aggregator. The latter degrades faster than the
+one with the max aggregation.
+
+\subsection{Cancer register data}
+We decided to arrange our experiments on cancer
+data in 
+a setting that simulate a predictive task. We sorted the medical
+records by insertion date, then we used the most recent $80\%$ of
+records as test 
+dataset, an equal amount of the remaining most recent records as
+validation dataset, and the rest as training dataset. At the end the
+training, validation, and test datasets have respectively $51\,101$,
+$17\,034$, and $17\,035$ records.
+
+We used the text in the $1.5$ millions unlabeled records, plus the
+text in training datasets to train \ac{glove} word
+vectors representations. We trained two different models, one
+in an interpretable configuration called \maxi{} and one not
+interpretable with 
+best configuration that we call \maxp{}. We found the hyperparameters
+configuration with grid search. 
+\maxi{} have one \ac{gru} layer of dimension $256$
+for \eqref{eq:maxModelRL} and \eqref{eq:maxModelRR}, 1 layer of
+output dimension $68$ with aggregating function \eqref{eq:aggregation}
+for \eqref{eq:maxModelF}, and zero layers for \eqref{eq:maxModelC}. 
+\maxp{} have
+one \ac{gru} layer with
+dimension $128$ for \eqref{eq:maxModelRL} and \eqref{eq:maxModelRR},
+one \ac{mlp} layer of dimension $512$ with aggregating function
+\eqref{eq:aggregation} for \eqref{eq:maxModelF}, and
+one layer of output dimension $68$ for \eqref{eq:maxModelC}.
+
+We trained the models minimizing categorical cross entropy with Adam
+\cite{kingma2014adam} using a learning rate of $0.001$. The
+experiments were performed in \emph{PyTorch} on machines with
+\emph{GeForce RTX 2080 Ti} 
+GPU using batches of $32$ samples.
+
+We compared \maxp{} and \maxi{} with a baseline of two stacked
+bidirectional 
+\ac{gru} layer of dimension $256$ and with \ac{bert} pretrained on the
+same data where \ac{glove} where trained for the other models, and
+fine-tuned on the training set.
+
+\begin{table}
+  \centering
+  \caption{Results on cancer data}
+  \label{tab:results}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    &Acc.&Acc. T3&Acc. T5&MAP&K\\
+    \hline
+    \hline
+    \textbf{Site}&&&&&\\
+    \gru{}&0.8977&0.9636&0.9764&0.9331&0.8848\\
+    \bert{}&0.8980&0.9623&0.9768&0.9330&0.8852\\
+    \maxi{}&0.8792&0.9533&0.9610&0.9190&0.8637\\
+    \maxh{}&0.8980&0.9611&0.9773&0.9329&0.8851\\
+    \softmaxh{}&0.8983&0.9617&0.9760&0.9329&0.8855\\
+    \softmax{}&0.9008&0.9607&0.9749&0.9341&0.8883\\
+    \maxp{}&\textbf{0.9024}&\textbf{0.9658}&\textbf{0.9797}&\textbf{0.9369}&\textbf{0.8901}\\
+    \hline
+    \hline
+    \textbf{Morpho.}&&&&&\\
+    \gru{}&0.8266&0.9402&0.9602&0.8881&0.8064\\
+    \bert{}&0.8367&0.9267&0.9439&0.8870&0.8178\\
+    \maxi{}&0.7317&0.9012&0.9305&0.8169&0.6964\\
+    \maxh{}&0.8313&0.9382&0.9582&0.8894&0.8117\\
+    \softmaxh{}&0.8318&0.9388&0.9566&0.8894&0.8119\\
+    \softmax{}&\textbf{0.8424}&0.9445&0.9632&\textbf{0.8973}&\textbf{0.8240}\\
+    \maxp{}&0.8394&\textbf{0.9452}&\textbf{0.9634}&0.8962&0.8207\\
+    \hline
+  \end{tabular}
+\end{table}
+In \cref{tab:results} we resumed the results of the models on the test
+dataset. We report accuracy, \ac{map} and Cohen's kappa score (K).
+\ac{map} is used in information
+retrieval \cite{manning_introduction_2008}. It expresses how well the
+correct class of a sample can be retrieved in 
+the first results of the classifier output.
+Cohen's kappa score is usually used to assess
+the agreement of two annotators \cite{cohen_coefficient_1960}. It
+measures the difference between the observed agreement and the
+agreement that can happen choosing randomly the class. Can be used to
+mitigate the bias caused by the unbalanced data set.
+
+\begin{table}
+  \centering
+  \ttfamily
+  \scriptsize
+  \caption{Visualization of interpretable outputs.}
+  \label{tab:multiAttention1}
+  \begin{tabular}{|c|c|c|}
+    \hline
+    $y_i$&\textrm{Relevant} $\vect{h}_{i,j}$&$x_{i,j}$\textrm{, relevant} $\vect{h}_{i,j}$\\
+    \hline
+    \input{attentions/multiB3.tex}
+    \hline
+    \input{attentions/multiB2.tex}
+    \hline
+    %\input{attentions/multiB3.tex}
+    %\hline
+    \input{attentions/multiB4.tex}
+    \hline
+  \end{tabular}
+\end{table}
+The interpretable model is not powerful as \maxp{}, and in this task
+is not even as the baseline, but it can be used as a
+classification support and to 
+gain insight in the classification process. In
+\cref{tab:multiAttention1} we show three different samples where we
+underline with different colors --- only for the indicated relevant
+codes --- the values of $\vect{h}_{i,j}$ in \eqref{eq:maxModelF}. We
+consider a code relevant if the corresponding value in the
+68-dimension vector $\vect{h}_{i,j}$ is greater than $0.1$. In the
+first sample, that was correctly classified, all the terms related to
+prostate gland cancer are strongly underlined. Apart from
+\emph{prostatico} and \emph{prostata} that are Italian terms for
+\emph{prostatic} and \emph{prostate}, the main underlined terms are
+\emph{PSA} (Prostate-Specific Antigene) and \emph{Gleason} score that
+are two common exams in prostate cancer cases
+\cite{brimo2013prostate}.
+
+The second sample is a more difficult
+document, it is roughly translated in english:\\
+%\smallskip\noindent
+\begin{small}
+  \ttfamily
+  \begin{tabular}{l}
+    ISOLATED FRAGMENTS ATTRIBUTABLES\\
+    TO HIGH DEGREE\\
+    INTESTINAL TUBULAR ADENOMA.\\
+    FRAGMENTS (NR. 2) OF PEDUNCULATED\\
+    POLYPUS AT 20 CM FROM\\
+    THE ANAL ORIFICE. (PERFORMED\\
+    HEMATOXYLIN-EOSIN COLORING).
+\end{tabular}
+\end{small}\\
+For this sample, the model propose the three classification codes \emph{18},
+\emph{20}, and \emph{21} (with value $1$ for both \emph{18} and
+\emph{20}, and little less for \emph{21}). It suggests that the terms
+\emph{intestinal tubular adenoma} and \emph{pedunculated polypus} are
+related to colon, \emph{polypus} can be related also to rectum, and
+\emph{anal orifice} is related to rectum and anus. Note that this
+record was labeled with the code for rectum, while the medical report
+explicitly mention that the fragments have been extracted at 20 cm
+from the anal orifice (the human rectum is long approximately 12 cm
+and the anal canal 3-5 cm \cite{greene2006ajcc}).
+
+The third sample is an even more complex record, in english is
+translated:\\
+\begin{small}
+  \ttfamily
+  \begin{tabular}{l}
+    LEFT PLEURAL EFFUSION OF\\
+    UNKNOWN ORIGIN AND LUNG\\
+    THICKENING OF UNKNOWN ORIGIN,\\
+    NODULES OF THE ABDOMINAL WALL.\\
+    CANCEROUS INFILTRATION OF THE\\
+    CONNECTIVE-ADIPOSE STROMA.\\
+    IMMUNOHISTOCHEMICAL: CK7 +,\\
+    CK20 -, TTF-1 -, PROTEIN\\
+    S-100 -. 2 CM LESION,\\
+    0 X 1,3 X 0,7. 1-2)\\
+    SERIAL SECTIONS.
+\end{tabular}
+\end{small}\\
+The model classifies the record mainly with codes \emph{34} and
+\emph{80}, and less with \emph{56} and \emph{67}. It underlines with
+the lung code the terms
+\emph{plurial effusion} and \emph{lung thickening}, but is interesting
+that it also underlines the immunohistochemical results. The
+positive \emph{CK7}, negative \emph{CK20} pattern represents a common
+diagnosis 
+of lung origin for metastatic adenocarcinoma
+\cite{kummar2002cytokeratin}. Also immunohistochemistry is a common
+approach in the diagnosis of tumors of uncertain origin
+\cite{duraiyan2012applications}. This can be the reason for the
+underlying with code \emph{80} of the immunoistochemical part.
+It is interesting to note also that \emph{pleuric} is
+suggested to be related to ovary cancer, in fact the pleural cavity
+constitutes the most frequently extra abdominal metastatic site in
+ovarian carcinoma \cite{porcel2012pleural}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{img/plotSintex.eps}
+  \caption{.}
+  \label{fig:sintex}
+\end{figure}
+To quantify the effectiveness of the interpretability, we designed an
+experiment where the dataset is created taking for each document the
+first $k$ words selected by  
+ordering the results of the aggregator, $u_t$ in case of max,
+$a_t(\vect{u};\theta^a)u_t$ in case of attention. In \cref{fig:sintex}
+we plot the accuracy obtained training a plain \ac{gru} model on the
+cleaned datasets, increasing $k$. 
+
+\subsection{Discussion}
+
+
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "thesis"
+%%% End:

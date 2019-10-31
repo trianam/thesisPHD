@@ -508,7 +508,8 @@ In detail, to calculate the weights $\vect{w}^{(p+1)}$ for the next
 phase $p+1$, it is 
 sufficient to determine the gradient of 
 the error surface in the current point $\vect{w}^{(t)}$ in order to
-apply an optimization method like \ac{sgd}.
+apply an optimization method like \ac{sgd}. We discuss \ac{sgd} in
+detail in \cref{sec:sgd}.
 
 \subsection{Loss}
 The goal of the lerning algorithm is to learn a function $f$ such that
@@ -681,8 +682,40 @@ $L_1$ and $L_2$ regularization:
 \end{equation*}
 
 \subsubsection{Dropout}
-
+Similarly to other regularization techniques, \emph{dropout} method
+\cite{hinton2012improving} is designed to prevent the network from
+learning on specific weights. It works by randomly setting to $0$ the
+output of a randomly chosen neurons for each sample. The connections
+between the dropout technique and other regularizations are
+established \cite{wager2013dropout}.
 \subsection{\acf{sgd}}
+\label{sec:sgd}
+To successfully training a model, it is necessary to solve the
+optimization problem \eqref{eq:lossmin}. A common solution is to use
+gradient based methods. Gradient based methods works by estimating the
+error computing the loss $\loss$ over the training set and then
+calculating the 
+gradients of the error respect to the parameters $\theta$. Once the
+gradient is computed, the values of the weights are moved in the
+opposite direction of the gradient. \acf{sgd} is a general
+optimization algorithm that is profitably used in training \ac{ann}
+\cite{bottou2012stochastic,lecun1995convolutional}.
+\begin{algorithm}
+  \caption{\acf{sgd}}\label{alg:sgd}
+  \SetKwInput{Input}{Input}
+  \Input{
+    Parametrized function $f(\vect{x};\theta)$\\
+    Training set $\mathcal{D}(\vect{x}_{1:n},\vect{y}_{1:n})$
+  }
+  \While{stopping criteria not met}{
+    Sample training example $\vect{x}_i,\vect{y}_i$\;
+    Compute $\loss(f(\vect{x}_i;\theta),\vect{y}_i)$\;
+    $\hat{\vect{g}}\rightarrow$ gradients of
+    $\loss(f(\vect{x}_i;\theta),\vect{y}_i)$ w.r.t. $\theta$\;
+    $\theta\rightarrow\theta-\nu_t\hat{\vect{g}}$
+  }
+\end{algorithm}
+\fxnote*{Stefano}{Finish}
 
 \subsection{\acf{rnn}}
 \acp{rnn} are specialized versions of \ac{ann} for sequences. They
