@@ -248,11 +248,10 @@ layer.
   \label{fig:schemeLstmb}
 \end{figure}
 
-\gru{} is a 2 level bidirectional \ac{gru} where each layer has
-dimension 256.
+\gru{} is a stacked bidirectional \ac{gru} model.
 
 The other models where trained on different hyperparameters
-configurations which range is explained in
+configurations whose range is explained in
 \cref{sec:hyperparameters}. We proceed to explain in detail their
 structure.
 \subsection{\maxp, \softmax, \maxi, \softmaxi}
@@ -345,8 +344,8 @@ The model is flexible enough to gain interpretability under certain
 assumptions. If we remove the last layer in \eqref{eq:maxModelC},
 the dimension of last layer in \eqref{eq:maxModelF}
 needs to be equal to the
-output dimension ($1$ for the artificial dataset, $68$ for the site
-task, and $203$ for the 
+output dimension (in the experiments: $1$ for the artificial dataset,
+$68$ for the site task, and $203$ for the 
 morphology).
 We hypothesize that in this case, the values of
 $u_t$ (or the weighted values $a_t(\vect{u};\sigma^a)u_t$ if we use the

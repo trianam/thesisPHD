@@ -1,4 +1,4 @@
-\chapter{Deep learning}
+\chapter{Machine Learning}
 \section{Machine Learning Theory}
 \ac{ml} is a branch of \ac{ai}
 where the focus is to develop systems that learn from the
@@ -365,6 +365,9 @@ preference for each class $\HSet_n$. The \ac{srm} rule follows a
 \emph{bound minimization} approach. The goal is to find a hypothesis
 that minimizes a certain upper bound on the true risk.
 
+\section{\acf{svm}}
+
+
 \section{Neural Networks}
 In our work we used mainly a specific kind of \ac{rnn}: \ac{lstm}.
 \acp{rnn} are a class of \acp{ann} where the connections are not only
@@ -715,7 +718,14 @@ optimization algorithm that is profitably used in training \ac{ann}
     $\theta\rightarrow\theta-\nu_t\hat{\vect{g}}$
   }
 \end{algorithm}
-\fxnote*{Stefano}{Finish}
+The hyperparameter $\nu_t$ is the learning rate. It can be either
+fixed throughout the learning process, or decay as a function of the
+time step $t$. Adam is a widely used algorithm that adaptively change
+the learning rate \cite{kingma2014adam}. The error calculated in
+\cref{alg:sgd} is based on only one example. This may result in
+inaccurate gradient calculation. A common way to reduce the noise of
+this inaccuracy is to estimate the error and the gradients on a sample
+of $m$ examples. This is called minibatch \ac{sgd}.
 
 \subsection{\acf{rnn}}
 \acp{rnn} are specialized versions of \ac{ann} for sequences. They
@@ -820,13 +830,11 @@ after a sequence $\vect{x}^{(t)},\dots,\vect{x}^{(\tau)}$ of inputs.
 In order to train a \ac{rnn}, it is sufficient to apply the
 backpropagation to the entire unfolded model.
 
-\subsection{\acf{gru}}
-
 \subsection{\acf{lstm}}
 The major drawback of \acp{rnn} is the \emph{vanishing
   gradient} problem during the backpropagation. The gradient
 for long-term associations, propagated through many stages, tends to
-become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter_1997_lstm}.
+become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter_1997_long}.
 
 \begin{figure}
   \centering
@@ -983,6 +991,24 @@ calculates one dimension of $\vect{y}$. The input $\vect{x}$ is copied
 for every cell and, together with the previous-phase
 output,
 constitutes the input $in_1,\dots,in_m$ of the single cells.
+
+\subsection{\acf{gru}}
+The \ac{gru} was introduced by \cite{cho2014learning} as an
+alternative to \ac{lstm}. \ac{gru} is also based on gating mechanism,
+but it has fewer gates respect \ac{lstm} and the memory is directly
+exposed to the output. One gate called \emph{reset} is used to control
+access to the previous state and compute a proposed update. The new
+status is calculated as an interpolation between the previous and the
+proposed status, where the proportion of the interpolation is
+controlled by the \emph{update} gate.
+
+The choice between \ac{lstm} and \ac{gru} is context dependent, in
+certain applications \ac{lstm} gives better performances, in other
+applications \ac{gru} does \cite{yin2017comparative}. 
+
+
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "thesis"
