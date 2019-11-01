@@ -1,6 +1,4 @@
 \chapter{Experiments}
-\fxnote*{Stefano}{metodologia adottata, perch'e ci sono, a cosa
-  servono, cosa interessa vedere}
 With the experiments we want to show the feasibility of deep learning
 methods and more generally machine learning methods applied to large
 scale histological records. Moreover we want to compare classical
@@ -97,10 +95,10 @@ defined by:
 \end{equation*}
 where $\mu_{i}$ and $\nu_{i}$ are the number of samples classified as
 $i$ for the first and second classifier. They are defined as:
-\begin{eqnarray*}
-  \mu_i(\vect{y}) &=& \sum_{j=1}^{n}1(y_j = i)\\
-  \nu_i(\vect{\hat y}) &=& \sum_{j=1}^{n}1(\hat y_j = i)
-\end{eqnarray*}
+\begin{align*}
+  \mu_i(\vect{y}) &= \sum_{j=1}^{n}1(y_j = i)\\
+  \nu_i(\vect{\hat y}) &= \sum_{j=1}^{n}1(\hat y_j = i)
+\end{align*}
 
 \subsection{\acf{map}} is a measure used in information
 retrieval \cite{manning_introduction_2008}. It expresses how well the
@@ -680,17 +678,17 @@ in the plain model of \cref{sec:modelh}. We determined the
 hyperparameters evaluating the validation set in the space (with the
 better configuration underlined):
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1},2],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1},2],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
 \end{align*}
 for the \emph{main site} task, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
 \end{align*}
 for the \emph{morphology} task.
 
@@ -698,55 +696,55 @@ In \softmax{} we used the \emph{attention} aggregation function in the
 plain model. The hyperparameters
 space was:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,\underline{128},256],\\
-  \xi_{(l)}^h&\in&[0,\underline{1}],\\
-  \xi_{(d)}^h&\in&[256,\underline{512},1024],\\
-  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[64,\underline{128},256],\\
+  \xi_{(l)}^h&\in[0,\underline{1}],\\
+  \xi_{(d)}^h&\in[256,\underline{512},1024],\\
+  \xi_{(d)}^a&\in[128,\underline{256},512,1024],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256}],\\
-  \xi_{(l)}^h&\in&[0,\underline{1}],\\
-  \xi_{(d)}^h&\in&[64,\underline{128},256],\\
-  \xi_{(d)}^a&\in&[128,\underline{256},512,1024],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[64,128,\underline{256}],\\
+  \xi_{(l)}^h&\in[0,\underline{1}],\\
+  \xi_{(d)}^h&\in[64,\underline{128},256],\\
+  \xi_{(d)}^a&\in[128,\underline{256},512,1024],
 \end{align*}
 for the morphology.
 
 In \maxh{} we used the \emph{max} aggregation in the hierarchical
 model of \cref{sec:modelh}. The hyperparameters space was:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
-  \xi_{(l)}^h&\in&[0,1,\underline{2},4],\\
-  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in[0,1,\underline{2},4],\\
+  \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
 \end{align*}
 for the site, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
-  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
 \end{align*}
 for the morphology.
 
 In \softmaxh{} we used the \emph{attention} aggregation in the
 hierarchical model. The hyperparameters space was:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,64,\underline{128},256],\\
-  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
-  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,64,\underline{128},256],\\
+  \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in[64,\underline{128},256,512],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in&[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in&[32,\underline{64},128,256],\\
-  \xi_{(l)}^h&\in&[0,\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[256,512,\underline{1024},2048],\\
-  \xi_{(d)}^a=\xi'^a_{(d)}&\in&[64,\underline{128},256,512],
+  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
+  \xi_{(d)}^a=\xi'^a_{(d)}&\in[64,\underline{128},256,512],
 \end{align*}
 for the morphology.
 
@@ -754,17 +752,17 @@ In \maxi{} we used the \emph{max} aggregation in the plain
 model. Also we set the model to be interpretable. The hyperparameters
 space was: 
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[2,4,8,16,32,64,\underline{128},256,512],\\
-  \xi_{(l)}^h&\in&[\underline{1},2,4],\\
-  \xi_{(d)}^h&\in&[2,4,8,16,32,64,128,256,512,1024,2048],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[2,4,8,16,32,64,\underline{128},256,512],\\
+  \xi_{(l)}^h&\in[\underline{1},2,4],\\
+  \xi_{(d)}^h&\in[2,4,8,16,32,64,128,256,512,1024,2048],
 \end{align*}
 for the site, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r&\in&[1,\underline{2},4],\\
-  \xi_{(d)}^f=\xi_{(d)}^r&\in&[64,128,\underline{256},512],\\
-  \xi_{(l)}^h&\in&[\underline{1}],\\
-  \xi_{(d)}^h&\in&[],
+  \xi_{(l)}^f=\xi_{(l)}^r&\in[1,\underline{2},4],\\
+  \xi_{(d)}^f=\xi_{(d)}^r&\in[64,128,\underline{256},512],\\
+  \xi_{(l)}^h&\in[\underline{1}],\\
+  \xi_{(d)}^h&\in[],
 \end{align*}
 for the morphology. Note that in this setting the dimension of the
 last layer of $G$ must be equal to the output dimension of the model

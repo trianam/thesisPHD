@@ -3,7 +3,7 @@
 \section{Dataset}
 \label{sec:dataset}
 We collected a set of $1\,592\,385$ anatomopathological exam results
-from Tuscany region in the period 2004-2013. About $6\%$
+from Tuscany region \ac{rtt} in the period 2004-2013. About $6\%$
 of these records refer to a positive tumor
 diagnosis and have topological and morphological ICD-O3 labels,
 determined by tumor registry experts. Other reports are associated
@@ -33,7 +33,7 @@ appear in either training, validation, and test sets) ICD-O3 codes. We
 obtained in the end 
 a dataset suitable for supervised learning consisting of $85\,170$
 labeled records over $203$ morphological classes and $68$
-topological classes (see below).
+topological classes.
 
 We collected also the unlabeled rest of the dataset to train
 unsupervised methods.
@@ -51,7 +51,7 @@ morphology; other clinical variables, e.g.\ \emph{Gleason},
 \ac{rtt} personnel, thus they can be considered reliable and used as
 ground truth for the learning models.
 
-Furthermore, there is an histology table containing records resulting
+Furthermore, there is a histology table containing records resulting
 from microscopy exams. Each record contains three free-text
 fields, one for the macroscopy, one for the diagnosis, and one for
 other information.
@@ -73,7 +73,7 @@ without a related histology exam because \ac{rtt} uses also other
 sources to collect tumor cases, e.g.\ \acp{hdr} and death
 certificates. There are also histology exams without a related
 neoplasm 
-case because not always an histology results in a tumor case.
+case because not always a histology results in a tumor case.
 
 To train the unsupervised methods, we keep all the records from the
 histology table that cannot be joined with 
@@ -145,8 +145,8 @@ proceeded to confront the different parameters as in
 \cref{fig:gloveParameter}.
 
 In order to speed up the computation for the models \lstmng{}, \lstmb{}
-and \lstmc{} we cut the length of text to 200. Covering completely the
-$87\%$ of records.
+and \lstmc{} we cut the length of text to 200. The
+$87\%$ of records have less than 200 words.
 
 \lstmng{} is the \ac{ann} in \cref{fig:schemeLstmng},
 composed of two layers of $150$ bidirectional \ac{lstm} cells,
@@ -265,22 +265,19 @@ superscript in the following to keep notation simple.  Sequences will
 be denoted in boldface. The RNN-based sequence classifiers used in
 this work compute their predictions $f(\vect{x})$ as follows:
 \begin{align}
-  e_t &=& E(x_t;\theta^e),\label{eq:embed}\\
-  h^f_t &=& F(e_t,h^f_{t-1};\theta^f),\label{eq:maxModelRL}\\  
-  h^r_t &=& R(e_t,h^r_{t+1};\theta^r),\label{eq:maxModelRR}\\
-  u_t &=& G(h_t;\theta^h),\label{eq:maxModelF}\\
-  \phi & =& A(\vect{h},\vect{u};\theta^a),\label{eq:aggregation}\\
-  f(\vect{x}) &=& g(\phi;\theta^c).\label{eq:maxModelC}
+  e_t &= E(x_t;\theta^e),\label{eq:embed}\\
+  h^f_t &= F(e_t,h^f_{t-1};\theta^f),\label{eq:maxModelRL}\\  
+  h^r_t &= R(e_t,h^r_{t+1};\theta^r),\label{eq:maxModelRR}\\
+  u_t &= G(h_t;\theta^h),\label{eq:maxModelF}\\
+  \phi &= A(\vect{h},\vect{u};\theta^a),\label{eq:aggregation}\\
+  f(\vect{x}) &= g(\phi;\theta^c).\label{eq:maxModelC}
 \end{align}
 $E$ is an embedding function mapping words into $p$-dimensional real
 vectors (where embedding parameters $\theta_e$ can be either
 pretrained and adjustable or fixed, see Section~\ref{sec:word-vectors}
 below.  Functions $F$ and $R$ corresponds to (forward and reverse)
 dynamics that can be described in term of several (possibly layered)
-recurrent cells. In this work we focus on \ac{gru}
-cells~\cite{cho2014properties} for their simplicity and because
-preliminary experiments revealed no advantages over long-short term
-memory cells~\cite{hochreiter1997long} on our data. Each vector $h_t$,
+recurrent cells. Each vector $h_t$,
 the concatenation of $h^f_t$ and $h^r_t$, can be interpreted as latent
 representations of the information contained at position $t$ in the
 document. $G$ is an additional \ac{mlp} mapping each latent vector into a
@@ -301,8 +298,8 @@ function include:
   using an attention mechanism as in~\cite{yang_hierarchical_2016}; in
   this case, (scalar) attention weights are computed as
   \begin{align*}
-    c_t&=&C(\vect{u};\theta^a),\\
-    a_t(\vect{u};\theta^a) &=& \frac{e^{\langle c, c_t\rangle}}
+    c_t&=C(\vect{u};\theta^a),\\
+    a_t(\vect{u};\theta^a) &= \frac{e^{\langle c, c_t\rangle}}
     {\sum_i{e^{\langle c, c_i\rangle}}},\\
   \end{align*}
   %$$
@@ -373,15 +370,15 @@ $t=1,\dots,T^{(i,s)}$ is the $t$-th word of the $s$-th sentence in the
 $i$-th document, and associated target classes
 $y^{(i)}\in\{1,\dots,K\}$. The prediction $f(\vect{x})$ is calculated:
 \begin{align}
-  e_{s,t} &=& E(x_{s,t};\theta^e),\label{eq:embedH}\\
-  h^f_{s,t} &=& F(e_{s,t},h^f_{s,t-1};\theta^{f}),\label{eq:maxModelRLH}\\  
-  h^r_{s,t} &=& R(e_{s,t},h^r_{s,t+1};\theta^{r}),\label{eq:maxModelRRH}\\
-  u_{s,t} &=& G(h_{s,t};\theta^{h}),\label{eq:maxModelFH}\\
-  \phi_s & =& A(\vect{h}_s,\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
-  h'^{f}_{s} &=& F'(\phi_{s},h'^{f}_{s-1};\theta'^{f}),\label{eq:maxModelRLHS}\\  
-  h'^{r}_{s} &=& R'(\phi_{s},h'^{r}_{s+1};\theta'^{r}),\label{eq:maxModelRRHS}\\
-  \phi' & =& A'(\vect{s},\vect{h}';\theta'^{a}),\label{eq:aggregationHS}\\
-  f(\vect{x}) &=& g(\phi';\theta^c).\label{eq:maxModelCH}
+  e_{s,t} &= E(x_{s,t};\theta^e),\label{eq:embedH}\\
+  h^f_{s,t} &= F(e_{s,t},h^f_{s,t-1};\theta^{f}),\label{eq:maxModelRLH}\\  
+  h^r_{s,t} &= R(e_{s,t},h^r_{s,t+1};\theta^{r}),\label{eq:maxModelRRH}\\
+  u_{s,t} &= G(h_{s,t};\theta^{h}),\label{eq:maxModelFH}\\
+  \phi_s &= A(\vect{h}_s,\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
+  h'^{f}_{s} &= F'(\phi_{s},h'^{f}_{s-1};\theta'^{f}),\label{eq:maxModelRLHS}\\  
+  h'^{r}_{s} &= R'(\phi_{s},h'^{r}_{s+1};\theta'^{r}),\label{eq:maxModelRRHS}\\
+  \phi' &= A'(\vect{s},\vect{h}';\theta'^{a}),\label{eq:aggregationHS}\\
+  f(\vect{x}) &= g(\phi';\theta^c).\label{eq:maxModelCH}
 \end{align}
 As in the plain model, $E$ is an embedding function, $F$ and $R$
 corresponds to forward and reverse dynamics that process word

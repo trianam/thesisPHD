@@ -50,12 +50,12 @@ i.e. dictionary entry of the word, e.g. words such as ``booking'',
 ``booked'', ``books'' to their common lemma ``book''. This mapping is
 usually performed using lemma lexicons or morphological analyzers. It
 is a linguistically defined process and may not work well for forms
-that are not in the lexicon or for mis-pelling. a coarser process is
-called \emph{stemming}. A stemmer maps words to shorter words that are
+that are not in the lexicon or for mispelling. A coarser process is
+called \emph{stemming}, it maps words to shorter words that are
 not necessarily grammatically valid. E.g. ``picture'', ``pictures'',
 and ``pictured'' will be stemmed to ``pictur''. \emph{Lexical
   resources} are dictionary that are meant to be accessed by machine
-rather than by humans. They tipically contain information about words,
+rather than by humans. They typically contain information about words,
 e.g. there are lexicons that map inflected word forms to their
 possible morphological analyses, telling that a certain word may be a
 singular masculine noun or a past-perfect verb.
@@ -64,7 +64,7 @@ When the focus entity is text, i.e. sentences, paragraphs documents,
 the features are the count and the order of the letters and words
 within the text. \emph{Bag of words} is a very common feature
 extraction procedure. We look at the histogram of the words within the
-text. We can also compute quantities that are directly derived from
+text. We can compute quantities that are directly derived from
 the words and the letters such as the length of the sentence. We can
 also integrate statistics based on external information. When using
 bag of words, it is common to use \ac{tfidf} weighting
@@ -82,8 +82,8 @@ representation is much more informative than a bag of words.
 When considering a word within a sentence or a document, the features
 of a word are its position within the sentence and the words or
 letters surrounding it. It is common to focus on the immediate context
-of a word by considering a \emph{window} surrounding it (with tipical
-values of 2,5, and 10 words to each side). We may also be interested
+of a word by considering a \emph{window} surrounding it (with typical
+values of 2, 5, and 10 words to each side). We may also be interested
 in the absolute position of a word inside a sentence, having features
 such as ``the word is the 5th in the sentence'' or ``the word appear
 within the first 10 of the sentence''.
@@ -93,8 +93,8 @@ at the text \emph{distance} between them or the identities of the
 words that appear between them.
 
 Sentences in natural language have structures beyond the linear order
-of their words. The structure is not directly observable and are
-referred to as \emph{sintax}. While it is not observable it can be
+of their words. The structure is not directly observable and is
+referred to as \emph{syntax}. While it is not observable it can be
 inferred from the sentence. Specialized systems exist for the
 prediction of parts of speech, syntactic trees, semantic roles,
 discourse relations, and other linguistic properties. These prediction
@@ -137,8 +137,7 @@ data set, and $D_j$ is the set of documents containing term $j$. In
 those representations, common terms receive a lower weight. An
 alternative representation suggested in
 \cite{martinez_information_2011} employed within-category frequencies
-but only yielded modest improvements over \ac{tfidf} and thus we do not
-use it in our baseline.
+but only yielded modest improvements over \ac{tfidf}.
 
 A more informative representation of documents can be obtained by
 taking into account bigrams and trigrams, i.e.\ pairs or triplets or
@@ -157,7 +156,7 @@ orthogonal representation even when they are semantically
 close. Moreover the vast majority of the dataset, i.e. the unlabeled
 records, remains unused with
 this representation. As detailed in \cref{sec:word-vectors}, word
-vectors can be used to address the seconf limitation and also allow us
+vectors can be used to address the second limitation and also allow us
 to take advantage of unlabeled data, which can be typically be
 obtained in large amounts and with little cost.
 
@@ -209,19 +208,35 @@ excerpt of the trained dataset is visible in \cref{fig:gloveGraph}.
 
 The training process involves the construction of the
 $n\times n$ triangular matrix $C$ of words co-occurrence, where $n$ is
-the number of unique words $w_1,\dots,w_n$ inside the text\footnote{Possibly excluded the
-  most and the least frequent terms.}. In order to do this, a window of
+the number of unique words $w_1,\dots,w_n$ inside the text (possibly
+with the exclusion of the
+  most and the least frequent terms). In order to do this, a window of
 size $\omega$ slides
 through the text. After the construction of $C$, \ac{glove} uses the
 information contained in it to train a model that produces vector of
-specific dimension $\nu$.
-
-$\omega$, $\nu$, and the number of
-training iterations $\eta$ are parameters of the method. 
+specific dimension $\nu$. $\omega$, $\nu$, and the number of
+training iterations $\eta$ are the hyperparameters of the method. 
 
 \section{Attention models}
-Attention models are an important concept in neural networks that has
-been researched within diverse application domains.
+Conditioned generation with attention is a powerful architecture. They
+find the main application in the context of sequence-to-sequence
+generation.
+
+The first results with attentive models where due to Bahdanau et al.\
+\cite{bahdanau_neural_2014}, who used an architecture based on two
+parts. The task of the first part is to encode the input using an
+\ac{rnn} to create hidden representations of the sequence. Contrarily
+to previous approaches, the sequence is not encoded in a single
+representation, but each word of the input have his
+representation. The second part generate the output
+sequence, with a generative \ac{rnn}, using a weighted average of the
+input representation to condition the generation. The weights are
+calculated by the attention mechanism, based on the values of the
+hidden representation of the input, and the state of the output
+generating \ac{rnn}. The attention mechanism is trained together with
+the rest of the model. Luong et al.\ \cite{luong2015effective}
+explored variation on the attention mechanism leading to some
+improvement.
 
 \section{Hierarchical models}
 In \cite{yang_hierarchical_2016} and \cite{wang2019multi}

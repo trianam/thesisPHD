@@ -44,10 +44,10 @@ classification for topography and
 morphology~\cite{airtum_handbook_2008}.  The development of text
 analysis tools specifically devoted to the automatic classification of
 incidence records according to ICD-O3 codes has been addressed in a
-number of previous papers. These
-works, however, have either focused on reasonably large datasets but
+number of previous papers. However, these
+works have either focused on reasonably large datasets but
 using simple linear classifiers based on bag-of-words representations
-of text~\cite{jouhet_automated_2011,kavuluru_automatic_2013}, or have
+of text~\cite{jouhet_automated_2011,kavuluru_automatic_2013}, or
 applied recent state-of-the-art deep learning
 techniques~\cite{gao_hierarchical_2018,qiu_deep_2018} but using
 smaller datasets and restricted to a partial set of
@@ -57,22 +57,21 @@ a vector space) that can be derived from word co-occurrences in large
 corpora of unlabeled
 text~\cite{mikolov_linguistic_2013,pennington_glove:_2014,devlin2018bert}. Large
 medical corpora are easily available for English (e.g. PubMed) but not
-necessarily for other languages.
+ for other languages.
 
 A topographical \ac{icdo3} code is structured as \emph{Cmm.s} where
-\emph{mm} and \emph{s} represent the main site and the subsite,
-respectively. For example, \emph{C50.2}
+\emph{mm} represent the main site and \emph{s} the subsite. For example, \emph{C50.2}
 is the code for the upper-inner quadrant (\emph{2}) of breast (\emph{50}).
 
 A morphological \ac{icdo3} code is structured as \emph{tttt/b}
-where \emph{tttt} and \emph{b} represent the cell type and the tumor
+where \emph{tttt} represent the cell type and \emph{b} the tumor
 behavior (benign, uncertain, in-situ, malignant primary site,
-malignant metastatic site), respectively. For example, \emph{8140/3}
+malignant metastatic site). For example, \emph{8140/3}
 is the code for an adenocarcinoma (\emph{adeno 8140};
 \emph{carcinoma 3}).
 
 \section{Existing works on \ac{icdo}}
-Early works for ICD-O3 code assignment were based on rule-based
+Early works for ICD-O3 code assignment were structured on rule-based
 systems, where the code was assigned by creating a set of handcrafted
 text search queries and combining results by standard Boolean
 operators~\cite{crocetti_automatic_2004}. In order to prevent spurious
@@ -82,9 +81,10 @@ achieve a sufficiently high recall on future (unseen) cases.
 A number of studies reporting on the application of machine learning
 to this problem have been published during the last decade. Direct
 comparisons among these works are impossible due to the (not
-surprising) lack of a standard publicly available dataset and
-heterogeneous details in the settings. Still, we highlight in the
-following the main differences among them in order to provide some
+surprising) lack of standard publicly available datasets and the
+presence of 
+heterogeneous details in the settings. Still, we highlight the main
+differences among them in order to provide some 
 background. In~\cite{jouhet_automated_2011}, the authors employed
 support vector machine (SVM) and Naive Bayes classifiers on a small
 dataset of $5\,121$ French pathology reports and a reduced number of
@@ -97,55 +97,56 @@ Naive Bayes, and logistic regression) were also compared but only on
 the topography task and using 14, 42, and 57 classes. The authors
 reported a micro-averaged F1 measure of 90\% when using SVM with both
 unigrams and bigrams. Still, the bag-of-words representations used by
-these linear classifiers do not take word order into account and are
+these linear classifiers do not consider word order and are
 unable to capture similarities and relations among words (which are
 all represented by orthogonal vectors). Deep learning techniques are
-known to overcome these limitations but were not employed to this
-problem until very recently. In~\cite{qiu_deep_2018}, a convolutional
-neural network (CNN) architecture fed by word vectors pretrained on
+known to overcome these limitations but were not applied to this
+problem until very recently. In~\cite{qiu_deep_2018}, a \ac{cnn}
+architecture fed by word vectors pretrained on 
 PubMed was applied to a small corpus of 942 breast and lung cancer
-English reports with 12 topography classes; the authors demonstrate
+reports in English with 12 topography classes; the authors demonstrate
 the superiority of this approach compared to linear classifiers with
 significant increases in both micro and macro F1
-measure. In~\cite{gao_hierarchical_2018}, the same research group also
-experimented on the same dataset using recurrent neural networks (RNN)
+measures. In~\cite{gao_hierarchical_2018}, the same research group also
+experimented on the same dataset using \acp{rnn}
 with hierarchical attention~\cite{yang_hierarchical_2016}, obtaining
 further improvements over the CNN architecture.
 
-\section{Motivation and contributes}
+\section{Motivation and contributions}
 With this work we want to answer to some questions.
 \begin{enumerate}
 \item At the best of our
-  knowledge there are no large scale studies on deep learning method
-  applied to \acp{ehr}. Cancer registries collect large amount of
+  knowledge, there are no large scale studies on deep learning method
+  applied to pathology records. Cancer registries collect large amount of
   records and invest time labeling them with topographical and
-  morphological codes. Existing works focus in \ac{icdo} classification
-  of small dataset or using few 
+  morphological codes. Existing works focus on \ac{icdo} classification
+  of small datasets or using few 
   classes. We want to make a step further applying deep learning
   techniques to a large scale dataset.
-\item Novel deep learning techniques like attention models where not applied
-  to \ac{icdo} text classification. For instance new models like
-  \ac{bert} where not used in this context. We want to propose
+\item Novel deep learning techniques, like attention models, where not
+  applied 
+  to \ac{icdo} text classification. For instance, new models like
+  \ac{bert} were not used in this context. We want to propose
   experiments to assess how they perform on this kind of data.
-\item It is not yet clear from the literature that, in this context,
+\item It is not yet clear from the literature if, in this context,
   bag-of-words techniques are inferior to deep learning techniques.
 \item It is not clear if the use of novel attention-based techniques
-  represents an improvement respect to simpler \ac{rnn} methods on this
+  represents an improvement with respect to simpler \ac{rnn} methods on this
   kind of text. The structure of the sentences in italian-language
   medical reports differs substantially from the structure of the text
-  where usually \ac{rnn} methods are employed. Italian \ac{ehr} often
-  don't even present the usual subject-verb-object structure.
-\item Recent works use hierarchical models. Is not clear if they can
+  where \ac{rnn} methods are usually employed. Italian \ac{ehr} often
+  do not present the usual subject-verb-object structure.
+\item Recent works use hierarchical models. It is not clear if they can
   be effectively used on this kind of text.
 \item It is not clear the contribution and the applicability of
-  unsupervised learning techniques to uncommon text corpora. Usually
-  word vector are trained on long english text corpora, taken from
-  Wikipedia, Gigaword, or similar. Our document not only are in a
+  unsupervised learning techniques to uncommon text corpora. Usually,
+  word vectors are trained on long english text corpora, taken from
+  Wikipedia, Gigaword, or similar. Our documents not only are in a
   different language, but they also have a different structure.
 \item We want to evaluate the possible practical application of deep
   learning and machine learning techniques in a medical context. We
   imagine that automatic classification techniques can be effectively
-  used in this context. Moreover we evaluate the possibility to give
+  used in this context. Moreover, we evaluate the possibility to give
   some interpretation to the notoriously uninterpretable deep learning
   models. 
 \end{enumerate}
