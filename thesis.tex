@@ -3,13 +3,13 @@
 % EDIT HERE!!!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\candidate{Stefano Martina} % Your name
-\def\thesistitle{ICDO-3 classification of pathology records with Deep
+\def\thesistitle{Classification of cancer pathology records with Deep
   Learning methods} % Be as short as you can!! No more than 10 words
-\def\keywords{Deep Learning, Pathology reports}
+\def\keywords{Deep Learning, Pathology reports, Cancer, Machine Learning}
 \def\advisor{Prof. Paolo Frasconi} 
 \def\headphdprogram{Prof. Paolo Frasconi}
 \def\refereeone{\textnormal{Prof. Vassilis Katsouros}, \textit{Institute for Language and Speech Processing (ILSP)}}
-\def\refereetwo{\textnormal{Prof. Foteini Liwicki}, \textit{Lule{\aa} University of Technology}}
+\def\refereetwo{\textnormal{Prof. Foteini Simistira Liwicki}, \textit{Lule{\aa} University of Technology}}
 \def\ciclo{XXXII}
 % End EDIT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,7 +230,28 @@
 \input{acknowledgments}
 \newpage
 \begin{abstract}
-  \blindtext % Put your abstract here - don't exceed one page
+  \ac{nlp} is a discipline that involves the
+  design of methods that process text. Deep learning, and \ac{ml} in
+  general, is the discipline that studies and 
+  implements methods that learn to make predictions from data. In the
+  last years, many different ML methods have been presented in the
+  context of \ac{nlp}.
+  In this work we focused in particular on text classification
+  methods.
+  Cancer registries collect pathology reports from clinical data
+  sources and combine them with administrative data sources to
+  identify cancer diagnoses in a specific area.
+  Here we present a large scale study on deep learning methods applied
+  to cancer pathology reports in Italian language. In this study we
+  developed several classifiers to predict topography and morphology
+  \acs{icdo} codes. We compared classic machine learning approaches,
+  i.e. \ac{svm}, with recent deep learning
+  techniques, i.e. \ac{lstm} and \ac{gru}. Furthermore, we compared
+  recent attention-based and 
+  hierarchical techniques, e.g. \ac{bert}, with a more simple hard attention
+  method, showing that the latter is enough to perform slightly better
+  in this specific domain.
+
 \end{abstract}
 \newpage
 
@@ -254,7 +275,7 @@
 % \include{.. add your chapters}
 \include{conclusions}
 \appendix{
-%  \include{appendix1}  % Optional, for details that cannot fit the main body
+  \include{appendix1}  % Optional, for details that cannot fit the main body
   \include{publications} % Mandatory
 }
 % End EDIT

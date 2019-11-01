@@ -1,26 +1,27 @@
 \chapter{Machine Learning}
 \section{Machine Learning Theory}
 \ac{ml} is a branch of \ac{ai}
-where the focus is to develop systems that learn from data. Machine
-Learning is a field that is located in the intersection
+where the focus is to develop systems that learn from data. \ac{ml} is
+a field that is located in the intersection 
 of different disciplines:
 \begin{description}
-\item[statistics] deal with the uncertainty of the world and, as we
+\item[statistics] deals with the uncertainty of the world and, as we
   will see, ML can be framed as a probability estimation;
-\item[data science] is the science that interpretes and study the
-  information contained in the data and how can be used;
-\item[optimization theory] is the mathematical branch that define
-  methods to optimize functions, ML can be seen as an optimization
+\item[data science] is the science that interprets and studies the
+  information contained in the data and how it can be used;
+\item[optimization theory] is the mathematical branch that defines
+  methods to optimize functions. \ac{ml} can be seen as an optimization
   problem;
 \item[computer science] is the science that studies algorithms and
   their complexity;
-\item[computer engineering] focuses in the development of efficient
+\item[computer engineering] focuses on the development of efficient
   software.
 \end{description}
 
 In order to learn we must provide some data. The data can be of
-different kinds. We can denote three different types of \ac{ml}, based
-on the type of data and problem that we need to resolve: supervised,
+different kinds. Based
+on the type of data and on the problem that we need to resolve, we can denote
+three different types of \ac{ml}: supervised, 
 unsupervised, and reinforcement learning.
 
 \subsection{Supervised Learning}\label{sec:supervisedTheory}
@@ -29,21 +30,21 @@ each one labeled with $\vect{y}_i$:
 \begin{equation*}
   S=\left((\vect{x}_1,\vect{y}_1),\dots,(\vect{x}_n,\vect{y}_n)\right),
 \end{equation*}
-where each $\vect{x}_i\in\XSet$ and $\vect{y}_i\in\YSet$. Usually the
-data is prepared such that $\XSet$ is a space of integer or real
+where $\vect{x}_i\in\XSet$ and $\vect{y}_i\in\YSet$. Usually, $\XSet$
+is a space of integer or real 
 tensors of certain dimensionality, and $\YSet$ is a space of integer
 vectors for classification tasks and real vectors for regression
 tasks. In binary classification tasks $\YSet={0,1}$, in multilabel
 classification $\YSet={0,1}^k$ with $k$ possible labels, and in
 multiclass classification $\YSet={0,1}^k$ with only one value equal to
-$1$ and the rest $0$. The samples $\vect{x}_i$ of a dataset must be
+$1$ and the rest equal to $0$. The samples $\vect{x}_i$ of a dataset must be
 drawn from the same unknown distribution $\vect{x}_i\sim\dist{D}$. The
 relationship between the samples and the labels is defined by an unknown
 labeling function $f:\XSet\rightarrow\YSet$ such that for each sample
 $\vect{y}_i=f(\vect{x}_i)$.
 
-A learning algorithm receives as input a training set $S$, and should
-output a predictor $h_S:\XSet\rightarrow\YSet$ that minimize the
+A learning algorithm receives a training set $S$ as input, and should
+output a predictor $h_S:\XSet\rightarrow\YSet$ that minimizes the
 \emph{prediction error}. For a generic predictor $h$, the prediction
 error is:
 \begin{equation}\label{predictionError}
@@ -51,7 +52,7 @@ error is:
   f(\vect{x})]\define\dist{D}(\{\vect{x}:h(\vect{x})\neq
   f(\vect{x})\}),
 \end{equation}
-where for $A\subset\XSet$, the probability $\dist{D}$ assign a
+where, for $A\subset\XSet$, the probability $\dist{D}$ assign a
 likelihood $\dist{D}(A)$ of observing a value $\vect{x}\in A$. Given
 that both $\dist{D}$ and $f$ are unknown, to find $h_S$ the learning
 algorithm minimizes the \emph{empirical prediction error} (or
@@ -62,10 +63,10 @@ empirical risk):
 This learning paradigm of finding $h_S$ is called \ac{erm}.
 
 \ac{erm} rule may lead to \emph{overfitting} if not restricted. A predictor
-can performs well over the training set $S$ --- having a low empirical
-error --- but it can performs badly over the entire distribution
+can perform well over the training set $S$ --- having a low empirical
+error --- but it can perform badly over the entire distribution
 $\dist{D}$ with a high prediction error. A solution is to apply
-\ac{erm} over a restricted search space. We denote with $\HSet$ the
+\ac{erm} over a restricted search space. With $\HSet$ we denote the
 \emph{hypothesis class} of the possible predictors
 $h\in{HSet}:\XSet\rightarrow\YSet$. For a given class $\HSet$ and a
 training sample $S$, the $ERM_\HSet$ learner uses the \ac{erm} rule to
@@ -77,40 +78,42 @@ error over $S$:
 
 We induce an \emph{inductive bias} introducing restrictions over
 $\HSet$. Intuitively, choosing a more restricted hypothesis class
-better protect us against overfitting but at the same time may cause
+better protect the model against overfitting but at the same time may cause
 a stronger bias.
 
 
 \section{\acf{svm}}
-\ac{svm} \cite{cortes-support-1995} are supervised learning models
+\acp{svm} \cite{cortes-support-1995} are supervised learning models
 commonly used in classification problems. The basic idea of linear
-\ac{svm} is to find a hyperplane in the features space that separates
+\acp{svm} is to find a hyperplane in the features space that separates
 examples belonging to different classes. At prediction time, the model
-classify new examples based on their position relative to the
+classifies new examples based on their position relative to the
 hyperplane. For a given set of data, infinite separating hyperplanes
-could exist. \ac{svm} search for the maximum-margin separating
+could exist. \acp{svm} search for the maximum-margin separating
 hyperplane, i.e.\ the one with maximum distance from the nearest
 examples.
 
-The basic \ac{svm} algorithm works only if the feature belonging to
+The basic \ac{svm} algorithm works only if the features belonging to
 the two classes are linearly separable. The \emph{soft margin} method
-handles the cases where the classes are not linearly separable. A set
+manages the cases where the classes are not linearly separable. A set
 of \emph{slack} variables allows for a certain degree of
 misclassification. They allow for samples to be on the wrong side of
 the split.
 
-The soft margin allows to separate almost linear separable
-data. Hardly not linearly separable sets can be approached using the
+The soft margin allows to separate
+data that is linearly separable except for some examples. Sets that
+are hardly not 
+linearly separable sets can be approached using the
 \emph{kernel trick}. If we call $S$ the space of the features, the
 kernel trick works by finding a transformation $\phi:S\rightarrow V$
 from the original space to a new space $V$ where the examples are more
-easily separable. \ac{svm} can then be used on the new space $V$.
+easily separable. \acp{svm} can then be used on the new space $V$.
 
 \section{Neural Networks}
-In our work we used mainly a specific kind of \ac{rnn}: \ac{lstm}.
+In our work, we used mainly a specific kind of \acp{rnn}: \ac{lstm}.
 \acp{rnn} are a class of \acp{ann} where the connections are not only
-sequential from one layer to the subsequent, but instead they form
-loops. 
+sequential from one layer to the following one, but they form
+loops instead. 
 
 \subsection{\acf{ann}}
 \begin{figure}
@@ -140,9 +143,9 @@ loops.
   \caption{Artificial neuron.}
   \label{fig:neuron}
 \end{figure}
-An \ac{ann} is a model that performs elaboration in a way that
+An \ac{ann} is a model that performs elaborations in a way that
 mimics the brain functioning. The base unit is the \ac{an}, also called
-perceptron, of
+perceptron, in
 \cref{fig:neuron}. It performs the weighted sum of the inputs
 $x_1,\dots,x_n$, shifted by a bias $b$, followed by an activation
 function $f$. If we add a dummy input $x_0=1$ and rename the bias
@@ -158,7 +161,7 @@ The activation function $f$ can be of different types, the most common are:
 \item ReLU;
 \item TanH;
 \item Sigmoid;
-\item Linear;
+\item Linear.
 \end{itemize}
 
 \begin{figure}
@@ -204,7 +207,7 @@ The activation function $f$ can be of different types, the most common are:
     \node [align=center, above] at (\x*2,2) {\l \\ layer};
 
   \end{tikzpicture}
-  \caption{\acf{mlp} with one hidden layer.}
+  \caption{\acs{mlp} with one hidden layer.}
   \label{fig:ann}
 \end{figure}
 \acp{an} are organized in network structures. The basic layout of
@@ -215,7 +218,7 @@ inputs of the \ac{ann} and the output of the last layer is also the
 output of the network. The execution of the \ac{mlp} is feed forward:
 \begin{enumerate}
 \item the input values $x_{0,1},\dots x_{0,n}$ are presented to the
-  network and it is the input of the first layer;
+  network and they are the input of the first layer;
 \item  the computation is 
   carried one layer at a time, where each neuron $i$ of the layer $l$
   calculates the value $y_{l,i}$ of the intermediate output
@@ -229,18 +232,19 @@ output of the network. The execution of the \ac{mlp} is feed forward:
 
 The weights of the \acp{an} are initialized to random values and, in order
 to have meaningful outputs, the \ac{ann} needs to be trained. In a
-supervised learning framework the dataset is composed of the matrices
-$\matr{X}$ ($N\times n$) of the $N$ inputs $x_{i,j}$, and $\matr{Y}$
+supervised learning framework, the dataset is composed of the matrices
+$\matr{X}$ ($N\times n$) of the $N$ inputs $x_{i,j}$ and $\matr{Y}$
 ($N\times m$) of 
 the corresponding outputs $y_{i,j}$. The
 training process is called \emph{backpropagation} and it is organized in a
-succession of phases. For each phase $p$ there are two steps:
+sequence of phases. For each phase $p$ there are two steps:
 \begin{description}
 \item[execution] where an input $x_{p,1},\dots x_{p,n}$ is given to
   the network and an output $\hat{y}_{p,1},\dots,\hat{y}_{p,m}$ is calculated;
-\item[weight update] where is calculated the error between
+\item[weight update] where the error between
   $\hat{y}_{p,1},\dots,\hat{y}_{p,m}$ and the correct output
-  $y_{p,1},\dots,y_{p,m}$, this error is back propagated through all
+  $y_{p,1},\dots,y_{p,m}$ is calculated. This error is back propagated
+  through all 
   the layers and a correction $\Delta w_i$ is calculated for each weight $w_i$ of
   the network, in
   order to minimize the error surface in the space of the weights.
@@ -250,16 +254,17 @@ phase $p+1$, it is
 sufficient to determine the gradient of 
 the error surface in the current point $\vect{w}^{(t)}$ in order to
 apply an optimization method like \ac{sgd}. We discuss \ac{sgd} in
-detail in \cref{sec:sgd}.
+detail below.
 
 \subsection{Loss}
 The goal of the lerning algorithm is to learn a function $f$ such that
 predictions $\hat{\vect{y}}=f(\vect{x})$ over the training set are accurate respect
-to the correct labels $\vect{y}$. The \emph{loss} function quantifying
-the prediction error. Formally a loss function
-$\loss(\hat{\vect{y}},\vect{y})$ assign a scalar to a predicted output
-given the true expected output, it should be lower bounded with the
-minimum attained only for cases where the prediction is correct. The
+to the correct labels $\vect{y}$. The \emph{loss} function measures
+the prediction error. Formally, given the true expected output
+$\vect{y}$, a loss function
+$\loss(\hat{\vect{y}},\vect{y})$ assigns a scalar to a predicted
+output $\hat{\vect{y}}$. The loss function should be lower bounded with the
+minimum value attained only for cases where the prediction is correct. The
 parameters of the learned function, i.e. the weights $\vect{w}$, are
 set in order to minimize the loss over the training examples. Given a
 labeled training set $\mathcal{D}=(\vect{x}_{1:n},\vect{y}_{1:n})$ and a
@@ -270,13 +275,13 @@ such that the value of the loss is minimized:
   \hat\theta=\argmin_\theta\frac{1}{n}\sum_{i=1}^n\loss(f(\vect{x}_i;\theta),\vect{y}_i).
 \end{equation}
 
-The parameters $\theta$ represents the set of all the weights $w$ of
+The parameters $\theta$ represent the set of all the weights $w$ of
 the \ac{ann}. 
-We proceed to describe common losses functions.
+We proceed to describe common loss functions.
 
 \subsubsection{Hinge loss}
-Hinge loss, also known as margin loss is used in binary classification
-problems, when the classifier output $\tilde{y}$ is a single scalar, and
+Hinge loss (also known as margin loss) is used in binary classification
+problems, when the classifier output $\tilde{y}$ is a single scalar and
 $y\in\{+1,-1\}$. The classification rule is $\hat{y}=sign(\tilde{y})$
 and the classification is considered correct if
 $y\cdot\tilde{y}>0$. The hinge loss is defined as:
@@ -289,11 +294,11 @@ achieve a correct classification with a margin of at least 1.
 
 Hinge loss can be also extended to multi-class settings, where
 $\hat{\vect{y}}=\hat{y}_1,\dots,\hat{y}_n$ are the classifier's
-output, and $\vect{y}$ the one-hot vector of correct output
+output and $\vect{y}$ the one-hot vector of correct output
 classes. The classification rule is defined as selecting the class
-with the highest score $\argmax_i\hat{\vect{y}}_i$. denoting by
+with the highest score $\argmax_i\hat{\vect{y}}_i$. Denoting by
 $t=\argmax_iy_i$ the correct class index, and by $k=\argmax_{i\neq
-  t}\hat{y}_i$ the highest scoring class such that $k\neq t$. The
+  t}\hat{y}_i$ the highest scoring class such that $k\neq t$, the
 multi-class hinge loss is defined as:
 \begin{equation*}
   \loss_{hinge}(\hat{\vect{y}},
@@ -346,9 +351,9 @@ transformed by a \emph{softmax} function:
 \begin{equation*}
   softmax(\vect{x})_i=\frac{e^{x_i}}{\sum_j e^x_j}.
 \end{equation*}
-$\hat{\vect{y}}$ represent the class membership conditional
-distribution $\hat{y}_i=\prob(y=i|\vect{x})$. The categorical cross
-entropy loss measures the dissimilarity between the true label
+$\hat{\vect{y}}$ represents the class membership conditional
+distribution $\hat{y}_i=\prob(y=i|\vect{x})$. The categorical
+cross-entropy loss measures the dissimilarity between the true label 
 distribution $\vect{y}$ and the predicted label distribution
 $\hat{\vect{y}}$. It is defined:
 \begin{equation*}
@@ -360,22 +365,22 @@ single correct class assignment, $\vect{y}$ is the one-hot vector of
 the true class. In such cases the cross-entropy loss can be simplified
 to:
 \begin{equation*}
-  L_{cross-entropy}(\hat{\vect{y}},\vect{y}) = -\log(\hat{\vect{y}}_t),
+  \loss_{cross-entropy}(\hat{\vect{y}},\vect{y}) = -\log(\hat{\vect{y}}_t),
 \end{equation*}
 where $t$ is the correct class.
 
 \subsection{Regularization}
-The attempt to minimize the loss with \eqref{eq:lossmin} may results 
-in overfitting the training data, i.e. the model loose the capability
-to generalize to new data, and the loss evaluates poorly on new data
+The attempt to minimize the loss with \eqref{eq:lossmin} may result
+in overfitting the training data, i.e. the model loses the capability
+to generalize to new data and the loss evaluates poorly on new data
 that is not present in $\mathcal{D}$. To counter that, we often pose
 soft restrictions on the form of the solution. This is done using a
 \emph{regularization}
 function $R(\theta)$ over the parameters returning a scalar that
 reflect their \emph{complexity}. This is equivalent to introduce a
-restriction over the hypothesis space as seen in
+restriction over the hypothesis space, as seen in
 \cref{sec:supervisedTheory}. We want to keep the model complexity low,
-thus we add the regularizer to \eqref{eq:lossmin} and we let the
+Hence we add the regularizer to \eqref{eq:lossmin} and we let the
 optimization problem to balance between low loss and low complexity:
 \begin{equation}\label{eq:lossminReg}
   \hat\theta=\argmin_\theta\left\{\frac{1}{n}\sum_{i=1}^n\loss(f(\vect{x}_i;\theta),\vect{y}_i)+\lambda
@@ -383,13 +388,13 @@ optimization problem to balance between low loss and low complexity:
 \end{equation}
 
 Different combinations of loss function and regularization criteria
-result in different learning algorithms, with different inductive
+result in different learning algorithms with different inductive
 biases.
 
-In practice regularizers works penalizing high values for \ac{ann}
+Essentially, regularizers work penalizing high values for \ac{ann}
 weights, thus avoiding that the network concentrates only on few
 features. In \eqref{eq:lossminReg}, $R$ is applied to all the
-parameters, in the practice it can be applied on the single layers.
+parameters, in practice it can be applied on the single layers.
 
 We proceed to describe common regularization functions.
 
@@ -402,7 +407,7 @@ of the parameters:
 \end{equation*}
 
 $L_2$ regularization penalizes high parameters, but when their values
-becomes near to $0$ their effect is negligible.
+become near to $0$ their effect is negligible.
 
 \subsubsection{$L_1$ regularization}
 In $L_1$ regularization, also called \emph{sparse prior} or
@@ -426,23 +431,22 @@ $L_1$ and $L_2$ regularization:
 Similarly to other regularization techniques, \emph{dropout} method
 \cite{hinton2012improving} is designed to prevent the network from
 learning on specific weights. It works by randomly setting to $0$ the
-output of a randomly chosen neurons for each sample. The connections
+output of randomly chosen neurons for each sample. The connections
 between the dropout technique and other regularizations are
 established \cite{wager2013dropout}.
 \subsection{\acf{sgd}}
 \label{sec:sgd}
-To successfully training a model, it is necessary to solve the
+To successfully train a model, it is necessary to solve the
 optimization problem \eqref{eq:lossmin}. A common solution is to use
-gradient based methods. Gradient based methods works by estimating the
+gradient based methods. Gradient based methods work by estimating the
 error computing the loss $\loss$ over the training set and then
 calculating the 
 gradients of the error respect to the parameters $\theta$. Once the
 gradient is computed, the values of the weights are moved in the
-opposite direction of the gradient. \acf{sgd} is a general
-optimization algorithm that is profitably used in training \ac{ann}
-\cite{bottou2012stochastic,lecun1995convolutional}.
+opposite direction of the gradient.
+
 \begin{algorithm}
-  \caption{\acf{sgd}}\label{alg:sgd}
+  \caption{\acf{sgd}.}\label{alg:sgd}
   \SetKwInput{Input}{Input}
   \Input{
     Parametrized function $f(\vect{x};\theta)$\\
@@ -456,17 +460,20 @@ optimization algorithm that is profitably used in training \ac{ann}
     $\theta\rightarrow\theta-\nu_t\hat{\vect{g}}$
   }
 \end{algorithm}
-The hyperparameter $\nu_t$ is the learning rate. It can be either
+\acf{sgd} is a general
+optimization algorithm that is profitably used in training \ac{ann}
+\cite{bottou2012stochastic,lecun1995convolutional}.
+The hyperparameter $\nu_t$ is the learning rate. It can either be
 fixed throughout the learning process, or decay as a function of the
 time step $t$. Adam is a widely used algorithm that adaptively change
 the learning rate \cite{kingma2014adam}. The error calculated in
 \cref{alg:sgd} is based on only one example. This may result in
-inaccurate gradient calculation. A common way to reduce the noise of
+an inaccurate gradient calculation. A common way to reduce the noise of
 this inaccuracy is to estimate the error and the gradients on a sample
 of $m$ examples. This is called minibatch \ac{sgd}.
 
 \subsection{\acf{rnn}}
-\acp{rnn} are specialized versions of \ac{ann} for sequences. They
+\acp{rnn} are kinds of \acp{ann} specialized for sequences. They
 exhibit an
 internal state $\vect{h}$ that changes during the training and that
 recursively depends on the state of the previous phase. Precisely we
@@ -477,8 +484,8 @@ have \cref{eq:rnnState}:
 where $\vect{h}$ is the state vector, $\vect{x}$ is the input vector
 and $\vect{\theta}$ are the parameters of the state-function
 $f$. The index $t$ indicates 
-the iteration number, and can be interpreted as a discrete time or
-more in general as the progressive number of the sequence that is
+the iteration number and can be interpreted as a discrete time or,
+more in general, as the progressive number of the sequence that is
 presented as
 input.
 
@@ -520,10 +527,10 @@ input.
       \draw [arrow] (state-3) -- (state-r);
     \end{tikzpicture}
   }
-  \caption{\acf{rnn}, folded (a) and unfolded (b) models.}
+  \caption{\acs{rnn}, folded (a) and unfolded (b) models.}
   \label{fig:rnn}
 \end{figure}
-In order to express a compact visualisation of \acp{rnn} it is
+In order to express a compact visualization of \acp{rnn}, it is
 possible to use the computational graph in \cref{fig:rnn1} where the
 black box is a 
 delay of one iteration. An extract of the unfolding of the computation
@@ -709,10 +716,10 @@ equivalent to a
 generic \ac{rnn} where the hidden state $\vect{h}$ is a
 layer of \emph{memory cells}.
 
-In detail a single
+In detail, a single
 memory cell (\cref{fig:lstm1}) has four \acf{an}. One is labelled \emph{input}
 and processes the cell's 
-inputs into an internal state. The other three \ac{an} are labelled as
+inputs into an internal state. The other three \acp{an} are labelled as
 \emph{gates} and process the cell's inputs together with the previous-phase
 state in order to decide:
 \begin{itemize}
@@ -733,12 +740,31 @@ constitutes the input $in_1,\dots,in_m$ of the single cells.
 \subsection{\acf{gru}}
 The \ac{gru} was introduced by \cite{cho2014learning} as an
 alternative to \ac{lstm}. \ac{gru} is also based on gating mechanism,
-but it has fewer gates respect \ac{lstm} and the memory is directly
-exposed to the output. One gate called \emph{reset} is used to control
-access to the previous state and compute a proposed update. The new
-status is calculated as an interpolation between the previous and the
+but it has fewer gates respect to \ac{lstm} and the memory is directly
+exposed to the output. One gate $r$ called \emph{reset} is used to control
+access to the previous state $h_{t-1}$ and computes a proposed update
+$\tilde{h}$. The new 
+status $h_t$ is calculated as an interpolation between the previous and the
 proposed status, where the proportion of the interpolation is
-controlled by the \emph{update} gate.
+controlled by the \emph{update} gate $z$.
+Formally, at time $t$ the \ac{gru} computes its new state $h_t$ as:
+\begin{equation*}
+  h_t=(1-z_t)\bigodot h_{t-1}+z_t\bigodot\tilde{h}_t,
+\end{equation*}
+and the proposed new state $\tilde{h}_t$ as:
+\begin{equation*}
+  \tilde{h}_t=tanh(W_h x_t+r_t\odot(U_h h_{t-1})+b_h).
+\end{equation*}
+The update gate $z$ controls how much information from the past should be
+keep and how much new information should be have. $z_t$ is updated as:
+\begin{equation*}
+  z_t=\sigma(W_z x_t+U_z h_{t-1}+bz).
+\end{equation*}
+The reset gate $r$ controls how much of the past state contributes to
+the candidate. It is calculated as:
+\begin{equation*}
+  r_t=\sigma(W_r x_r+U_r h_{t-1}+b_r).
+\end{equation*}
 
 The choice between \ac{lstm} and \ac{gru} is context dependent, in
 certain applications \ac{lstm} gives better performances, in other

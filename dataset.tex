@@ -13,33 +13,24 @@ same patient existed for the same tumor, experts selected the most
 informative report in order to assign the ICD-O3 code to that tumor
 case, leaving a set of $94\,524$ labeled tumor cases.
 
-Histological exam records consist of three free-text fields (not all
-of them always filled-in), reporting tissue macroscopy, diagnosis,
+The histological exam records consist of three free-text fields (not all
+of them always filled-in) reporting tissue macroscopy, diagnosis,
 and, in some cases, the patient's anamnesis. We found that field
 semantics was not always used consistently and that the amount of
 provided details varied significantly from extremely synthetic to very
 detailed assessments of the morphology and the diagnosis. Field length
 ranged from $0$ to $1\,368$ words, with first quartile, median and
-third quartile respectively 34, 62, 134. For these reasons we merged
+third quartile respectively 34, 62, 134. For these reasons, we merged
 the three text fields
-into a single text document, did not apply any conflation (except for
+into a single text document. We did not apply any conflation (except for
 case normalization) kept punctuation.
 
 
-In a second time, we further refined the dataset. We removed duplicate
-reports and reports labeled with extremely rare (1048
-samples that not
-appear in either training, validation, and test sets) ICD-O3 codes. We
-obtained in the end 
-a dataset suitable for supervised learning consisting of $85\,170$
-labeled records over $203$ morphological classes and $68$
-topological classes.
-
-We collected also the unlabeled rest of the dataset to train
+We also collected the remaining unlabeled part of the dataset to train
 unsupervised methods.
 
 \subsection{Preparation}
-The data used in this work comes from the \ac{rtt}. Originally it
+The data used in this work comes from the \ac{rtt}. Originally, it
 comes in two tables. The first one is composed of
 a list of
 neoplasm records, for each one are specified: a series of
@@ -53,11 +44,11 @@ ground truth for the learning models.
 
 Furthermore, there is a histology table containing records resulting
 from microscopy exams. Each record contains three free-text
-fields, one for the macroscopy, one for the diagnosis, and one for
+fields: one for the macroscopy, one for the diagnosis, and one for
 other information.
 % Besides, the histology table contains \ac{icdo} and
 % \ac{icdo3} codes resulting from the application of the preexisting
-% rule-based classifier. We employ those codes in order to assess the
+% rule-based classifier. We employ these codes in order to assess the
 % existing
 % system, and use it as a baseline.
 
@@ -75,40 +66,40 @@ certificates. There are also histology exams without a related
 neoplasm 
 case because not always a histology results in a tumor case.
 
-To train the unsupervised methods, we keep all the records from the
+To train the unsupervised methods, we kept all the records from the
 histology table that cannot be joined with 
 the neoplasm table.
 
 \section{Models}\label{sec:models}
-We realized in total seven models:
+In total, we created thirteen models:
 \begin{description}
-\item[\svm] use \ac{svm} trained on \ac{tfidf} representations of text
+\item[\svm] uses \ac{svm} trained on \ac{tfidf} representations of text
   using unigrams;
-\item[\svmb] use \ac{svm} trained on \ac{tfidf} representations
+\item[\svmb] uses \ac{svm} trained on \ac{tfidf} representations
   using unigrams and bigrams;
-\item[\lstmng] use \ac{lstm} layers trained on \ac{tfidf} representations using
+\item[\lstmng] uses \ac{lstm} layers trained on \ac{tfidf} representations using
   bigrams;
-\item[\lstmc] use mixed convolutional and \ac{lstm} layers trained on
+\item[\lstmc] uses mixed convolutional and \ac{lstm} layers trained on
   \ac{glove} representations;
-\item[\lstmb] use \ac{lstm} trained on \ac{glove} representations.
-\item[\gru] use \ac{gru} layers trained on \ac{glove} representations.
-\item[\maxp] use \ac{gru} layers with max pooling trained on \ac{glove}
-  representations.
-\item[\softmax] use \ac{gru} layers with attention trained on \ac{glove}
-  representations.
-\item[\maxi] use \ac{gru} layers with max pooling, in an interpretable setting, trained on \ac{glove}
-  representations.
-\item[\softmaxi] use \ac{gru} layers with attention, in an interpretable setting, trained on \ac{glove}
-  representations.
-\item[\maxh] use hierarchical \ac{gru} layers with max pooling trained on \ac{glove}
-  representations.
-\item[\softmaxh] use hierarchical \ac{gru} layers with attention trained on \ac{glove}
-  representations.
-\item[\bert] is the \ac{bert} model \cite{devlin2018bert} pretrained
+\item[\lstmb] uses \ac{lstm} trained on \ac{glove} representations;
+\item[\gru] uses \ac{gru} layers trained on \ac{glove} representations;
+\item[\maxp] uses \ac{gru} layers with max pooling trained on \ac{glove}
+  representations;
+\item[\softmax] uses \ac{gru} layers with attention trained on \ac{glove}
+  representations;
+\item[\maxi] uses \ac{gru} layers with max pooling, in an interpretable setting, trained on \ac{glove}
+  representations;
+\item[\softmaxi] uses \ac{gru} layers with attention, in an interpretable setting, trained on \ac{glove}
+  representations;
+\item[\maxh] uses hierarchical \ac{gru} layers with max pooling trained on \ac{glove}
+  representations;
+\item[\softmaxh] uses hierarchical \ac{gru} layers with attention trained on \ac{glove}
+  representations;
+\item[\bert] is the model in \cite{devlin2018bert} pretrained
   on our unlabeled data and fine tuned with our labeled data.
 \end{description}
 
-In models \svm{} and \svmb{} we used a \ac{tfidf}
+In models \svm{} and \svmb{}, we used a \ac{tfidf}
 representation ignoring terms present in less
 than 3 documents or in
 more than 30\% of the documents. 
@@ -130,7 +121,7 @@ followed by a dense layer of $30$ neurons.
 In \lstmb{} and \lstmc{} we used the word vector representation
 explained in \cref{sec:word-vectors}. We trained \ac{glove} with a window dimension of $15$,
 in $50$ iterations to produce representations in dimension $60$. To
-decide those parameters we developed intrinsic tests collecting
+decide these parameters, we developed intrinsic tests collecting
 quadruples like:
 $$
 (melanoma,\ cute,\ duttale,\ mammella)
@@ -144,11 +135,11 @@ $\vect{x}_{skin}-\vect{x}_{melanoma}+\vect{x}_{ductal}$. Then we
 proceeded to confront the different parameters as in
 \cref{fig:gloveParameter}.
 
-In order to speed up the computation for the models \lstmng{}, \lstmb{}
-and \lstmc{} we cut the length of text to 200. The
+In order to accelerate the computation for the models \lstmng{}, \lstmb{}
+and \lstmc{}, we cut the length of text to 200. The
 $87\%$ of records have less than 200 words.
 
-\lstmng{} is the \ac{ann} in \cref{fig:schemeLstmng},
+\lstmng{} is the \ac{ann} in \cref{fig:schemeLstmng}. It is
 composed of two layers of $150$ bidirectional \ac{lstm} cells,
 followed by an average pooling of the sequences, followed by a
 dense \ac{relu} layer, followed by a dense \emph{softmax} layer.
@@ -182,7 +173,7 @@ equal to the number of classes for each task.
   \label{fig:schemeLstmng}
 \end{figure}
 
-\lstmc{}, in \cref{fig:schemeLstmc} is composed of a convolutional
+\lstmc{}, in \cref{fig:schemeLstmc}, is composed of a convolutional
 filter of size two, followed by a bidirectional \ac{lstm} layer of
 $150$ cells, followed by an average pooling of the sequences,
 followed by a dense \ac{relu}, followed by a dense \emph{softmax}
@@ -215,7 +206,7 @@ layer.
   \label{fig:schemeLstmc}
 \end{figure}
 
-\lstmb{} in \cref{fig:schemeLstmb} is composed of two bidirectional
+\lstmb{}, in \cref{fig:schemeLstmb}, is composed of two bidirectional
 \ac{lstm} layer of 
 $150$ cells, followed by an average pooling of the sequences,
 followed by a dense \ac{relu}, followed by a dense \emph{softmax}
@@ -257,12 +248,12 @@ structure.
 \subsection{\maxp, \softmax, \maxi, \softmaxi}
 \label{sec:model}
 In our setting, a dataset $\mathcal{D}=\{(\vect{x}^{(i)},y^{(i)})\}$
-consists of variable length sequence vectors $\vect{x}^{(i)}$, where
-$x^{(i)}_t$, for $t=1,\dots,T^{(i)}$ is the $t$-th word in the $i$-th
-document, and associated target classes
-$y^{(i)}\in\{1,\dots,K\}$. Unless necessary, we will drop the
-superscript in the following to keep notation simple.  Sequences will
-be denoted in boldface. The RNN-based sequence classifiers used in
+consists of variable length sequence vectors $\vect{x}^{(i)}$. For
+$t=1,\dots,T^{(i)}$, $x^{(i)}_t$ is the $t$-th word in the $i$-th
+document and $y^{(i)}\in\{1,\dots,K\}$ is the associated target
+class. To simplify the notation in the subsequent text, the
+superscripts are not used unless necessary. Sequences are
+denoted in boldface. The RNN-based sequence classifiers used in
 this work compute their predictions $f(\vect{x})$ as follows:
 \begin{align}
   e_t &= E(x_t;\theta^e),\label{eq:embed}\\
@@ -273,10 +264,10 @@ this work compute their predictions $f(\vect{x})$ as follows:
   f(\vect{x}) &= g(\phi;\theta^c).\label{eq:maxModelC}
 \end{align}
 $E$ is an embedding function mapping words into $p$-dimensional real
-vectors (where embedding parameters $\theta_e$ can be either
+vectors where embedding parameters $\theta_e$ can be either
 pretrained and adjustable or fixed, see Section~\ref{sec:word-vectors}
-below.  Functions $F$ and $R$ corresponds to (forward and reverse)
-dynamics that can be described in term of several (possibly layered)
+below.  Functions $F$ and $R$ correspond to (forward and reverse)
+dynamics that can be described in terms of several (possibly layered)
 recurrent cells. Each vector $h_t$,
 the concatenation of $h^f_t$ and $h^r_t$, can be interpreted as latent
 representations of the information contained at position $t$ in the
@@ -287,15 +278,15 @@ single $d$-dimensional representation vector for the entire sequence
 and $g$ is a softmax layer. Possible choices for the aggregator
 function include:
 \begin{itemize}
-\item $\phi=(h^f_T,h^r_1)$, which just
-  extract the extreme latent representations; these may be in
-  principle sufficient since they depend on the whole sequence due to
-  bidirectional dynamics; note however that this approach may require
-  long-term dependencies to be effectively learned.
+\item $\phi=(h^f_T,h^r_1)$, which
+  extracts the extreme latent representations; in principle, these may
+  be sufficient since they depend on the whole sequence due to 
+  bidirectional dynamics. However, note that this approach may require
+  long-term dependencies to be effectively learned;
 \item
   % $\phi = \sum_t a_t(\vect{u};\theta^a) h_t$,
   $\phi = \sum_t a_t(\vect{u};\theta^a) u_t$,
-  using an attention mechanism as in~\cite{yang_hierarchical_2016}; in
+  using an attention mechanism as in~\cite{yang_hierarchical_2016}. In
   this case, (scalar) attention weights are computed as
   \begin{align*}
     c_t&=C(\vect{u};\theta^a),\\
@@ -306,25 +297,25 @@ function include:
   %a_t(\vect{u};\theta^a) = \frac{e^{\langle \theta^a, u_t\rangle}}
   %{\sum_s{e^{\langle \theta^a, u_s\rangle}}}
   %$$
-  where $C$ is a single layer that map the representation $u_t$ of the
-  word to a hidden representation $c_t$, then the importance of the word is
+  where $C$ is a single layer that maps the representation $u_t$ of the
+  word to a hidden representation $c_t$. Then, the importance of the word is
   measured as a similarity with a context vector $c$ that is learned
   with the model and can be seen as an embedded representation of an
-  high level query as in memory networks \cite{sukhbaatar2015end}.
+  high level query as in memory networks \cite{sukhbaatar2015end};
 \item $\phi = \max_t u_t$ where the maximum is taken element-wise
-  along the sequence; this approach can be interpreted either as a
-  simplified (parameter-less) attention mechanism or a bag-layer as
+  along the sequence. This approach can be interpreted either as a
+  simplified (parameter-less) attention mechanism, or a bag-layer as
   proposed in the context of multi-instance
-  learning~\cite{tibo2017network}; in this case each ``feature''
+  learning~\cite{tibo2017network}. In this case, each ``feature''
   $\phi_j$ will be positive if at least one of $u_{j,1},\dots,u_{j,T}$
-  is positive; the resulting classifier will find it easy to create
+  is positive. The resulting classifier will find it easy to create
   decision rules predicting a document as belonging to a certain class
   if a given set of contextualized word representations are present
   and another given set of contextualized word representations are
   absent in the sequence.
 \end{itemize}
 
-The parameters $\theta^f,\theta^r,\theta^h$ and $\theta^a$ (if
+The parameters $\theta^f,\theta^r,\theta^h$, and $\theta^a$ (if
 present) are determined by minimizing a loss function $\loss$
 (categorical cross-entropy in our case) on training data:
 \begin{equation}
@@ -334,7 +325,7 @@ where $\theta=\theta^f\cup\theta^r\cup\theta^h\cup\theta^a$.
 
 We call \maxp{} the model $f(\vect{x})$ when setting the aggregator
 function $A$ equal to the max pooling $\max_t u_t$. When we use
-instead the attention $\sum_t a_t(\vect{u};\theta^a) u_t$, we call the
+the attention $\sum_t a_t(\vect{u};\theta^a) u_t$ instead, we call the
 model \softmax{}.
 
 The model is flexible enough to gain interpretability under certain
@@ -344,8 +335,8 @@ needs to be equal to the
 output dimension (in the experiments: $1$ for the artificial dataset,
 $68$ for the site task, and $203$ for the 
 morphology).
-We hypothesize that in this case, the values of
-$u_t$ (or the weighted values $a_t(\vect{u};\sigma^a)u_t$ if we use the
+We hypothesized that, in this case, the values of
+$u_t$ (or the weighted values $a_t(\vect{u};\sigma^a)u_t$, if we use the
 attention as aggregator) collect information on the importance of the
 area 
 around $x_t$ for the purpose of classification task. This
@@ -365,10 +356,10 @@ We extend the plain model of the previous section with a hierarchical setting,
 similarly to other works \cite{yang_hierarchical_2016}. In this
 setting our dataset $\mathcal{D}=\{\vect{x}^{(i)},y^{(i)}\}$
 consists of variable length sequence of sequence vectors
-$\vect{x}^{(i)}$, where $x_{s,t}^{(i)}$, for $s=1,\dots,S^{(i)}$ and
-$t=1,\dots,T^{(i,s)}$ is the $t$-th word of the $s$-th sentence in the
-$i$-th document, and associated target classes
-$y^{(i)}\in\{1,\dots,K\}$. The prediction $f(\vect{x})$ is calculated:
+$\vect{x}^{(i)}$, where, for $s=1,\dots,S^{(i)}$ and
+$t=1,\dots,T^{(i,s)}$, $x_{s,t}^{(i)}$ is the $t$-th word of the $s$-th sentence in the
+$i$-th document, and $y^{(i)}\in\{1,\dots,K\}$ is the associated
+target class. The prediction $f(\vect{x})$ is calculated: 
 \begin{align}
   e_{s,t} &= E(x_{s,t};\theta^e),\label{eq:embedH}\\
   h^f_{s,t} &= F(e_{s,t},h^f_{s,t-1};\theta^{f}),\label{eq:maxModelRLH}\\  
@@ -381,14 +372,14 @@ $y^{(i)}\in\{1,\dots,K\}$. The prediction $f(\vect{x})$ is calculated:
   f(\vect{x}) &= g(\phi';\theta^c).\label{eq:maxModelCH}
 \end{align}
 As in the plain model, $E$ is an embedding function, $F$ and $R$
-corresponds to forward and reverse dynamics that process word
+correspond to forward and reverse dynamics that process word
 representations,
 $h_{s,t}=h_{s,t}^f\oplus h_{s,t}^r$ is the latent representation of
 the information contained at position $t$ of the $s$-th sentence,
 $u_{s,t}$ is the contextualized representation of the word at position
 $t$ of the $s$-th sentence, and $A$ is an aggregation function that
-creates a single representation for the sentence. Furthermore $F'$ and
-$R'$ corresponds to 
+creates a single representation for the sentence. Furthermore, $F'$ and
+$R'$ correspond to 
 forward and reverse dynamics that process sentence representations,
 and $A'$ is the aggregation function that creates a single
 representation for the entire document. $h'_s=h'^f_s\oplus h'^r_s$

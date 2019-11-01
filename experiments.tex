@@ -1,249 +1,77 @@
 \chapter{Experiments}
 With the experiments we want to show the feasibility of deep learning
-methods and more generally machine learning methods applied to large
-scale histological records. Moreover we want to compare classical
-bag-of-word techniques with recent deep learning methods. We want also
+methods and, more generally, machine learning methods applied to large
+scale histological records. Moreover, we want to compare classical
+bag-of-word techniques with recent deep learning methods. We also want
 to assess the effects of leveraging large corpora of unlabeled text
-that come from the same distribution, in the context of text
-classification. Finally we want to check if attention-based methods
-give an improvement, especially when used in a hierarchic way like
-previous works. Also we want to show some practical use cases and
+that comes from the same distribution, in the context of text
+classification. Finally, we want to check if attention-based methods
+determine an improvement, especially when used in a hierarchic way
+like in
+previous works. We also want to show some practical use cases and
 evaluate the interpretation of deep learning models.
 
-We start describing some useful metrics in \cref{sec:metrics} that can
+In \cref{sec:metrics}, we describe some useful metrics that can
 be used to assess the 
 classifier behavior and also to use the classifiers in different use
 cases.
 
-In \cref{ch:icdoFirst} we organize a comparative study between
+In \cref{ch:icdoFirst}, we organize a comparative study between
 \ac{svm} and deep learning techniques using both bag-of-words and word
-vectors. We train the models \svm, \svmb, \lstmng, \lstmc, and
-\lstmb in 10-fold cross validation. We calculate for all the model
-different metrics, and we summarize the average and standard deviation
-along the folds. In those 
+vectors. We trained the models \svm, \svmb, \lstmng, \lstmc, and
+\lstmb in 10-fold cross validation. We calculated 
+different metrics for all the models and we summarized the average and
+standard deviation 
+along the folds. In these
 experiments we can appreciate the improvements of using word
-vectors. Furthermore we can notice that by using \ac{svm}, either on
-unigrams and bigrams, we got already good results.
+vectors. Furthermore, we can notice that by using \ac{svm}, either on
+unigrams and bigrams, we already achieved good results.
+
+Related to the motivations in \cref{sec:motivation}, with these
+experiments we want to prove Q1. Also we want to answer to Q3 by
+comparing ac{lstm} with
+\ac{svm} with both \ac{glove} and bag-of-word features.  
+With the training of word vectors we also want to answer to Q5.
 
 In \ref{ch:artificial} we want to investigate the potentialities of
 the attention based models and the simpler max aggregation. We
-designed an artificial experiment where we the two different
-kind of aggregation are compared. Moreover we use this artificial
-dataset also to preliminarily investigate the interpretability
-potentialities of \maxi{} and \softmaxi{}. With those experiments we
+designed an artificial experiment where the two different
+kinds of aggregation are compared. Moreover, we also used this artificial
+dataset to preliminarily investigate the interpretability
+potentialities of \maxi{} and \softmaxi{}. With these experiments we
 want to show that the attention model is not always better than a
 simpler max aggregation.
 
-In \cref{ch:icdo} we changed the setting, instead of doing a 10-fold
+Regarding to the questions in \cref{sec:motivation}, these
+artificial experiments are a preliminary answer to Q4 and Q6 because
+we confront attention-based techniques with simpler aggregation
+techniques. Also in these experiments we start to study the
+interpretability of the models. 
+
+In \cref{ch:icdo}, we changed the setting, instead of doing a 10-fold
 cross validation we adopt a temporal split. This decision was made to
 reflect a probable practical employment of the classifier, where it is
-being trained on the past data and evaluated on future data. In those
+being trained on the past data and evaluated on future data. In these
 experiments we are interested in evaluating the effects of the
 attention models, comparing them with a simpler form constituted by
 the max aggregation of \maxp{}. We focused on \ac{gru} because
-preliminary experiments do not show an improvement of using
-\ac{lstm}. With those experiments we want to show that in this context
-the adoption of hierarchical models is not beneficial. Moreover we
-want to evaluate how the interpretable models works respect to the
+preliminary experiments did not show an improvement of using
+\ac{lstm}. With these experiments, we want to show that in this context
+the adoption of hierarchical models is not beneficial. Moreover, we
+want to evaluate how the interpretable models work respect to the
 others.
 
-\section{Metrics}\label{sec:metrics}
-We used different metrics in order to evaluate the models.
-All the metrics are defined between $0$ and $1$ or between $-1$ and $1$,
-higher is the value, better is the assessment.
-
-\subsection{Accuracy}
-is defined
-as the ratio between the correct-classified and all documents. If $\vect{y}$
-is the ground truth and $\vect{\hat y}$ is the predicted
-classification vectors for $n$ samples, then the accuracy is defined
-as:
-\begin{equation*}
-  accuracy\left(\vect{y}, \vect{\hat y}\right) \equiv
-  \frac{1}{n}\sum_{i=1}^{n} 1\left(\hat y_i = y_i\right),
-\end{equation*}
-Where
-\begin{equation*}
-  1(a = b)\equiv
-  \begin{cases}
-    1 & \text{if }a = b,\\
-    0 & \text{otherwise}.
-  \end{cases}
-\end{equation*}
-
-In an
-unbalanced dataset, like the one of this work, it is a biased score -
-a model that predicts well only the most frequent classes, and ignore
-the rest, achieve a good accuracy. To resolve this we considered also
-other metrics.
-
-\subsection{Cohen's kappa} score is usually used to asses
-the agreement of two annotators \cite{cohen_coefficient_1960}. It
-measures the difference between the observed agreement and the
-agreement that can happen by choosing randomly the class. It can then
-be used to mitigate the bias caused by the unbalanced dataset. Cohen's
-kappa is defined as:
-\begin{equation*}
-  \kappa(\vect{y}, \vect{\hat y})\equiv \frac{p_o(\vect{y}, \vect{\hat y}) -p_e(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})} = 1-\frac{1-p_o(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})},
-\end{equation*}
-where $p_o$ is the observed agreement that is equal to the accuracy
-and $p_e$ represents the probability of agreement by chance. For $n$
-samples and $k$ classes it is
-defined by:
-\begin{equation*}
-  p_e(\vect{y}, \vect{\hat y}) = \frac{1}{n^2}\sum_{i=1}^{k} \mu_{i}(\vect{y})\cdot\nu_{i}(\vect{\hat y}),
-\end{equation*}
-where $\mu_{i}$ and $\nu_{i}$ are the number of samples classified as
-$i$ for the first and second classifier. They are defined as:
-\begin{align*}
-  \mu_i(\vect{y}) &= \sum_{j=1}^{n}1(y_j = i)\\
-  \nu_i(\vect{\hat y}) &= \sum_{j=1}^{n}1(\hat y_j = i)
-\end{align*}
-
-\subsection{\acf{map}} is a measure used in information
-retrieval \cite{manning_introduction_2008}. It expresses how well the
-true classification can be retrieved in 
-the first results of the classifier. We define two variants of
-\ac{map}, one (MAPc) to state how well all records for a specific class are
-retrieved, the other (MAPs) to asses how well the correct class is retrieved
-for a specific sample. The first is defined for $n$ samples and $k$ classes,
-with $\vect{Y}=\vect{y}_1,\dots,\vect{y}_k$ and $\vect{\hat
-  Y}=\vect{\hat y}_1,\dots,\vect{\hat y}_k$ the ground truth and
-prediction $n\times k$ matrices. The formula is:
-\begin{equation*}
-  MAPc(\vect{Y}, \vect{\hat Y})\equiv
-  \frac{1}{k}\sum_{c=1}^{k}AveP(\vect{y}_c, \vect{\hat y}_c),
-\end{equation*}
-where $AveP$ is the average precision for class $c$:
-\begin{equation*}
-  AveP(\vect{y}, \vect{\hat y}) \equiv
-  \frac{1}{\sum_{i=1}^k 1(y_i)}\sum_{j=1}^k P_j(\vect{y}, \vect{\hat y})\cdot 1(y_{\sigma_{\vect{\hat y}}(j)}),
-\end{equation*}
-where $1(y)$ is an indicator
-function that is $1$ for the elements classified positively, $0$
-otherwise. $\sigma_{\vect{\hat y}}(j)$ is a function that returns the
-  index in $\vect{\hat y}$ of the $j$-th element in the ordered
-  version of $\vect{\hat y}$ . $P_j$ is defined as:
-\begin{equation*}
-P_j(\vect{y}, \vect{\hat y}) \equiv \frac{1}{j}\sum_{c=1}^j
-1(y_{\sigma_{\vect{\hat y}}(c)}).
-\end{equation*}
-
-MAPs is defined like MAPc, but on the transposed classification
-matrices
-\begin{equation*}
-  MAPs(\vect{Y}, \vect{\hat Y})\equiv
-  MAPc(\vect{Y}^T, \vect{\hat Y}^T)
-\end{equation*}
-
-\subsection{Precision} is defined for $n$ samples and binary
-classifications as:
-\begin{equation}\label{eq:precision}
-P(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
-  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(\hat y_s)}.
-\end{equation}
-It expresses the ratio of correct positive predictions over all the
-positive predictions.
-
-\subsection{Recall} conversely, is defined as:
-\begin{equation}\label{eq:recall}
-R(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
-  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(y_s)},
-\end{equation}
-and it is the ratio of correct predicted positive over all the positive
-classes.
-
-\subsection{F1-score} is the harmonic mean of precision and recall,
-combining the two measures:
-\begin{equation*}
-F_1(\vect{y}, \vect{\hat y}) \equiv 
-2\frac{P(\vect{y}, \vect{\hat y})\cdot R(\vect{y}, \vect{\hat y})}
-{P(\vect{y}, \vect{\hat y})+R(\vect{y}, \vect{\hat y})}.
-\end{equation*}
-
-Precision, recall, and thus $F_1$ score are defined only for binary
-classifiers. In order to use those metrics in a multi-class
-classification problem it is possible to average the measures for the
-different classes. We considered different methodologies of averaging:
-\begin{description}
-  \item[micro] averaging is performed flattening the array of truth
-    and prediction of the different classes and then appling the
-    scoring formula;
-  \item[macro] average is performed calculating the metrics on the
-    single classes and then averaging them:
-    \begin{equation*}
-      \frac{1}{k}\sum_{c=1}^k S(\vect{y}_c, \vect{\hat y}_c);
-    \end{equation*}
-  \item[weighted] average uses the normalized number of samples for
-    each class in order to give a weight to them:
-    \begin{equation*}
-      \frac{1}{\sum_{i=1}^k|\vect{\hat y}_i|}\sum_{c=1}^k|\vect{\hat y}_c|\cdot S(\vect{y}_c, \vect{\hat y}_c).
-    \end{equation*}
-\end{description}
-
-Micro average considers all the samples equally, regardless of the
-representativeness of classes in the dataset. Macro average takes
-into account the unbalancement and it is more sensible to few
-represented classes. Precision, recall, and $F_1$ score are
-equal to the accuracy when micro averaged in a multiclass
-environment. 
-
-\subsection{ROC curve} is a graph of \emph{true positive rate} versus
-\emph{false positive rate} with the change of the classifier threshold. The
-true positive rate is equal to the recall defined in
-\cref{eq:recall}. Conversely the false positive rate is defined as:
-\begin{equation}\label{eq:fpr}
-FPR(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
-  y_s \text{ and not }y_s)}{\sum_{s=1}^n 1(\text{not }y_s)}.
-\end{equation}
-
-ROC curves start from $(0,0)$ and end in $(1,1)$. The area under
-the curve can be used as a metric for the classifier, a perfect
-classifier has an area of $1$.
-
-The curves can be calculated only for binary classifiers. Like for the
-precision, recall and $F_1$ score, it is possible to generalise them to
-multiclass problems averaging micro or macro.
-
-\subsection{Precision-recall curve} is a graph of precision
-(\cref{eq:precision}) versus 
-recall (\cref{eq:recall}) with the change of the classifier
-threshold. The curves start from $(0,1)$ and end in $(1,0)$. A perfect
-classifier has an area under the curve of $1$.
-
-Also precision-recall curves can be calculated only for binary
-classifiers. In order to generalise them to multiclass problem it is
-necessary to micro or macro average.
-
-\subsection{Use cases}
-The different metrics are useful to assess models in different
-situations. In case you need to retrieve records of a specific
-cancer case from the register, MAPc assesses how
-well the task is executed.
-Conversely in case of an operator-assistance software, MAPs
-assess how the correct classification
-for a specific histological record is retrieved on top results. 
-
-Cohen's kappa measures the agreement of automatic
-and human annotators. Thus it is an indirect measure of the
-classification correctness.
-
-Precision and recall are two measures in trade off between them. The
-former is more significant when you need a list of
-correctly-classified records, at cost of not retrieving all of
-them. The latter is more
-meaningful when you need to retrieve the major number of cases at cost
-of retrieving also some false positives. A peculiarity of the
-automatic annotator is that you can change the threshold to support
-higher precision or recall depending on the specific retrieving
-task. Recall-precision
-curves can be used to assess the correct threshold.
+Regarding the questions in \cref{sec:motivation}, these experiments
+answer to Q1 (with different settings respect to the experiments in
+\cref{ch:icdoFirst}). We answer to Q2 and Q4 because we apply attention and
+hierarchical models to the cancer pathology reports. We also want to
+answer to Q6 because we implement interpretable models. 
 
 
 \section{Bag-of-words, word vectors, \ac{svm} and deep learning}
 \label{ch:icdoFirst}
 The focus of this section is to asses the improvement of employing
-word vectors respect to use bag-of-words. Moreover to evaluate the
+word vectors respect to the use of bag-of-words and to evaluate the
 employment of deep learning techniques.
 
 We realized four multiclass classifiers for the
@@ -272,7 +100,7 @@ $Y^b$ of behavior:
 
 % We considered the third \ac{icdo} version. There are
 % $94\,061$ records with \ac{icdo3} codes.
-The tasks have a variable number of represented classes, resumed in
+The tasks have a variable number of represented classes, summarized in
 \cref{fig:numClasses}.
 \begin{table}
   \center
@@ -290,7 +118,7 @@ The tasks have a variable number of represented classes, resumed in
   \end{tabular}
 \end{table}
 Moreover, data is not balanced. As visible in \cref{fig:classDist},
-some classes are common, many are rare.
+some classes are common, while many are rare.
 % In order to collect more than the
 % $90\%$ of the 
 % records it is sufficient to take the most frequent classes: $17$ over $70$
@@ -308,9 +136,9 @@ some classes are common, many are rare.
   \label{fig:classDist}
 \end{figure}
 
-Frequency of words in text
-respects the typical Zipf's distribution with few words that cover the
-majority of text, and a long tail of infrequent words.
+The frequency of words in the text
+follows the typical Zipf's distribution with few words that cover the
+majority of text and a long tail of infrequent words.
 % The $85\%$ of
 % the $9\,264\,143$ words in text is covered With $500$
 % over a total of $35\,216$ distinct words. 
@@ -321,15 +149,15 @@ majority of text, and a long tail of infrequent words.
 We used leave-one-out ten-folds cross validation
 to take advantage of all the available data. The whole
 pathological-record dataset was split in ten equal parts called
-folds. To preserve labels distribution, this is performed in a
+folds. To preserve labels distribution, this was performed in a
 stratified way (all the folds have the same proportions of
 labels). Afterwards, each
 model was trained ten times, using one fold at a time as test
-dataset and the rests as training. For each metric we summarize the
+dataset and the remaining as training. For each metric we summarized the
 average and the standard deviation among the runs. Regarding the
 curves we calculated the cumulative for each 
-one, i.e.\ we concatenate the prediction for all the folds and
-calculate the curves on them. 
+one, i.e.\ we concatenated the prediction for all the folds and
+calculated the curves on them. 
 
 \begin{table}
   \centering
@@ -371,7 +199,7 @@ calculate the curves on them.
   \input{tabs/behaviour.tex}
 \end{table}
 
-The results are resumed in
+The results are summarized in
 \cref{tab:resultsSite,tab:resultsFullSite,tab:resultsType,tab:resultsBehaviour},
 one table for each task, one column for each 
 model described in \cref{sec:models}. Rows specify the metrics
@@ -412,21 +240,21 @@ percentage, indicating average and standard deviation among folds.
 \end{figure}
 
 Macro-averaged recall-precision curves for every method and task are
-resumed in
+summarized in
 \cref{fig:curvesSite,fig:curvesFullSite,fig:curvesType,fig:curvesBehaviour}. Areas
 under the curves are indicated in 
 plot legends.
 
-One of the aims of those experiments was to investigate different
+One of the aims of these experiments was to investigate different
 machine learning 
 models for cancer cases classification based on the interpretation
-of pathological-reports free text. We can that
+of pathological-reports free text. We can state that
 Considering \ac{svm} models, the improvement of using
-bigrams respect monograms is not remarkable.
+bigrams respect to monograms is not remarkable.
 The use of deep learning is not necessarily beneficial to the
-classification task, we already get good results using \ac{svm}
-models. We can observe also that, when we take 
-advantage of the unlabeled data with \ac{glove}, we get an
+classification task, we already obtained good results using \ac{svm}
+models. We can also observe that, when we took 
+advantage of the unlabeled data with \ac{glove}, we achieved an
 improvement.
 \lstmb{} performs always better than the other models, except
 regarding macro-averaged precision, where \ac{svm} models are better.
@@ -441,16 +269,16 @@ the information contained in free-text pathology reports.
 Classic \ac{rnn} approaches exhibit some limits related to
 memory. We designed an artificial experiment in
 order to investigate how \ac{rnn} and \maxp{} address those
-problems. The purpose of those experiments is to compare compare plain
-\ac{rnn} models with attention-based models. Moreover we want also to
+problems. The purpose of these experiments is to compare compare plain
+\ac{rnn} models with attention-based models. Moreover, we also want to
 compare the attention with the max-pooling based models, and start to
 explore the potentiality of the interpretable setting. The dataset 
 $\mathcal{D}=(\vect{X}\in [0,\dots,9]^{n\times m},\vect{y}\in [0,1]^n)$ is
 composed of $n$ sequences of length
 $m$ of digits $x_{i,j}\in[0,\dots,9]$. If the $i$-th sequence contains
 at least three consecutive digits
-$x_{i,j-1},x_{i,j},x_{i,j+1}$ that concatenated represents a prime
-number then the
+$x_{i,j-1},x_{i,j},x_{i,j+1}$ that concatenated represent a prime
+number, then the
 sample is positive and labeled with $y_i=1$, otherwise is negative and
 $y_i=0$.
 
@@ -461,15 +289,15 @@ samples with
 sequence lengths of
 $$
 m\in[100,200,300,400,500,600,700,800,900,1000].$$
-We choose this setting because we wanted to stress the memorizing
+We chose this setting because we wanted to underline the memorizing
 capability of \ac{gru}. In fact, the network needs to keep track in
 his memory of
-all the sequence, and larger the sequence, higher is the amount of
+all the sequence, and the larger the sequence, the higher the amount of
 memory needed.
 
 We trained four models on
 all the datasets: a plain \ac{gru}, a
-\maxp{}, a \softmax{}, and a \maxi{}, all with same hidden dimension of $32$. 
+\maxp{}, a \softmax{}, and a \maxi{}, all with the same hidden dimension of $32$. 
 
 \begin{figure}
   \centering
@@ -485,15 +313,15 @@ all the datasets: a plain \ac{gru}, a
   \label{fig:testAccMax}
 \end{figure}
 
-In \cref{fig:testAccBase} and \cref{fig:testAccMax} we compare
+In \cref{fig:testAccBase} and \cref{fig:testAccMax}, we compare
 the learning curves of the two model trained on the increasing
 difficulty problems. We can observe 
 that \maxp{} degrades less than the baseline under the assumption of
 having the same dimensionality. The interpretation for this can be
-that the max pooling force locality on the sequence, thus simplifying
+that the max pooling forces locality on the sequence, thus simplifying
 the task for the underlying \ac{rnn} that at time $t$ needs to keep
-track only of the neighbors of $t$ in the sequence. Thus \maxp{} can
-be using on increasingly long sequences without losing potentiality.
+track only of the neighbors of $t$ in the sequence. Thus, \maxp{} can
+be used on increasingly long sequences without losing potentiality.
 
 \begin{figure}
   \centering
@@ -529,21 +357,21 @@ be using on increasingly long sequences without losing potentiality.
 \end{figure}
 
 Regarding the interpretable models, we can observe that
-The degradation of the interpretable \maxi{} model in
-fig. \ref{fig:testAccInt} is worst 
+the degradation of the interpretable \maxi{} model in
+fig. \ref{fig:testAccInt} is worse 
 compared to \maxp{} in fig. \ref{fig:testAccMax},
-but is still better compared with the base \ac{gru} model in
-fig. \ref{fig:testAccBase}. Conversely the interpretable model can be
+but is still better compared to the base \ac{gru} model in
+fig. \ref{fig:testAccBase}. Conversely, the interpretable model can be
 used to gain
 some insights on the decision process. As visible in
 fig. \ref{fig:testAttention}, the model performs the classification
 task focusing on 
 the part of the sequences where the prime numbers are present. The
-reasons that \maxi{} is not scaling as \maxp{} can be found in the fact
+reasons why \maxi{} is not scaling as \maxp{} can be found in the fact
 that in the interpretable setting we basically moved the aggregation
 from before to after the classification part. The max pooling in
-\maxi{} do not have the same localizing effect on the underlying
-part. Nevertheless, it still have some effect on simplifying the
+\maxi{} does not have the same localizing effect on the underlying
+part. Nevertheless, it still has some effect on simplifying the
 task.
 
 \begin{figure}
@@ -571,12 +399,12 @@ aggregation. In
 \cref{fig:testAttentionSoft} we have empirical evidence that the
 attention aggregation is not sufficient to guarantee the model
 interpretability (at least in this setting). This can be explained
-with the fact that the softmax function do 
+with the fact that the softmax function does 
 not avoid the learning of underlying
 distribute representations. 
 On the loss calculation, the effects of a
-distribution with high variance before the aggregation, are the 
-same of as a distribution with lower variance. Thus the \ac{sgd} do
+distribution with high variance before the aggregation are the 
+same to the ones of a distribution with lower variance. Thus, the \ac{sgd} does
 not favor focused representations in $u_t$.
 
 \begin{figure}
@@ -587,19 +415,27 @@ not favor focused representations in $u_t$.
     $\mathcal{D}^{(m)}$ for different dimensions of $m$.} 
   \label{fig:testAccDiff}
 \end{figure}
-In \cref{fig:testAccDiff} we show the maximum reached accuracy for the
+In \cref{fig:testAccDiff}, we show the maximum reached accuracy for the
 models, summarizing
-\cref{fig:testAccBase,fig:testAccMax,fig:testAccInt} and adding also
+\cref{fig:testAccBase,fig:testAccMax,fig:testAccInt} and also adding
 \softmax{}. From this plot we can evince that \softmax{} degrades
 faster than \maxp{}. This can be due to the fact that the attention,
 using a softmax on all the underlying representations,
-still needs to rely on the entire sequence. Thus there is not the
+still needs to rely on the entire sequence. Thus, there is not the
 strong focusing effect of the max aggregation.
 
 
-\section{Aggregation, interpretability,
-  hierarchical}\fxnote*{Stefano}{Find title}
+\section{Aggregation, interpretability, hierarchical}
 \label{ch:icdo}
+In these experiments we further refined the dataset. We removed duplicate
+reports and reports labeled with extremely rare (1048
+samples that do not
+appear in all three of training, validation, and test sets) ICD-O3
+codes. In the end we
+obtained 
+a dataset suitable for supervised learning consisting of $85\,170$
+labeled records, over $203$ morphological classes, and $68$
+topological classes.
 
 We defined two multi-class classification tasks: (1) main tumor site
 prediction ($68$ mutually exclusive classes) and (2) morphology
@@ -610,20 +446,20 @@ large enough size of the dataset.
 
 We decided to arrange our experiments on cancer
 data in 
-a setting that simulate a predictive task. We sorted the medical
+a setting that simulates a predictive task. We sorted the medical
 records by insertion date, then we used the most recent $80\%$ of
 records as test 
 dataset, an equal amount of the remaining most recent records as
-validation dataset, and the rest as training dataset. At the end the
-training, validation, and test datasets have respectively $51\,101$,
-$17\,034$, and $17\,035$ records.
+validation dataset, and the rest as training dataset. The splitting of
+data resulted in $51\,101$ records for training,
+$17\,034$ for validation, and $17\,035$ for test datasets.
 
 We used the text in the $1.5$ millions unlabeled records, plus the
 text in training datasets to train \ac{glove} word
 vectors representations.
 
 We trained the models \maxp{}, \softmax{}, \maxi{}, \maxh{}, and
-\softmaxh{} on both prediction tasks. Finding the hyperparameters 
+\softmaxh{} on both prediction tasks. We found the hyperparameters 
 configurations doing grid search on the space explained in
 \cref{sec:hyperparameters}. 
 % \maxi{} have one \ac{gru} layer of dimension $256$
@@ -656,20 +492,20 @@ the model.
 
 $\xi^e$ is associated with the embedding layer $E$ and in our case
 refers to \ac{glove} 
-hyperparameters~\cite{pennington_glove:_2014}, we found with an
-intrinsic evaluation that the better configuration was $60$ for the vector
+hyperparameters~\cite{pennington_glove:_2014}. With an intrinsic
+evaluation, we found that the better configuration was $60$ for the vector
 size, $15$ for the window size, and $50$ iterations. $\xi^f$,
 $\xi^r$, $\xi'^{f}$, and $\xi'^{r}$ define the number of
 \ac{gru} layers ($\xi_{(l)}$) and the number of unit per each layer
-($\xi_{(d)}$) respectively for $F$, $R$, $F'$, $R'$. 
+($\xi_{(d)}$) respectively for $F$, $R$, $F'$, and $R'$. 
 $G$ is a \ac{mlp}, $\xi^h$ controls the number of
-layers and their dimension. To limit the
-hyperparameters space, we decided to
-make equal-dimension stacked layers in case of more than one,
-regarding $F$, $R$, and $G$. $\xi^a$ and $\xi'^a$ controls the
-kind of aggregating function of $A$ and $A'$ respectively, and in case
-of \emph{attention} 
-it controls the dimension of the attention layer. Finally $\xi^c$ controls the
+layers and their dimension. Regarding $F$, $R$, and $G$, we decided to
+have all the stacked layer with 
+the same dimension to limit the
+hyperparameters space. $\xi^a$ and $\xi'^a$ control the
+kind of aggregating function of $A$ and $A'$ respectively and, in case
+of \emph{attention}, 
+it controls the dimension of the attention layer. Finally, $\xi^c$ controls the
 data-dependent output dimension of $g$.
 
 In \maxp{} we used the \emph{max} aggregation
@@ -764,13 +600,13 @@ for the site, and:
   \xi_{(l)}^h&\in[\underline{1}],\\
   \xi_{(d)}^h&\in[],
 \end{align*}
-for the morphology. Note that in this setting the dimension of the
+for the morphology. Note that, in this setting, the dimension of the
 last layer of $G$ must be equal to the output dimension of the model
 (and the softmax is applied directly after the aggregation $A$,
 without any layer). Thus, $\xi_{(d)}^h$ refers only to the
-layers before the last one, if they exists.
+layers before the last one, if they exist.
 
-Regarding \gru{} we searched in a space of $[1,2,4]$ number of layers of
+Regarding \gru{}, we searched in a space of $[1,2,4]$ number of layers of
 dimension in $[128,256,512,1024]$. We found that the best
 configuration was using $2$ layers of dimension $256$.
 
@@ -834,7 +670,7 @@ configuration was using $2$ layers of dimension $256$.
     \hline
   \end{tabular}
 \end{table}
-In \cref{tab:results} we resumed the results of the models on the test
+In \cref{tab:results} we summarized the results of the models on the test
 dataset. We report accuracy, \ac{map} and Cohen's kappa score (K).
 
 \begin{table}
@@ -859,14 +695,14 @@ dataset. We report accuracy, \ac{map} and Cohen's kappa score (K).
 \end{table}
 From the results we observe that the use of hierarchical models and
 recent architectures like \ac{bert} is not beneficial in this
-context. Moreover we can see that attention model are equivalent to a
+context. Moreover, we can see that attention models are equivalent to a
 simpler max pooling.
 
-The interpretable model is not powerful as \maxp{}, and in this task
+The interpretable model is not as powerful as \maxp{}, and in this task
 not even as the baseline, but it can be used as a
 classification support and to 
 gain insight in the classification process. In
-\cref{tab:multiAttention1} we show three different samples where we
+\cref{tab:multiAttention1}, we show three different samples where we
 underline with different colors --- only for the indicated relevant
 codes --- the values of $\vect{h}_{i,j}$ in \eqref{eq:maxModelF}. We
 consider a code relevant if the corresponding value in the
@@ -880,7 +716,7 @@ are two common exams in prostate cancer cases
 \cite{brimo2013prostate}.
 
 The second sample is a more difficult
-document, it is roughly translated in english with:\\
+document, it is roughly translated in english as:\\
 %\smallskip\noindent
 \begin{small}
   \ttfamily
@@ -902,17 +738,17 @@ related to colon, \emph{polypus} can be related also to rectum, and
 \emph{anal orifice} is related to rectum and anus. Note that this
 record was labeled from the \ac{rtt} with the code for rectum, while
 the medical report 
-explicitly mention that the fragments have been extracted at 20 cm
+explicitly mentions that the fragments have been extracted at 20 cm
 from the anal orifice (the human rectum is long approximately 12 cm
 and the anal canal 3-5 cm \cite{greene2006ajcc}). This record is an
 example of the complexity of the dataset. The mislabeling is not
 necessarily a human classification error, \ac{rtt} have access to more
-information respect to the one contained in our dataset, the fact that
-this example refers in particular to an operation to the colon do not
+information respect to the one contained in our dataset. The fact that
+this example refers in particular to an operation to the colon does not
 exclude that it was related to a rectum tumor.
 
-The third sample is an even more complex record, in english is it
-translated with:\\
+The third sample is an even more complex record, in english it is
+translated as:\\
 \begin{small}
   \ttfamily
   \begin{tabular}{l}
@@ -932,26 +768,27 @@ translated with:\\
 The model classifies the record mainly with codes \emph{34} and
 \emph{80}, and less with \emph{56} and \emph{67}. It underlines with
 the lung code the terms
-\emph{plurial effusion} and \emph{lung thickening}, but is interesting
-that it also underlines the immunohistochemical results. The
+\emph{plurial effusion} and \emph{lung thickening}, but interestingly
+it also underlines the immunohistochemical results. The
 positive \emph{CK7}, negative \emph{CK20} pattern represents a common
 diagnosis 
 of lung origin for metastatic adenocarcinoma
-\cite{kummar2002cytokeratin}. Also immunohistochemistry is a common
+\cite{kummar2002cytokeratin}. Also, immunohistochemistry is a common
 approach in the diagnosis of tumors of uncertain origin
 \cite{duraiyan2012applications}. This can be the reason for the
 underlying with code \emph{80} of the immunoistochemical part.
 It is interesting to note also that \emph{pleuric} is
 suggested to be related to ovary cancer, in fact the pleural cavity
-constitutes the most frequently extra abdominal metastatic site in
+constitutes the most frequent site for extra abdominal metastasis in
 ovarian carcinoma \cite{porcel2012pleural}.
 
-Those experiments with interpretable models serve the purpose of
-illustrate that those model can be useful even if in the
-classification they performs poorly. In an practical context it is
+These experiments with interpretable models serve the purpose of
+illustrating that these models can be useful even if they perform
+poorly in the 
+classification. In a practical context, it is
 possible to combine the more powerful \maxp{} with the interpretable
-\maxi{}. A software that helps humans in the classification process,
-can use \maxp{} to suggest the most-probable class, and \maxi{} to
+\maxi{}. A software that helps humans in the classification process
+can use \maxp{} to suggest the most-probable class and \maxi{} to
 highlight the most relevant terms.
 
 \begin{figure}
@@ -965,16 +802,17 @@ To quantify the effectiveness of the interpretability, we designed an
 experiment where a dataset is created taking for each document the
 first $k$ words selected by  
 ordering the results of the aggregator $u_t$ in case of \maxi{}, and
-$a_t(\vect{u};\theta^a)u_t$ in case of \softmaxi{}. In \cref{fig:sintex}
+$a_t(\vect{u};\theta^a)u_t$ in case of \softmaxi{}. In
+\cref{fig:sintex}, 
 we plot the accuracy obtained training a plain \ac{gru} model on the
-cleaned datasets, for increasing values of $k$. It is surprisingly
-that even with few words the document is classified practically with
-the same results as \gru{}. This can means both that the
+cleaned datasets, for increasing values of $k$. Surprisingly,
+even with few words the document is classified practically with
+the same results as \gru{}. This can mean both that the
 interpretation is working well distilling the document with its most
 relevant terms, and that the information contained in our medical
-texts is concentrated in few terms. The latter can be also the reason
+texts is concentrated in few terms. The latter can also be the reason
 why in \cref{tab:resultsSite,tab:resultsType} we do not observe a big
-improvement of using deep learning methods respect to \ac{svm}.
+improvement in using deep learning methods respect to \acp{svm}.
 
 
 

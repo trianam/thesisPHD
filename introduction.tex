@@ -112,10 +112,10 @@ experimented on the same dataset using \acp{rnn}
 with hierarchical attention~\cite{yang_hierarchical_2016}, obtaining
 further improvements over the CNN architecture.
 
-\section{Motivation and contributions}
+\section{Motivation and contributions}\label{sec:motivation}
 With this work we want to answer to some questions.
-\begin{enumerate}
-\item At the best of our
+\begin{description}
+\item[Q1] At the best of our
   knowledge, there are no large scale studies on deep learning method
   applied to pathology records. Cancer registries collect large amount of
   records and invest time labeling them with topographical and
@@ -123,33 +123,30 @@ With this work we want to answer to some questions.
   of small datasets or using few 
   classes. We want to make a step further applying deep learning
   techniques to a large scale dataset.
-\item Novel deep learning techniques, like attention models, where not
-  applied 
-  to \ac{icdo} text classification. For instance, new models like
-  \ac{bert} were not used in this context. We want to propose
+\item[Q2] We want to apply Novel deep learning techniques, like
+  attention models and \ac{bert}, to cancer pathology reports text
+  classification. We want to propose
   experiments to assess how they perform on this kind of data.
-\item It is not yet clear from the literature if, in this context,
-  bag-of-words techniques are inferior to deep learning techniques.
-\item It is not clear if the use of novel attention-based techniques
-  represents an improvement with respect to simpler \ac{rnn} methods on this
-  kind of text. The structure of the sentences in italian-language
-  medical reports differs substantially from the structure of the text
-  where \ac{rnn} methods are usually employed. Italian \ac{ehr} often
+\item[Q3] It is not yet clear from the literature if, in this domain,
+  bag-of-words techniques are inferior to deep learning
+  techniques. The structure of the sentences in italian-language 
+  cancer pathology reports differs substantially from the structure of the text
+  where \ac{rnn} methods are usually employed. The records often
   do not present the usual subject-verb-object structure.
-\item Recent works use hierarchical models. It is not clear if they can
-  be effectively used on this kind of text.
-\item It is not clear the contribution and the applicability of
+\item[Q4] It is not clear if the use of novel attention-based and
+  hierarchical techniques 
+  represents an improvement with respect to simpler \ac{rnn} methods on this
+  kind of text. 
+\item[Q5] It is not clear the contribution and the applicability of
   unsupervised learning techniques to uncommon text corpora. Usually,
   word vectors are trained on long english text corpora, taken from
   Wikipedia, Gigaword, or similar. Our documents not only are in a
   different language, but they also have a different structure.
-\item We want to evaluate the possible practical application of deep
-  learning and machine learning techniques in a medical context. We
-  imagine that automatic classification techniques can be effectively
-  used in this context. Moreover, we evaluate the possibility to give
+\item[Q6] We want to evaluate the possibility to give
   some interpretation to the notoriously uninterpretable deep learning
   models. 
-\end{enumerate}
+\end{description}
+
 
 %%% Local Variables:
 %%% mode: latex

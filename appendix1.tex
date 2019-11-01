@@ -1,6 +1,192 @@
-\chapter{Details of experiments}
-\label{app:details}
+\chapter{Metrics}\label{sec:metrics}
+We used different metrics in order to evaluate the models.
+All the metrics are defined between $0$ and $1$ or between $-1$ and $1$,
+the higher the value, the better the assessment.
 
-Totally optional
-\section{Setup of Experiment 1}
-\section{Detailed results}
+\section{Accuracy}
+is defined
+as the ratio between the correct-classified documents and all documents. If $\vect{y}$
+is the ground truth and $\vect{\hat y}$ is the predicted
+classification vectors for $n$ samples, then the accuracy is defined
+as:
+\begin{equation*}
+  accuracy\left(\vect{y}, \vect{\hat y}\right) \equiv
+  \frac{1}{n}\sum_{i=1}^{n} 1\left(\hat y_i = y_i\right),
+\end{equation*}
+where
+\begin{equation*}
+  1(a = b)\equiv
+  \begin{cases}
+    1 & \text{if }a = b,\\
+    0 & \text{otherwise}.
+  \end{cases}
+\end{equation*}
+
+In an
+unbalanced dataset, like the one of this work, it is a biased score -
+a model that predicts well only the most frequent classes, and ignores
+the rest, achieves a good accuracy. To resolve this we also considered
+other metrics.
+
+\section{Cohen's kappa} score is usually used to asses
+the agreement of two annotators \cite{cohen_coefficient_1960}. It
+measures the difference between the observed agreement and the
+agreement that can happen by choosing randomly the class. It can then
+be used to mitigate the bias caused by the unbalanced dataset. Cohen's
+kappa is defined as:
+\begin{equation*}
+  \kappa(\vect{y}, \vect{\hat y})\equiv \frac{p_o(\vect{y}, \vect{\hat y}) -p_e(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})} = 1-\frac{1-p_o(\vect{y}, \vect{\hat y})}{1-p_e(\vect{y}, \vect{\hat y})},
+\end{equation*}
+where $p_o$ is the observed agreement that is equal to the accuracy
+and $p_e$ represents the probability of agreement by chance. For $n$
+samples and $k$ classes it is
+defined by:
+\begin{equation*}
+  p_e(\vect{y}, \vect{\hat y}) = \frac{1}{n^2}\sum_{i=1}^{k} \mu_{i}(\vect{y})\cdot\nu_{i}(\vect{\hat y}),
+\end{equation*}
+where $\mu_{i}$ and $\nu_{i}$ are the number of samples classified as
+$i$ for the first and second classifier. They are defined as:
+\begin{align*}
+  \mu_i(\vect{y}) &= \sum_{j=1}^{n}1(y_j = i)\\
+  \nu_i(\vect{\hat y}) &= \sum_{j=1}^{n}1(\hat y_j = i)
+\end{align*}
+
+\section{\acf{map}} is a measure used in information
+retrieval \cite{manning_introduction_2008}. It expresses how well the
+true classification can be retrieved in 
+the first results of the classifier. We define two variants of
+\ac{map}, one (MAPc) to state how well all records for a specific class are
+retrieved, the other (MAPs) to asses how well the correct class is retrieved
+for a specific sample. The first is defined for $n$ samples and $k$ classes,
+with $\vect{Y}=\vect{y}_1,\dots,\vect{y}_k$ being the ground truth and $\vect{\hat
+  Y}=\vect{\hat y}_1,\dots,\vect{\hat y}_k$ being the
+prediction. The formula is:
+\begin{equation*}
+  MAPc(\vect{Y}, \vect{\hat Y})\equiv
+  \frac{1}{k}\sum_{c=1}^{k}AveP(\vect{y}_c, \vect{\hat y}_c),
+\end{equation*}
+where $AveP$ is the average precision for class $c$:
+\begin{equation*}
+  AveP(\vect{y}, \vect{\hat y}) \equiv
+  \frac{1}{\sum_{i=1}^k 1(y_i)}\sum_{j=1}^k P_j(\vect{y}, \vect{\hat y})\cdot 1(y_{\sigma_{\vect{\hat y}}(j)}),
+\end{equation*}
+where $1(y)$ is an indicator
+function that is $1$ for the elements classified positively, $0$
+otherwise. $\sigma_{\vect{\hat y}}(j)$ is a function that returns the
+  index in $\vect{\hat y}$ of the $j$-th element in the ordered
+  version of $\vect{\hat y}$ . $P_j$ is defined as:
+\begin{equation*}
+P_j(\vect{y}, \vect{\hat y}) \equiv \frac{1}{j}\sum_{c=1}^j
+1(y_{\sigma_{\vect{\hat y}}(c)}).
+\end{equation*}
+
+MAPs is defined like MAPc, but on the transposed classification
+matrices
+\begin{equation*}
+  MAPs(\vect{Y}, \vect{\hat Y})\equiv
+  MAPc(\vect{Y}^T, \vect{\hat Y}^T).
+\end{equation*}
+
+\section{Precision} is defined for $n$ samples and binary
+classifications as:
+\begin{equation}\label{eq:precision}
+P(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(\hat y_s)}.
+\end{equation}
+It expresses the ratio of correct positive predictions over all the
+positive predictions.
+
+\section{Recall} is defined as:
+\begin{equation}\label{eq:recall}
+R(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and }y_s)}{\sum_{s=1}^n 1(y_s)},
+\end{equation}
+and it is the ratio of correct predicted positive over all the positive
+classes.
+
+\section{F1-score} is the harmonic mean of precision and recall,
+combining the two measures:
+\begin{equation*}
+F_1(\vect{y}, \vect{\hat y}) \equiv 
+2\frac{P(\vect{y}, \vect{\hat y})\cdot R(\vect{y}, \vect{\hat y})}
+{P(\vect{y}, \vect{\hat y})+R(\vect{y}, \vect{\hat y})}.
+\end{equation*}
+
+Precision, recall, and thus $F_1$ score are defined only for binary
+classifiers. In order to use these metrics in a multi-class
+classification problem it is possible to average the measures for the
+different classes. We considered different methodologies of averaging:
+\begin{description}
+  \item[micro] averaging is performed flattening the array of truth
+    and prediction of the different classes and then applying the
+    scoring formula;
+  \item[macro] average is performed calculating the metrics on the
+    single classes and then averaging them:
+    \begin{equation*}
+      \frac{1}{k}\sum_{c=1}^k S(\vect{y}_c, \vect{\hat y}_c);
+    \end{equation*}
+  \item[weighted] average uses the normalized number of samples for
+    each class in order to give a weight to them:
+    \begin{equation*}
+      \frac{1}{\sum_{i=1}^k|\vect{\hat y}_i|}\sum_{c=1}^k|\vect{\hat y}_c|\cdot S(\vect{y}_c, \vect{\hat y}_c).
+    \end{equation*}
+\end{description}
+
+Micro average considers all the samples equally, regardless of the
+representativeness of classes in the dataset. Macro average considers
+the unbalancement and it is more sensible to few 
+represented classes. Precision, recall, and $F_1$ score are
+equal to the accuracy when micro averaged in a multiclass
+environment. 
+
+\section{ROC curve} is a graph of \emph{true positive rate} versus
+\emph{false positive rate} with the change of the classifier threshold. The
+true positive rate is equal to the recall defined in
+\cref{eq:recall}. Conversely the false positive rate is defined as:
+\begin{equation}\label{eq:fpr}
+FPR(\vect{y}, \vect{\hat y}) \equiv \frac{\sum_{s=1}^n 1(\hat
+  y_s \text{ and not }y_s)}{\sum_{s=1}^n 1(\text{not }y_s)}.
+\end{equation}
+
+ROC curves start from $(0,0)$ and end in $(1,1)$. The area under
+the curve can be used as a metric for the classifier, a perfect
+classifier has an area of $1$.
+
+The curves can be calculated only for binary classifiers. Like for the
+precision, recall and $F_1$ score, it is possible to generalise them to
+multiclass problems averaging micro or macro.
+
+\section{Precision-recall curve} is a graph of precision
+(\cref{eq:precision}) versus 
+recall (\cref{eq:recall}) with the change of the classifier
+threshold. The curves start from $(0,1)$ and end in $(1,0)$. A perfect
+classifier has an area under the curve of $1$.
+
+Also, precision-recall curves can be calculated only for binary
+classifiers. In order to generalise them to multiclass problem, it is
+necessary to micro or macro average.
+
+\section{Use cases}
+The different metrics are useful to assess models in different
+situations. In case you need to retrieve records of a specific
+cancer case from the register, MAPc assesses how
+well the task is executed.
+Conversely in case of an operator-assistance software, MAPs
+assess how the correct classification
+for a specific histological record is retrieved on top results. 
+
+Cohen's kappa measures the agreement of automatic
+and human annotators. Thus, it is an indirect measure of the
+classification correctness.
+
+Precision and recall are two measures in trade off between them. The
+former is more significant when you need a list of
+correctly-classified records, at cost of not retrieving all of
+them. The latter is more
+meaningful when you need to retrieve the greatest number of cases at cost
+of retrieving also some false positives. A peculiarity of the
+automatic annotator is that you can change the threshold to support
+higher precision or recall depending on the specific retrieving
+task. Recall-precision
+curves can be used to assess the correct threshold.
+

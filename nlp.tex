@@ -1,19 +1,20 @@
 \chapter{Text analysis with deep learning}
 
 \section{\ac{nlp}}
-\ac{nlp} is the field of designing methods that take as input or
-produce as output natural language data. Natural language is
+\ac{nlp} is the field of designing methods that takes natural language
+data as an input or
+produces it as an output. Natural language is
 ambiguous and variable, for instance the sentence ``i saw a woman on a
 hill with a binocular'' can means that I had a binocular and with
 those I saw a
 woman on a hill, or that a woman was on a hill using the
-binocular. This ambiguity can also be the source of problems in
-specific context as the medical text, where specific countermeasures
-can be adopted \cite{zhao_clinical_2019,codish2005model}.
+binocular. This ambiguity can also be the source of problems in a
+specific domain like the one of the medical text, and specific countermeasures
+may be adopted \cite{zhao_clinical_2019,codish2005model}.
 
 Language is
 \emph{symbolic} and \emph{discrete}, the relationship between different words,
-i.e. symbols, can not be inferred from the symbols
+i.e. symbols, cannot be inferred from the symbols
 themselves. It is possible to easily compare concepts that have a
 continuous representation, e.g. two different colors in an image,
 while it cannot be done easily with words without using large lookup
@@ -32,40 +33,40 @@ relatively low dimensional space. This representation allows to
 transform the isolated symbols into mathematical objects that can be
 operated on.
 
-The principal model that is used in \ac{nlp} are \ac{rnn}. They are
-capable of producing a vector that summarize the entire input
-sequence. They allow abandoning the \emph{markov} assumption that was
-prevalent in \ac{nlp} for decades, and designing models that can
+The primary model that is used in \ac{nlp} are \acp{rnn}. They are
+capable of producing a vector that summarizes the entire input
+sequence. With them, it is possible to abandon the \emph{markov} assumption that was
+prevalent in \ac{nlp} for decades, and to design models that can
 condition on entire sentences or documents. This capability leads to
-impressive gains in \emph{language-modeling}, the task of predicting
+impressive progress in \emph{language-modeling}, the task of predicting
 the probability of the next word in a sequence.
 
 \subsection{Features}
-The mapping from textual data to real valued vector that can be used
+The mapping from textual data to real valued vectors that can be used
 as input for \ac{ann} models, is called \emph{features extraction}.
 
-When the focus entity is a word outside of a context, the main source
-of information is the letters. We can look at \emph{lemma},
+When the focus entity is a word out of context, the main source
+of information is the letters. We can look at a \emph{lemma},
 i.e. dictionary entry of the word, e.g. words such as ``booking'',
-``booked'', ``books'' to their common lemma ``book''. This mapping is
+``booked'', ``books'' have ``book'' as their common lemma. This mapping is
 usually performed using lemma lexicons or morphological analyzers. It
 is a linguistically defined process and may not work well for forms
-that are not in the lexicon or for mispelling. A coarser process is
+that are not in the lexicon or for mispellings. A coarser process is
 called \emph{stemming}, it maps words to shorter words that are
-not necessarily grammatically valid. E.g. ``picture'', ``pictures'',
+not necessarily grammatically valid, e.g. ``picture'', ``pictures'',
 and ``pictured'' will be stemmed to ``pictur''. \emph{Lexical
-  resources} are dictionary that are meant to be accessed by machine
-rather than by humans. They typically contain information about words,
+  resources} are dictionary that are meant to be accessed by machines
+rather than humans. They typically contain information about words,
 e.g. there are lexicons that map inflected word forms to their
-possible morphological analyses, telling that a certain word may be a
-singular masculine noun or a past-perfect verb.
+possible morphological analyses, informing that a certain word may be a
+singular masculine noun or a past perfect verb.
 
-When the focus entity is text, i.e. sentences, paragraphs documents,
+When the focus entity is text, i.e. sentences or paragraphs documents,
 the features are the count and the order of the letters and words
 within the text. \emph{Bag of words} is a very common feature
 extraction procedure. We look at the histogram of the words within the
 text. We can compute quantities that are directly derived from
-the words and the letters such as the length of the sentence. We can
+the words and the letters, such as the length of the sentence. We can
 also integrate statistics based on external information. When using
 bag of words, it is common to use \ac{tfidf} weighting
 \cite{manning_introduction_2008}. A word $w$ in a document $d$ that is
@@ -85,16 +86,16 @@ letters surrounding it. It is common to focus on the immediate context
 of a word by considering a \emph{window} surrounding it (with typical
 values of 2, 5, and 10 words to each side). We may also be interested
 in the absolute position of a word inside a sentence, having features
-such as ``the word is the 5th in the sentence'' or ``the word appear
+such as ``the word is the 5th in the sentence'' or ``the word appears
 within the first 10 of the sentence''.
 
 When considering more than a word within a context, we can also look
 at the text \emph{distance} between them or the identities of the
 words that appear between them.
 
-Sentences in natural language have structures beyond the linear order
+In natural language, sentences have structures beyond the linear order
 of their words. The structure is not directly observable and is
-referred to as \emph{syntax}. While it is not observable it can be
+referred to as \emph{syntax}. While it is not observable, it can be
 inferred from the sentence. Specialized systems exist for the
 prediction of parts of speech, syntactic trees, semantic roles,
 discourse relations, and other linguistic properties. These prediction
@@ -110,11 +111,11 @@ meaning of a word can be inferred from the contexts in which it is
 used. By observing co-occurrence patterns of words across a large body
 of text, it is possible to infer that a word is similar to another
 word. Many algorithms were derived to make use of this property. They
-can be categorized into clustering-based methods, with assign similar
+can be categorized into clustering-based methods that assign similar
 words to the same cluster and represent each word by its cluster
 membership \cite{miller2004name}, and embedding-based methods which
 represent each word as a 
-vector such that similar words (with similar distribution) have
+vector such that similar words (with a similar distribution) have
 similar vectors \cite{pennington_glove:_2014,mikolov_linguistic_2013}.
 
 \section{Text classification}
@@ -125,13 +126,13 @@ representations of textual documents
 described by a \textit{set} or a \textit{multiset} of words.
 Multisets allow one to take into account the number of occurrences of
 a word in the document. Vector representations of documents are easily
-derived from bags-of-words. When using unigrams, the dimensionality of
+derived from bag-of-words. When using unigrams, the dimensionality of
 each vector equals the size of the vocabulary in use. In the simplest
 case, the vector $x$ representing a document has Boolean components
 $x_j=1$ if and only if term $j$ appears in the document. A slightly more
 informative representation, derived from multisets, is \ac{tfidf}
 \cite{manning_introduction_2008}. In this case 
-$x_j=n_j\log \frac{|D|}{|D_j|}$ where $n_j$ is the number of times
+$x_j=n_j\log \frac{|D|}{|D_j|}$, where $n_j$ is the number of times
 term $j$ occurs in the document, $|D|$ is the cardinality of the
 data set, and $D_j$ is the set of documents containing term $j$. In
 those representations, common terms receive a lower weight. An
@@ -140,24 +141,23 @@ alternative representation suggested in
 but only yielded modest improvements over \ac{tfidf}.
 
 A more informative representation of documents can be obtained by
-taking into account bigrams and trigrams, i.e.\ pairs or triplets or
+considering bigrams and trigrams, i.e.\ pairs or triplets or
 terms that occur consecutively in a document. These representations
 are suitable for large data sets and have been commonly employed in
 other contexts.
 % Explain how we used bigrams and trigrams
 
 Bag-of-words representations (including those employing bigrams or
-trigrams) enable the application of very simple text classifiers such
-as \ac{nb} or \ac{svm} \cite{cortes-support-1995}. However, they
+trigrams) enable the application of very simple text classifiers like
+\ac{nb} or \ac{svm} \cite{cortes-support-1995}. However, they 
 suffer two fundamental problems. First, the relative order of terms in
 the documents is lost, making it impossible to take advantage of the
 syntactic structure of the sentences. Second, distinct words have an
 orthogonal representation even when they are semantically
-close. Moreover the vast majority of the dataset, i.e. the unlabeled
-records, remains unused with
-this representation. As detailed in \cref{sec:word-vectors}, word
+close. Moreover, with this representation  the vast majority of the dataset, i.e. the unlabeled
+records, remains unused. As detailed in \cref{sec:word-vectors}, word
 vectors can be used to address the second limitation and also allow us
-to take advantage of unlabeled data, which can be typically be
+to take advantage of unlabeled data, which can be typically
 obtained in large amounts and with little cost.
 
 \section{Word Vectors}
@@ -207,7 +207,7 @@ purpose, we trained \ac{glove}~\cite{pennington_glove:_2014}. An
 excerpt of the trained dataset is visible in \cref{fig:gloveGraph}.
 
 The training process involves the construction of the
-$n\times n$ triangular matrix $C$ of words co-occurrence, where $n$ is
+$n\times n$ triangular matrix $C$ of words' co-occurrence, where $n$ is
 the number of unique words $w_1,\dots,w_n$ inside the text (possibly
 with the exclusion of the
   most and the least frequent terms). In order to do this, a window of
@@ -227,32 +227,59 @@ The first results with attentive models where due to Bahdanau et al.\
 parts. The task of the first part is to encode the input using an
 \ac{rnn} to create hidden representations of the sequence. Contrarily
 to previous approaches, the sequence is not encoded in a single
-representation, but each word of the input have his
-representation. The second part generate the output
+representation, but each word of the input has its
+representation. The second part generates the output
 sequence, with a generative \ac{rnn}, using a weighted average of the
 input representation to condition the generation. The weights are
 calculated by the attention mechanism, based on the values of the
-hidden representation of the input, and the state of the output
+hidden representation of the input and the state of the output
 generating \ac{rnn}. The attention mechanism is trained together with
 the rest of the model. Luong et al.\ \cite{luong2015effective}
 explored variation on the attention mechanism leading to some
 improvement.
 
 \section{Hierarchical models}
-In \cite{yang_hierarchical_2016} and \cite{wang2019multi}
+Recent works on attention employ hierarchical structures of the
+models. Yang et al.\ \cite{yang_hierarchical_2016} proposed a model
+called \ac{han}
+that combines two characteristics: a hierarchical structure that
+reflects the hierarchical structure of the text and an attention
+mechanism applied to each one of the two methods. Their hypothesis was
+that a better text representation can be obtained incorporating the
+document structure in the model. Their model is structured in two
+levels: a sentence encoder that uses a bidirectional \ac{gru} layer to
+extract hidden 
+representations of each word, followed by an attention mechanism that
+aggregates them; a document encoder that repeats the same process
+obtaining document representations from the
+sentences representations. The attention mechanism calculates the
+importance of a word as the similarity between a hidden word
+representation and a learned context vector.
+
+Gao et al.\ \cite{gao_hierarchical_2018} applied \ac{han}
+\cite{yang_hierarchical_2016} in the context of cancer pathology
+reports. They implemented two classification tasks on 942 reports: one
+with 12 main site \ac{icdo} codes and the other with 4 histological
+grade. They demonstrated that in their tasks \ac{han} outperforms other
+conventional machine learning and deep learning approaches.  
+
+Wang et al.\ \cite{wang2019multi} organized ngrams in a hierarchical
+structure, and used a tree-structured \ac{lstm} to achieve a
+self-explaining text classification model. They evaluated the model on
+a public medical text classification dataset. 
 
 \section{\acs{bert}}
 \ac{bert} \cite{devlin2018bert} is a recent model that represents the
 state of the art in many \ac{nlp} related tasks
 \cite{chatterjee2019semeval,hu2019introductory,lee2019biobert,tshitoyan2019unsupervised}.
 It is a
-bi-directional pre-training model backboned by the Transformer Encoder
-\cite{vaswani2017attention}. It is an attention-based technique that
+bi-directional pre-training model supported by the Transformer Encoder
+\cite{vaswani2017attention}. This model is attention-based and
 learns context-dependent word representation on large unlabeled
 corpora, and then the model is fine tuned end to end on specific labeled
 tasks. During pre-training, the model is trained
 on unlabeled data over two different tasks. In \ac{mlm} some tokens
-are masked and the model is trained to predict those token based on
+are masked and the model is trained to predict those tokens based on
 the context. In \ac{nsp} the model is trained to understand the
 relationship between sentences predicting if two sentences are actually
 consecutive or if they where randomly replaced (with 50\%
