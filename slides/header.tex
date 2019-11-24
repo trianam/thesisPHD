@@ -1,0 +1,90 @@
+%This work is licensed under the Creative Commons
+%Attribution-ShareAlike 4.0 International License. To view a copy of
+%this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or
+%send a letter to Creative Commons, PO Box 1866, Mountain View, CA
+%94042, USA.
+
+%\documentclass[gray,handout, pdflatex, 11pt]{beamer}
+%\documentclass[handout, pdflatex, 11pt]{beamer}
+
+\documentclass[pdflatex, 11pt]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{calligra}
+\usepackage{lmodern}
+%\usepackage[italian]{babel}
+\usepackage{acronym}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage{bm}
+\usepackage{acronym}
+\usepackage{array}
+\usepackage{pifont}
+\usepackage{appendixnumberbeamer}
+\usepackage{tikz}
+\usetikzlibrary{shapes, chains, scopes, shadows, positioning, arrows,
+  decorations.pathmorphing, calc, mindmap, petri}
+
+\newcommand{\cmark}{\ding{52}}%{\ding{51}}
+\newcommand{\xmark}{\ding{56}}%{\ding{55}}
+\newcommand{\hmark}{\ding{42}}%{\ding{43}}
+%\newcommand{\cmark}{*}
+%\newcommand{\xmark}{x}
+%\newcommand{\hmark}{-}
+
+\graphicspath{{img/}}
+\lstset{inputpath=../cSrc/}
+
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=links,urlcolor=links}
+
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+
+
+\mode<presentation>{
+  \usetheme{Martina}
+  %-------------------------1
+  %\usetheme{Boadilla}
+  %\usecolortheme{beaver}
+  %-------------------------1
+  %-------------------------2
+  %\usetheme{Goettingen}
+  %\usecolortheme{sidebartab}
+  %-------------------------2
+  %\useoutertheme[right]{sidebar}
+  %\usefonttheme{default}
+  \setbeamercovered{transparent}
+  %\setbeameroption{show notes on second screen=right}
+  %\setbeamertemplate{navigation symbols}{}
+  %\setbeamertemplate{footline}{}
+
+  \bibliographystyle{abbrv}  
+  %\renewcommand\bibfont{\scriptsize}
+  %\setbeamertemplate{bibliography item}{\textbullet}
+  \setbeamertemplate{bibliography item}{\insertbiblabel}
+  \setbeamertemplate{itemize item}{\cmark}
+  % \setbeamertemplate{itemize subitem}{-}
+  \setbeamertemplate{enumerate items}[default]
+  \setbeamertemplate{sections/subsections in toc}[square]
+}
+
+\newcommand{\backupbegin}{
+   \newcounter{finalframe}
+   \setcounter{finalframe}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+   \setcounter{framenumber}{\value{finalframe}}
+}
+
+% \usebackgroundtemplate
+% {
+%   \begin{tikzpicture}
+%     \node[opacity=0.1] {\includegraphics[]{img/logoUnifi.png}};
+% %    \node[opacity=0.04] {\includegraphics[scale=1]{img/logoUnifi.eps}};
+%   \end{tikzpicture}
+% }
