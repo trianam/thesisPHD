@@ -81,6 +81,181 @@
    \setcounter{framenumber}{\value{finalframe}}
 }
 
+
+%======================================================
+
+
+\newcommand{\svm}{\textbf{\emph{U-SVM}}}
+\newcommand{\svmb}{\textbf{\emph{B-SVM}}}
+\newcommand{\lstmng}{\textbf{\emph{B-LSTM}}}
+\newcommand{\lstmc}{\textbf{\emph{G-CRNN}}}
+\newcommand{\lstmb}{\textbf{\emph{G-LSTM}}}
+\newcommand{\maxp}{\textbf{\emph{G-MAX}}}
+\newcommand{\softmax}{\textbf{\emph{G-ATT}}}
+\newcommand{\maxi}{\textbf{\emph{G-MAXi}}}
+\newcommand{\softmaxi}{\textbf{\emph{G-ATTi}}}
+\newcommand{\maxh}{\textbf{\emph{G-MAXh}}}
+\newcommand{\softmaxh}{\textbf{\emph{G-ATTh}}}
+\newcommand{\bert}{\textbf{\emph{BERT}}}
+\newcommand{\gru}{\textbf{\emph{G-GRU}}}
+
+
+\newcommand{\site}{Main-site}
+\newcommand{\fullSite}{Full-site}
+\newcommand{\type}{Type}
+\newcommand{\behaviour}{Behavior}
+
+\newcommand{\matr}[1]{\bm{#1}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\dist}[1]{\mathcal{#1}}
+
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{lemma}[definition]{Lemma}
+%\newtheorem{corollary}[definition]{Corollary}
+%\newtheorem{theorem}[definition]{Theorem}
+
+\def\RSet{\mathbb{R}}
+\def\NSet{\mathbb{N}}
+\def\XSet{\mathbb{X}}
+\def\YSet{\mathbb{Y}}
+\def\HSet{\mathbb{H}}
+\def\prob{\mathbb{P}}
+\def\expect{\mathbb{E}}
+\def\define{\overset{\underset{\mathrm{def}}{}}{=}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\def\loss{\mathcal{L}}
+
+\acrodef{han}[HAN]{Hierarchical Attention Network}
+\acrodef{max}[MM]{Max Model}
+\acrodef{softmax}[AM]{Attention Model}
+\acrodef{maxi}[MMi]{Max Model interpretable}
+\acrodef{maxh}[MMh]{Max Model hierarchical}
+\acrodef{softmaxh}[AMh]{Attention Model hierarchical}
+\acrodef{srm}[SRM]{Structural Risk Minimization}
+\acrodef{vcd}[VC-dimension]{Vapnik-Chervonenkis dimension}
+\acrodef{pac}[PAC]{Probably Approximately Correct}
+\acrodef{iid}[i.i.d.]{indipendently and identically distributed}
+\acrodef{ml}[ML]{Machine Learning}
+\acrodef{ai}[AI]{Artificial Intelligence}
+\acrodef{erm}[ERM]{Empirical Risk Minimization}
+\acrodef{rtt}[RTT]{Registro Tumori della Toscana, Tumor Registry of Tuscany}
+\acrodef{icdo}[ICD-O]{International Classification of Diseases for Oncology}
+\acrodef{icdo1}[ICD-O-1]{International Classification of Diseases for Oncology, first edition}
+\acrodef{icdo3}[ICD-O-3]{International Classification of Diseases for Oncology, third edition}
+\acrodef{hdr}[HDR]{Hospital Discharge Register}
+\acrodef{ehr}[EHR]{Electronic Health Record}
+\acrodef{cdf}[CDF]{Cumulative Distribution Function}
+\acrodef{an}[AN]{Artificial Neuron}
+\acrodef{ann}[ANN]{Artificial Neural Network}
+\acrodef{cnn}[CNN]{Convolutional Neural Network}
+\acrodef{rnn}[RNN]{Recurrent Neural Network}
+\acrodef{mlp}[MLP]{Multilayer Perceptron}
+\acrodef{lstm}[LSTM]{Long Short-Term Memory}
+\acrodef{sgd}[SGD]{Stochastic Gradient Descend}
+\acrodef{glove}[GloVe]{Global Vectors}
+\acrodef{nb}[NB]{Naive Bayes}
+\acrodef{svm}[SVM]{Support Vector Machine}
+\acrodef{tfidf}[TF-IDF]{Term-Frequency Inverse-Document-Frequency}
+\acrodef{map}[MAP]{Mean Average Precision}
+\acrodef{relu}[ReLU]{Rectified Linear Unit}
+\acrodef{gru}[GRU]{Gated Recurrent Unit}
+\acrodef{nlp}[NLP]{Natural Language Processing}
+\acrodef{bert}[BERT]{Bidirectional Encoder Representations from Transformers}
+\acrodef{mlm}[MLM]{Masked Language Model}
+\acrodef{nsp}[NSP]{Next Sentence Prediction}
+
+\newcommand\floatwidth{0.9\textwidth}
+\newcommand\attTableIcdoWidth{2.5cm}
+\newcommand\attTableTextWidth{10cm}
+\newlength\lunderset
+\newlength\rulethick
+\lunderset=1.7pt\relax
+\rulethick=.8pt\relax
+\def\stackalignment{l}
+\newcommand\att[4][1]{\setbox0=\hbox{#2}%
+  \stackunder[#1\lunderset-\rulethick]{\strut#2}{\color{#3!#4}\rule{\wd0}{\rulethick}}}
+
+\definecolor{att}{rgb}{0, 1, 0}
+\definecolor{attb}{rgb}{1, 0, 0}
+\newcommand{\attvisB}[3]{\tikz[overlay]\node[fill=att!#2,inner sep=1pt, anchor=text, rectangle, rounded corners=1mm,draw=attb!#3] {#1};\phantom{#1}}
+
+\makeatletter
+  \providecommand*\setfloatlocations[2]{\@namedef{fps@#1}{#2}}
+\makeatother
+\setfloatlocations{figure}{htbp}
+\setfloatlocations{table}{htbp}
+
+\newcommand{\dataLabelScale}{0.6}
+\newcommand{\schemeNodeDistance}{0.5cm}
+
+\tikzstyle{every neuron}=[circle, draw, minimum size=1cm]
+\tikzstyle{bias}=[circle,draw]
+\tikzstyle{operation}=[circle,draw]
+\tikzstyle{activation}=[draw]
+\tikzstyle{layer}=[draw,minimum size=1cm]
+\tikzstyle{delay}=[draw,minimum size=0.5cm,fill=black]
+\tikzstyle{neuron missing}=[draw=none, scale=4,text height=0.333cm,execute at begin node=\color{black}$\vdots$]
+\tikzstyle{vmissing}=[draw=none, scale=4,text height=0.333cm,execute at begin node=\color{black}$\vdots$]
+\tikzstyle{hmissing}=[draw=none, scale=4,text width=0.41cm,execute at
+begin node=\color{black}$\cdots$]
+\tikzstyle{line}=[]
+\tikzstyle{arrow}=[->, >=stealth]
+\tikzstyle{arrowInverse}=[<-, >=stealth]
+\tikzstyle{vectorLine}=[line width=0.6mm]
+\tikzstyle{vectorArrow}=[->, >=stealth, line width=0.6mm]
+\tikzstyle{border}=[draw]
+\tikzstyle{dataBlock}=[draw,minimum size=1cm, minimum height=2cm, double copy shadow={shadow xshift=-0.5ex, shadow yshift=-0.5ex}, fill=white]
+\tikzstyle{layer}=[draw,minimum height=2cm]
+\tikzstyle{joined}=[join=by {->}]
+\tikzstyle{support}=[coordinate,join=by {-}]
+\tikzstyle{dataLabel}=[scale=\dataLabelScale]
+
+\newcommand\nodeInput{} % just for safety
+\def\nodeInput(#1){%
+  \node[dataBlock,joined,scale=\dataLabelScale] (#1) {$200$};
+}
+
+\newcommand\nodeEmbedding{} % just for safety
+\def\nodeEmbedding(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Embed}};
+}
+
+\newcommand\nodeGlove{} % just for safety
+\def\nodeGlove(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{GloVe}};
+}
+
+\newcommand\nodeConv{} % just for safety
+\def\nodeConv(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Conv 2}};
+}
+
+\newcommand\nodeLstm{} % just for safety
+\def\nodeLstm(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Bi. LSTM}};
+}
+
+\newcommand\nodeAvg{} % just for safety
+\def\nodeAvg(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Avg pool}};
+}
+
+\newcommand\nodeRelu{} % just for safety
+\def\nodeRelu(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{ReLU}};
+}
+
+\newcommand\nodeSoftmax{} % just for safety
+\def\nodeSoftmax(#1){%
+  \node[layer,joined] (#1) {\rotatebox{90}{Softmax}};
+}
+
+
+
+
 % \usebackgroundtemplate
 % {
 %   \begin{tikzpicture}
