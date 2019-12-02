@@ -290,6 +290,149 @@
 \end{figure}
 \end{frame}
 
+\begin{frame}{\acf{gru}}
+  \vspace{-0.8cm}
+\begin{figure}
+  \centering
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=1.4cm, y=1cm]
+      \node at (1,-0.5) {};
+
+      \coordinate (input1) at (1,0.5);
+      \coordinate (input2) at (2,0.5);
+      \coordinate (input3) at (2.4,0.5);
+      \coordinate (input4) at (3.4,0.5);
+      \node[] (input01) at (1,0) {$x_1$};
+      \node[] (input02) at (2,0) {$x_m$};
+      \node[] (input03) at (2.4,0) {$h_1$};
+      \node[] (input04) at (3.4,0) {$h_n$};
+      \node[] at (1.5,0.2) {$\cdots$};
+      \node[] at (2.9,0.2) {$\cdots$};
+      \node[every neuron, label={[xshift=-10mm, yshift=-10mm, align=left, font=\tiny]update\\gate}] (updateGate) at (0.5,2.5) {$\sigma$};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] reset\\gate}] (resetGate) at (4,1.5) {$\sigma$};
+      \node[operation] (updateTimesLeft) at (0, 4) {$\times$};
+      \node[operation] (updateTimesRight) at (1, 4) {$\times$};
+      \node[operation, label={[xshift=10mm,yshift=-10mm]state}] (state) at (0.5, 5) {$+$};
+      \node[delay] (delay) at (-0.3,4.8) {};
+      \node[operation] (resetTimesLeft) at (2.4, 2.5) {$\times$};
+      \node[operation] (resetTimesRight) at (3.4, 2.5) {$\times$};
+      \node[every neuron] (candidateState) at (2,3.5) {$t$};
+      \coordinate (output1) at (2.2,5.5);
+      \node (output2) at (2.2,6) {$out_i$};
+      \node at (4.2,5.3) {$cell_i$};
+
+      \fill[black] (input1) circle (1mm);
+      \fill[black] (input2) circle (1mm);
+      \fill[black] (input3) circle (1mm);
+      \fill[black] (input4) circle (1mm);
+      \fill[black] (output1) circle (1mm);
+      
+      \foreach \n in {input1, input2, input3, input4}{
+        \foreach \m in {updateGate, resetGate}{
+          \draw[arrow] (\n) -- (\m);
+        }
+      }
+
+      \foreach \n in {input1, input2, resetTimesLeft, resetTimesRight}{
+        \draw[arrow] (\n) -- (candidateState);
+      }
+      
+      \draw[arrow] (updateGate) -- (updateTimesLeft) node[draw=none,fill=none,font=\scriptsize,midway,left] {$1-$};
+      \draw[arrow] (updateGate) -- (updateTimesRight);
+      \draw[arrow] (updateTimesLeft) -- (state);
+      \draw[arrow] (updateTimesRight) -- (state);
+      %\draw [arrow] (state) ..  controls  (3.8,4.2) and (3.2,3) ..  (resetGate);
+      \draw[arrow] (state) -- (delay);
+      \draw[arrow] (delay) -- (updateTimesLeft);
+      \draw[arrow] (state) -- (output1);
+      \draw[arrow] (input3) -- (resetTimesLeft);
+      \draw[arrow] (input4) -- (resetTimesRight);
+      \draw[arrow] (resetGate) -- (resetTimesLeft);
+      \draw[arrow] (resetGate) -- (resetTimesRight);
+      \draw[arrow] (candidateState) -- (updateTimesRight);
+      \draw[line] (output1) -- (output2);
+      \draw[line] (input01) -- (input1);
+      \draw[line] (input02) -- (input2);
+      \draw[line] (input03) -- (input3);
+      \draw[line] (input04) -- (input4);
+
+      \path[border] (-0.6,0.5) -- (4.5,0.5) -- (4.5,5.5) -- (-0.6,5.5) -- (-0.6,0.5); 
+    \end{tikzpicture}
+    %\label{fig:gru1}
+  }\hfill
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=0.8cm, y=0.6cm]
+      \node at (1,-2.5) {};
+
+      % \draw[step=1.0,black,thin] (0,3) grid (4,4);
+      \draw[step=1.0,black,thin] (0,3) grid (2,4);
+      \draw[step=1.0,black,thin] (3,3) grid (4,4);
+      \coordinate (input1) at (0.5,3);
+      \coordinate (input2) at (1.5,3);
+      \coordinate (input3) at (3.5,3);
+      \coordinate (inputM1) at (0.5,2.5);
+      \coordinate (inputM2) at (1.5,2.5);
+      \coordinate (inputM3) at (3.5,2.5);
+      \coordinate (output1) at (0.5,4);
+      \coordinate (output2) at (1.5,4);
+      \coordinate (output3) at (3.5,4);
+
+      \coordinate (outputM) at (2,6);
+      \coordinate (outputTM) at (1,6);
+      
+      \node at (0.5, 3.5) {$cell_1$};
+      \node at (1.5, 3.5) {$cell_2$};
+      \node at (2.5, 3.5) {$\cdots$};
+      \node at (3.5, 3.5) {$cell_n$};
+      \coordinate (pass) at (4.5, 3.5);
+      \node (inputT) at (1,0) {$\vect{x}$};
+      \coordinate (inputTM) at (1,1);
+      \node (outputT) at (1,7) {$\vect{y}$};
+
+      \node[delay] (delay) at (4,1) {};
+
+      \foreach \c in {input1, input2, input3, output1, output2, output3}{
+        \fill[black] (\c) circle (1mm);
+      }
+
+      \foreach \c in {inputM1, inputM2, inputM3}{
+        \draw [vectorLine] (delay) ..  controls
+        ($0.5*(delay)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+        \draw [vectorLine] (inputTM) ..  controls
+        ($0.5*(inputTM)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+      }
+
+      \foreach \c in {1, 2, 3}{
+        \draw[vectorArrow] (inputM\c) -- ($(input\c)-(0,0.1)$);
+      }
+
+      \foreach \c in {output1, output2, output3}{
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputM)-(0,0.5)$) ..  (outputM);
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputTM)-(0,0.5)$) ..  (outputTM);
+      }
+
+      %\draw [vectorArrow] (outputM) ..  controls  ($(outputM)+(1,2)$) and ($(delay)+(1,0)$) ..  (delay);
+      \draw [vectorArrow]
+      (outputM) ..
+      controls  ($(outputM)+(1,2)$) and ($(pass)+(0,1)$) ..
+      (pass) ..
+      controls  ($(pass)-(0,1)$) and ($(delay)+(1,0)$) ..
+      (delay);
+      \draw[vectorLine] (inputT) -- (inputTM);
+      \draw[vectorArrow] (outputTM) -- (outputT);
+    \end{tikzpicture}
+    %\label{fig:gru2}
+  }
+  \caption{memory cell (a), and general
+    scheme (b). The black box is a delay}
+  %\label{fig:gru}
+\end{figure}
+\end{frame}
+
 \subsection{Attention Models}
 
 \subsection{Hierarchical models}
