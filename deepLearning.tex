@@ -594,10 +594,10 @@ become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter1
       \node[] (input01) at (2.5,0) {$in_1$};
       \node[] (input02) at (3.5,0) {$in_m$};
       \node[] at (3,0.2) {$\cdots$};
-      \node[every neuron, label={[xshift=-2mm]input}] (inputN) at (1,2) {};
-      \node[every neuron, label={[xshift=2mm, align=left, font=\tiny] input\\gate}] (inputGate) at (2,2) {};
-      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] forget\\gate}] (forgetGate) at (3,2) {};
-      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] output\\gate}] (outputGate) at (4,2) {};
+      \node[every neuron, label={[xshift=-2mm]input}] (inputN) at (1,2) {$t$};
+      \node[every neuron, label={[xshift=0.5mm, align=left, font=\tiny] input\\gate}] (inputGate) at (2,2) {$\sigma$};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] forget\\gate}] (forgetGate) at (3,2) {$\sigma$};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] output\\gate}] (outputGate) at (4,2) {$\sigma$};
       \node[operation] (inputTimes) at (1.5, 3) {$\times$};
       \node[operation, label={[xshift=-3mm]state}] (state) at (2, 4) {$+$};
       \node[delay] (delay2) at (2.7,3.7) {};
@@ -616,7 +616,7 @@ become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter1
           \draw[arrow] (\n) -- (\m);
         }
       }
-      \foreach \m in {inputGate, forgetGate, outputGate}{
+      \foreach \m in {inputGate, forgetGate}{
         \draw[arrow] (delay1) -- (\m);
       }
 
@@ -626,6 +626,7 @@ become zero. A possible solution for this problem is \ac{lstm} \cite{hochreiter1
       \draw[arrow] (inputTimes) -- (state);
       \draw[arrow] (forgetTimes) -- (state);
       \draw [arrow] (state) ..  controls  (0.15,4) and (0.15,1) ..  (delay1);
+      \draw [arrow] (state) ..  controls  (3.8,4.2) and (3.2,3) ..  (outputGate);
       \draw[arrow] (state) -- (delay2);
       \draw[arrow] (delay2) -- (forgetTimes);
       \draw[arrow] (state) -- (outputTimes);

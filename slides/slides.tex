@@ -50,14 +50,245 @@
 
 \subsection{Cancer registries}
 
+\begin{frame}{Cancer}
+  pippo
+\end{frame}
+
+\begin{frame}{Cancer registries}
+  \begin{itemize}
+  \item \alert{Collect} administrative and clinical data of a specific region
+  \item \alert{Identify} new cancer diagnoses
+  \item Provide \alert{details} on diagnoses and outcomes 
+  \item \alert{Manual} classification of reports
+  \end{itemize}
+\end{frame}
+
 \subsection{\acs{icdo}}
 
+\begin{frame}{\acs{icdo3}}
+  \begin{itemize}
+  \item International \alert{classification} standard
+  \item Specialization to \alert{oncology} domain
+  \end{itemize}
+  \begin{block}{\acf{icdo3}}
+      \begin{itemize}
+      \item Topography: \texttt{Cmm.s} where \texttt{mm} is the
+        \alert{main} site and \texttt{s} the \alert{subsite}
+      \item Morphology: \texttt{tttt/b} where \texttt{tttt} is the
+        cell \alert{type} and \texttt{b} the \alert{behavior}
+      \end{itemize}
+  \end{block}
+\end{frame}
+
 \subsection{Scientific questions}
+
+\begin{frame}{Scientific questions}
+  \begin{description}
+  \item[Q1] Implement \alert{large scale} study on deep learning
+    applied to pathology reports, existing works are on
+    \begin{itemize}
+    \item \alert{small} datasets or
+    \item \alert{few} classes
+    \end{itemize}
+  \item[Q2] Apply \alert{novel} deep learning techniques, like
+    \alert{attention} models and \alert{acs{bert}}
+  \item[Q3] \alert{Compare} classical \alert{bag-of-words} techniques with
+    newer deep learning techniques in this domain
+  \item[Q4] \alert{Compare} novel \alert{attention}-based and
+    \alert{hierarchical} techniques with simpler models
+  \item[Q5] \alert{Investigate} the contribution and applicability of
+    \alert{unsupervised} learning techniques on uncommon text corpora
+  \item[Q6] \alert{Investigate} the possibility to give
+    \alert{interpretation} to deep learning models
+  \end{description}
+\end{frame}
 
 
 \section{Machine Learning}
 
 \subsection{\acs{rnn}}
+
+\begin{frame}{\acf{rnn}}
+  \begin{figure}
+    \centering
+    % \subfigure[]{
+    \subfloat[\label{fig:rnn1}]{
+      \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+        \node [] (input) at (0,0) {$\vect{x}$};
+        
+        \node [layer] (state) at (0,1) {$\vect{h}$};
+        \node [delay] (delay) at (1,1) {};
+        
+        \node [] (output) at (0,2) {$\vect{y}$};
+        
+        \draw [arrow] (input) -- (state);
+        \draw [arrow] (state) -- (output);
+        \draw (state) edge[arrow, bend left=60] (delay.north);
+        \draw (delay.south) edge[arrow, bend left=60] (state);
+      \end{tikzpicture}
+    }\hfill
+    % \subfigure[]{
+    \subfloat[\label{fig:rnn2}]{
+      \begin{tikzpicture}[x=1.5cm, y=1.5cm]
+        \foreach \l [count=\i] in {t-1,t,t+1}{
+          \node [] (input-\i) at (\i*1.2,0) {$\vect{x}^{(\l)}$};
+          \node [layer] (state-\i) at (\i*1.2,1) {$\vect{h}^{(\l)}$};
+          \node [] (output-\i) at (\i*1.2,2) {$\vect{y}^{(\l)}$};
+          
+          \draw [arrow] (input-\i) -- (state-\i);
+          \draw [arrow] (state-\i) -- (output-\i);
+        }
+        \node [layer, dashed] (state-l) at (0,1) {$\vect{h}^{(t-2)}$};
+        \node [layer, dashed] (state-r) at (4*1.2,1) {$\vect{h}^{(t+2)}$};
+        
+        \draw [arrow] (state-l) -- (state-1);
+        \draw [arrow] (state-1) -- (state-2);
+        \draw [arrow] (state-2) -- (state-3);
+        \draw [arrow] (state-3) -- (state-r);
+      \end{tikzpicture}
+    }
+    \caption{\acs{rnn}, folded (a) and unfolded (b) models.}
+    %\label{fig:rnn}
+  \end{figure}
+  \begin{equation*}
+    \vect{h}^{(t)} = f(\vect{h}^{(t-1)}, \vect{x}^{(t)}; \vect{\theta})
+  \end{equation*}
+\end{frame}
+
+\begin{frame}{\acf{lstm}}
+  \vspace{-0.85cm}
+  \begin{figure}
+  \centering
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=1.5cm, y=1cm]
+      \node at (1,-0.5) {};
+
+      \node[delay] (delay1) at (1.6,0.8) {};
+      \coordinate (input1) at (2.5,0.5);
+      \coordinate (input2) at (3.5,0.5);
+      \node[] (input01) at (2.5,0) {$in_1$};
+      \node[] (input02) at (3.5,0) {$in_m$};
+      \node[] at (3,0.2) {$\cdots$};
+      \node[every neuron, label={[xshift=-2mm]input}] (inputN) at (1,2) {$t$};
+      \node[every neuron, label={[xshift=0.5mm, align=left, font=\tiny] input\\gate}] (inputGate) at (2,2) {$\sigma$};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] forget\\gate}] (forgetGate) at (3,2) {$\sigma$};
+      \node[every neuron, label={[xshift=3mm, align=left, font=\tiny] output\\gate}] (outputGate) at (4,2) {$\sigma$};
+      \node[operation] (inputTimes) at (1.5, 3) {$\times$};
+      \node[operation, label={[xshift=-3mm]state}] (state) at (2, 4) {$+$};
+      \node[delay] (delay2) at (3.0,3.6) {};
+      \node[operation] (forgetTimes) at (2.5, 3) {$\times$};
+      \node[operation] (outputTimes) at (3, 5) {$\times$};
+      \coordinate (output1) at (3,5.5);
+      \node (output2) at (3,6) {$out_i$};
+      \node at (0.7,5.3) {$cell_i$};
+
+      \fill[black] (input1) circle (1mm);
+      \fill[black] (input2) circle (1mm);
+      \fill[black] (output1) circle (1mm);
+      
+      \foreach \n in {input1, input2}{
+        \foreach \m in {inputN, inputGate, forgetGate, outputGate}{
+          \draw[arrow] (\n) -- (\m);
+        }
+      }
+      \foreach \m in {inputGate, forgetGate}{
+        \draw[arrow] (delay1) -- (\m);
+      }
+
+      \draw[arrow] (inputN) -- (inputTimes);
+      \draw[arrow] (inputGate) -- (inputTimes);
+      \draw[arrow] (forgetGate) -- (forgetTimes);
+      \draw[arrow] (inputTimes) -- (state);
+      \draw[arrow] (forgetTimes) -- (state);
+      \draw [arrow] (state) ..  controls  (0.15,4) and (0.15,1) ..  (delay1);
+      \draw [arrow] (state) ..  controls  (3.8,4.6) and (3.2,3) ..  (outputGate);
+      \draw[arrow] (state) -- (delay2);
+      \draw[arrow] (delay2) -- (forgetTimes);
+      \draw[arrow] (state) -- (outputTimes);
+      \draw[arrow] (outputGate) -- (outputTimes);
+      \draw[line] (outputTimes) -- (output1);
+      \draw[line] (output1) -- (output2);
+      \draw[line] (input01) -- (input1);
+      \draw[line] (input02) -- (input2);
+
+      \path[border] (0.4,0.5) -- (4.5,0.5) -- (4.5,5.5) -- (0.4,5.5) -- (0.4,0.5); 
+      
+
+    \end{tikzpicture}
+    \label{fig:lstm1}
+  }\hfill
+  % \subfigure[]{
+  \subfloat[]{
+    \begin{tikzpicture}[x=0.8cm, y=0.6cm]
+      \node at (1,-2.5) {};
+
+      % \draw[step=1.0,black,thin] (0,3) grid (4,4);
+      \draw[step=1.0,black,thin] (0,3) grid (2,4);
+      \draw[step=1.0,black,thin] (3,3) grid (4,4);
+      \coordinate (input1) at (0.5,3);
+      \coordinate (input2) at (1.5,3);
+      \coordinate (input3) at (3.5,3);
+      \coordinate (inputM1) at (0.5,2.5);
+      \coordinate (inputM2) at (1.5,2.5);
+      \coordinate (inputM3) at (3.5,2.5);
+      \coordinate (output1) at (0.5,4);
+      \coordinate (output2) at (1.5,4);
+      \coordinate (output3) at (3.5,4);
+
+      \coordinate (outputM) at (2,6);
+      \coordinate (outputTM) at (1,6);
+      
+      \node at (0.5, 3.5) {$cell_1$};
+      \node at (1.5, 3.5) {$cell_2$};
+      \node at (2.5, 3.5) {$\cdots$};
+      \node at (3.5, 3.5) {$cell_n$};
+      \coordinate (pass) at (4.5, 3.5);
+      \node (inputT) at (1,0) {$\vect{x}$};
+      \coordinate (inputTM) at (1,1);
+      \node (outputT) at (1,7) {$\vect{y}$};
+
+      \node[delay] (delay) at (4,1) {};
+
+      \foreach \c in {input1, input2, input3, output1, output2, output3}{
+        \fill[black] (\c) circle (1mm);
+      }
+
+      \foreach \c in {inputM1, inputM2, inputM3}{
+        \draw [vectorLine] (delay) ..  controls
+        ($0.5*(delay)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+        \draw [vectorLine] (inputTM) ..  controls
+        ($0.5*(inputTM)+0.5*(\c)$) and ($(\c)-(0,0.5)$) ..  (\c);
+      }
+
+      \foreach \c in {1, 2, 3}{
+        \draw[vectorArrow] (inputM\c) -- ($(input\c)-(0,0.1)$);
+      }
+
+      \foreach \c in {output1, output2, output3}{
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputM)-(0,0.5)$) ..  (outputM);
+        \draw [line] (\c) ..  controls  ($(\c)+(0,0.5)$) and
+        ($(outputTM)-(0,0.5)$) ..  (outputTM);
+      }
+
+      %\draw [vectorArrow] (outputM) ..  controls  ($(outputM)+(1,2)$) and ($(delay)+(1,0)$) ..  (delay);
+      \draw [vectorArrow]
+      (outputM) ..
+      controls  ($(outputM)+(1,2)$) and ($(pass)+(0,1)$) ..
+      (pass) ..
+      controls  ($(pass)-(0,1)$) and ($(delay)+(1,0)$) ..
+      (delay);
+      \draw[vectorLine] (inputT) -- (inputTM);
+      \draw[vectorArrow] (outputTM) -- (outputT);
+    \end{tikzpicture}
+    \label{fig:lstm2}
+  }
+  \caption{memory cell (a), and general
+    scheme (b). The black box is a delay}
+  %\label{fig:lstm}
+\end{figure}
+\end{frame}
 
 \subsection{Attention Models}
 
@@ -84,16 +315,6 @@
 
 
 
-\begin{frame}{intro}
-  \begin{itemize}
-  \item \alert{Performances} depends on hyperparameters
-    \begin{itemize}
-    \item neuron number, learning rate, etc\dots
-    \end{itemize}
-  \item (Random) grid search
-  \item Sequential model-based bayesian optimization
-  \end{itemize}  
-\end{frame}
 
 \begin{frame}
   \begin{center}
