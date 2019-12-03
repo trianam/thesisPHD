@@ -433,15 +433,79 @@
 \end{figure}
 \end{frame}
 
+\begin{frame}{Word vectors}
+  \begin{itemize}
+  \item \alert{Transforms} words in vectors
+  \item \alert{Unsupervised} learning method
+  \item \alert{Semantic} relations encoded in vector space geometric relations 
+  \end{itemize}
+  \begin{center}
+    \includegraphics[width=0.6\textwidth]{img/man_woman.jpg}
+  \end{center}
+\end{frame}
+
 \subsection{Attention Models}
 
+\begin{frame}{Attention models}
+  \begin{itemize}
+  \item Developed for seq-to-seq task
+  \item State of the art in machine translation
+  \end{itemize}
+  \begin{center}
+    \includegraphics[width=0.6\textwidth]{img/attention.jpg}
+  \end{center}  
+\end{frame}
+
 \subsection{Hierarchical models}
+\begin{frame}{Hierarchical models}
+  
+\end{frame}
 
 \subsection{\acs{bert}}
+\begin{frame}{\acf{bert}}
+  
+\end{frame}
 
 \section{Materials and Methods}
 
 \subsection{Datasets}
+\begin{frame}{Dataset}
+  \begin{itemize}
+  \item \alert{$1\,592\,385$} anatomopathological exam results
+    \begin{itemize}
+    \item From \alert{Tuscany} cancer registry
+    \item In period \alert{2004-2013}
+    \end{itemize}
+  \item \alert{$94\,524$} ($6\%$) labeled
+  \end{itemize}
+  \begin{block}{Structure}
+    \begin{itemize}
+    \item 3 text \alert{fields}: macroscopy, diagnosis, anamnesis
+    \item field \alert{length} from 0 to 1368 (quartiles 34, 62, 134)
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Preparation}
+  \begin{itemize}
+  \item Data comes in \alert{two} tables to merge:
+    \begin{enumerate}
+    \item neoplasm table, containing administrative and clinical variables
+    \item histology table, containing the text fields
+    \end{enumerate}
+    \begin{itemize}
+    \item there are neoplasms without histology associated
+      \begin{itemize}
+      \item (register have access to more data)
+      \end{itemize}
+    \item there are histologies without neoplasm associated
+      \begin{itemize}
+      \item (not tumor biopsies) 
+      \end{itemize}
+    \end{itemize}
+  \item The 3 text fields are \alert{merged}
+  \end{itemize}
+\end{frame}
 
 \subsection{Models}
 
