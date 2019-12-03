@@ -51,7 +51,7 @@
 \subsection{Cancer registries}
 
 \begin{frame}{Cancer}
-  pippo
+  
 \end{frame}
 
 \begin{frame}{Cancer registries}
@@ -105,6 +105,18 @@
 
 
 \section{Machine Learning}
+
+\begin{frame}{\acf{nlp}}
+  
+\end{frame}
+
+\begin{frame}{\acf{tfidf}}
+  
+\end{frame}
+
+\begin{frame}{\acf{svm}}
+  
+\end{frame}
 
 \subsection{\acs{rnn}}
 
@@ -508,6 +520,109 @@
 \end{frame}
 
 \subsection{Models}
+\begin{frame}{Models}
+  \begin{description}
+  \item[\svm] \alert{\acs{svm}} trained on \alert{\acs{tfidf}} representations using \alert{unigrams}
+  \item[\svmb] \alert{\acs{svm}} trained on \alert{\acs{tfidf}} using \alert{unigrams} and \alert{bigrams}
+  \item[\lstmng] \alert{\acs{lstm}} trained on \alert{\acs{tfidf}} using
+    \alert{bigrams}
+  \item[\lstmc] mixed \alert{convolutional} and \alert{\ac{lstm}} trained on
+    \alert{\acs{glove}}
+  \item[\lstmb] \alert{\acs{lstm}} trained on \alert{\acs{glove}}
+  \item[\gru] \alert{\acs{gru}} trained on \alert{\acs{glove}}
+  \item[\maxp] \alert{\acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
+  \item[\softmax] \alert{\acs{gru}} with \alert{attention} trained on \alert{\acs{glove}}
+  \item[\maxi] \alert{\acs{gru}} with \alert{max} pooling, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
+  \item[\softmaxi] \alert{\acs{gru}} with \alert{attention}, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
+  \item[\maxh] \alert{hierarchical \acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
+  \item[\softmaxh] \alert{hierarchical \acs{gru}} with \alert{attention} trained on \alert{\acs{glove}}
+  \item[\bert] \alert{pretrained} on unlabeled data and \alert{fine tuned} with labeled data
+  \end{description}
+\end{frame}
+
+\begin{frame}{\lstmng, \lstmc, \lstmb}
+  \begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0.1cm, auto, transform canvas={scale=0.5}]
+    \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
+      \nodeInput();
+      \nodeEmbedding();
+      \node[support] (emb) {};
+      \nodeLstm();
+      \node[support] (lstmA) {};
+      \nodeLstm();
+      \node[support] (lstmB) {};
+      \nodeAvg();
+      \node[support] (avg) {};
+      \nodeRelu();
+      \node[support] (relu) {};
+      \nodeSoftmax();
+      \node[dataLabel, joined] {$outDim$};
+    \end{scope}
+    \node[dataLabel, above=of emb] {$200\times 30$};
+    \node[dataLabel, above=of lstmA] {$200\times 300$};
+    \node[dataLabel, above=of lstmB] {$200\times 300$};
+    \node[dataLabel, above=of avg] {$300$};
+    \node[dataLabel, above=of relu] {$outDim$};
+  \end{tikzpicture}
+  \caption{Scheme for \lstmng{} model.}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0.1cm, auto]
+    \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
+      \nodeInput();
+      \nodeGlove();
+      \node[support] (glove) {};
+      \nodeConv();
+      \node[support] (conv) {};
+      \nodeLstm();
+      \node[support] (lstm) {};
+      \nodeAvg();
+      \node[support] (avg) {};
+      \nodeRelu();
+      \node[support] (relu) {};
+      \nodeSoftmax();
+      \node[dataLabel, joined] {$outDim$};
+    \end{scope}
+    \node[dataLabel, above=of glove] {$200\times 60$};
+    \node[dataLabel, above=of conv] {$199\times 100$};
+    \node[dataLabel, above=of lstm] {$199\times 300$};
+    \node[dataLabel, above=of avg] {$300$};
+    \node[dataLabel, above=of relu] {$outDim$};
+  \end{tikzpicture}
+  \caption{Scheme for \lstmc{} model.}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[node distance = 0.1cm, auto]
+    \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
+      \nodeInput();
+      \nodeGlove();
+      \node[support] (glove) {};
+      \nodeLstm();
+      \node[support] (lstmA) {};
+      \nodeLstm();
+      \node[support] (lstmB) {};
+      \nodeAvg();
+      \node[support] (avg) {};
+      \nodeRelu();
+      \node[support] (relu) {};
+      \nodeSoftmax();
+      \node[dataLabel, joined] {$outDim$};
+    \end{scope}
+    \node[dataLabel, above=of glove] {$200\times 60$};
+    \node[dataLabel, above=of lstmA] {$200\times 300$};
+    \node[dataLabel, above=of lstmB] {$200\times 300$};
+    \node[dataLabel, above=of avg] {$300$};
+    \node[dataLabel, above=of relu] {$outDim$};
+  \end{tikzpicture}
+  \caption{Scheme for \lstmb{} model.}
+\end{figure}
+
+\end{frame}
 
 \section{Experiments}
 
