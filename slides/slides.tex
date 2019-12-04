@@ -543,7 +543,8 @@
 \begin{frame}{\lstmng, \lstmc, \lstmb}
   \begin{figure}
   \centering
-  \begin{tikzpicture}[node distance = 0.1cm, auto, transform canvas={scale=0.5}]
+  \begin{tikzpicture}[node distance = 0.1cm, auto]
+    \begin{scope}[scale=0.7, transform shape]
     \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
       \nodeInput();
       \nodeEmbedding();
@@ -564,6 +565,7 @@
     \node[dataLabel, above=of lstmB] {$200\times 300$};
     \node[dataLabel, above=of avg] {$300$};
     \node[dataLabel, above=of relu] {$outDim$};
+    \end{scope}
   \end{tikzpicture}
   \caption{Scheme for \lstmng{} model.}
 \end{figure}
@@ -571,7 +573,9 @@
 \begin{figure}
   \centering
   \begin{tikzpicture}[node distance = 0.1cm, auto]
-    \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
+    \begin{scope}[scale=0.7, transform shape]
+      \begin{scope}[start chain, every node/.style={on chain}, node
+      distance = \schemeNodeDistance]
       \nodeInput();
       \nodeGlove();
       \node[support] (glove) {};
@@ -591,6 +595,7 @@
     \node[dataLabel, above=of lstm] {$199\times 300$};
     \node[dataLabel, above=of avg] {$300$};
     \node[dataLabel, above=of relu] {$outDim$};
+  \end{scope}
   \end{tikzpicture}
   \caption{Scheme for \lstmc{} model.}
 \end{figure}
@@ -598,6 +603,7 @@
 \begin{figure}
   \centering
   \begin{tikzpicture}[node distance = 0.1cm, auto]
+    \begin{scope}[scale=0.7, transform shape]
     \begin{scope}[start chain, every node/.style={on chain}, node distance = \schemeNodeDistance]
       \nodeInput();
       \nodeGlove();
@@ -618,11 +624,67 @@
     \node[dataLabel, above=of lstmB] {$200\times 300$};
     \node[dataLabel, above=of avg] {$300$};
     \node[dataLabel, above=of relu] {$outDim$};
+    \end{scope}
   \end{tikzpicture}
   \caption{Scheme for \lstmb{} model.}
 \end{figure}
-
 \end{frame}
+
+\begin{frame}{\gru, \maxp, \softmax}
+  \begin{block}{Plain model}
+  \begin{align*}
+  e_t &= E(x_t;\theta^e)\\
+  h^f_t &= F(e_t,h^f_{t-1};\theta^f)\\
+  h^r_t &= R(e_t,h^r_{t+1};\theta^r)\\
+  u_t &= G(h_t;\theta^h)\\
+  \phi &= A(\vect{u};\theta^a)\\
+  f(\vect{x}) &= g(\phi;\theta^c)
+  \end{align*}    
+  \end{block}
+  \begin{itemize}
+  \item $\phi=(h^f_T,h^r_1)$ (in this case $G$ is the identity
+    function)
+  \item
+    $\phi = \sum_t a_t(\vect{u};\theta^a) u_t$, $a_t(\vect{u};\theta^a) = \frac{e^{\langle c, c_t\rangle}}
+    {\sum_i{e^{\langle c, c_i\rangle}}}$, $c_t=C(\vect{u};\theta^a)$
+\item $\phi_j = \max_t u_{j,t}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\maxi, \softmaxi}
+  \begin{block}{Interpretable model}
+    \begin{align*}
+  e_t &= E(x_t;\theta^e)\\
+  h^f_t &= F(e_t,h^f_{t-1};\theta^f)\\
+  h^r_t &= R(e_t,h^r_{t+1};\theta^r)\\
+  u_t &= G(h_t;\theta^h)\\
+  f(\vect{x}) &= A(\vect{u};\theta^a)
+\end{align*}
+  \end{block}
+  \begin{itemize}
+  \item
+    $\phi = \sum_t a_t(\vect{u};\theta^a) u_t$, $a_t(\vect{u};\theta^a) = \frac{e^{\langle c, c_t\rangle}}
+    {\sum_i{e^{\langle c, c_i\rangle}}}$, $c_t=C(\vect{u};\theta^a)$
+\item $\phi_j = \max_t u_{j,t}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\maxh, \softmaxh}
+  \begin{block}{Hierarchical model}
+    \begin{align*}
+  e_{s,t} &= E(x_{s,t};\theta^e)\\
+  h^f_{s,t} &= F(e_{s,t},h^f_{s,t-1};\theta^{f})\\
+  h^r_{s,t} &= R(e_{s,t},h^r_{s,t+1};\theta^{r})\\
+  u_{s,t} &= G(h_{s,t};\theta^{h})\\
+  \phi_s &= A(\vect{u}_s;\theta^{a})\\
+  \bar{h}^{f}_{s} &= \bar{F}(\phi_{s},\bar{h}^{f}_{s-1};\bar{\theta}^{f})\\
+  \bar{h}^{r}_{s} &= \bar{R}(\phi_{s},\bar{h}^{r}_{s+1};\bar{\theta}^{r})\\
+  \bar{\phi} &= \bar{A}(\bar{\vect{h}};\bar{\theta}^{a})\\
+  f(\vect{x}) &= g(\bar{\phi};\theta^c)
+\end{align*}
+  \end{block}
+\end{frame}
+
 
 \section{Experiments}
 
