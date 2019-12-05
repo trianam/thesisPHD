@@ -475,7 +475,20 @@
 
 \subsection{\acs{bert}}
 \begin{frame}{\acf{bert}}
-  
+  \begin{center}
+    \includegraphics[width=0.6\textwidth]{img/transformer1.png}
+  \end{center}
+  \begin{itemize}
+  \item State of the art in many \acs{nlp} tasks
+  \item \alert{Attention} based
+  \item Learn \alert{Context dependent} word representations
+  \item \alert{Pretrained} on unlabeled data
+    \begin{itemize}
+    \item Mask Language Model (mask words and predict them)
+    \item Next Sentence Prediction (predict relationships between sentences) 
+    \end{itemize}
+  \item \alert{Fine tuned} to specific task
+  \end{itemize}
 \end{frame}
 
 \section{Materials and Methods}
