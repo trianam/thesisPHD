@@ -51,71 +51,62 @@
 \subsection{Cancer registries}
 
 \begin{frame}{Cancer}
-  
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{img/doctor.jpg}
+  \end{center}  
 \end{frame}
 
 \begin{frame}{Cancer registries}
   \begin{itemize}
   \item \alert{Collect} administrative and clinical data of a specific region
-  \item \alert{Identify} new cancer diagnoses
-  \item Provide \alert{details} on diagnoses and outcomes 
+  \item \alert{Quantify} the impact of the disease
+  \item Provide \alert{analytic} data to healthcare operators and
+    decision makers
   \item \alert{Manual} classification of reports
   \end{itemize}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{img/doctorPC.jpg}
+  \end{center}
 \end{frame}
 
 \subsection{\acs{icdo}}
 
-\begin{frame}{\acs{icdo3}}
-  \begin{itemize}
-  \item International \alert{classification} standard
-  \item Specialization to \alert{oncology} domain
-  \end{itemize}
-  \begin{block}{\acf{icdo3}}
-      \begin{itemize}
-      \item Topography: \texttt{Cmm.s} where \texttt{mm} is the
-        \alert{main} site and \texttt{s} the \alert{subsite}
-      \item Morphology: \texttt{tttt/b} where \texttt{tttt} is the
-        cell \alert{type} and \texttt{b} the \alert{behavior}
-      \end{itemize}
+\begin{frame}{\acl{icdo} (\acs{icdo3})}
+  \begin{block}{Topographical}
+    \alert{\emph{C \_ \_ . \_}}
+    \begin{itemize}
+    \item first two digits \alert{site}
+    \item third digit \alert{subsite}
+    \end{itemize}
+    E.g. \emph{C50.2} upper-inner quadrant (2) of breast (50)
+  \end{block}
+  \begin{block}{Morphological}
+    \alert{\emph{\_ \_ \_ \_ / \_}}
+    \begin{itemize}
+    \item first four digits \alert{cell type}
+    \item fifth digit \alert{behaviour}
+    \end{itemize}
+    E.g. \emph{8140/3} is an adenocarcinoma (adeno 8140;
+    carcinoma 3)
   \end{block}
 \end{frame}
 
-\subsection{Scientific questions}
-
-\begin{frame}{Scientific questions}
-  \begin{description}
-  \item[Q1] Implement \alert{large scale} study on deep learning
-    applied to pathology reports, existing works are on
-    \begin{itemize}
-    \item \alert{small} datasets or
-    \item \alert{few} classes
-    \end{itemize}
-  \item[Q2] Apply \alert{novel} deep learning techniques, like
-    \alert{attention} models and \alert{acs{bert}}
-  \item[Q3] \alert{Compare} classical \alert{bag-of-words} techniques with
-    newer deep learning techniques in this domain
-  \item[Q4] \alert{Compare} novel \alert{attention}-based and
-    \alert{hierarchical} techniques with simpler models
-  \item[Q5] \alert{Investigate} the contribution and applicability of
-    \alert{unsupervised} learning techniques on uncommon text corpora
-  \item[Q6] \alert{Investigate} the possibility to give
-    \alert{interpretation} to deep learning models
-  \end{description}
-\end{frame}
-
-
 \section{Machine Learning}
 
-\begin{frame}{\acf{nlp}}
-  
-\end{frame}
-
-\begin{frame}{\acf{tfidf}}
-  
+\begin{frame}{Bag-of-words}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{img/bow.png}
+  \end{center}
+  \begin{block}{\acf{tfidf}}
+    \begin{equation*}
+      w_{i,j} = tf_{i,j}\times \log\left(\frac{N}{df_i}\right)
+    \end{equation*}
+  \end{block}
 \end{frame}
 
 \begin{frame}{\acf{svm}}
-  
+  \centering
+  \includegraphics[width=0.45\textwidth]{img/svm.png}
 \end{frame}
 
 \subsection{\acs{rnn}}
@@ -468,33 +459,101 @@
   \end{center}  
 \end{frame}
 
-\subsection{Hierarchical models}
-\begin{frame}{Hierarchical models}
-  
+\subsection{Hierarchical Attention}
+\begin{frame}{\ac{han}}
+  \begin{center}
+    \includegraphics[width=0.57\textwidth]{img/han.png}
+  \end{center}    
 \end{frame}
 
 \subsection{\acs{bert}}
 \begin{frame}{\acf{bert}}
   \begin{center}
-    \includegraphics[width=0.6\textwidth]{img/transformer1.png}
+    %\begin{minipage}{.33\textwidth}
+      \includegraphics[width=.5\textwidth]{img/transformer1.png}
+      % \end{minipage}
+      
+    % \begin{minipage}{.4\textwidth}
+    %   \includegraphics[width=\textwidth]{img/transformer2.png}
+    % \end{minipage}
+    % \begin{minipage}{.4\textwidth}
+    %   \includegraphics[width=\textwidth]{img/transformer3.png}
+    % \end{minipage}
   \end{center}
   \begin{itemize}
   \item State of the art in many \acs{nlp} tasks
   \item \alert{Attention} based
   \item Learn \alert{Context dependent} word representations
   \item \alert{Pretrained} on unlabeled data
-    \begin{itemize}
-    \item Mask Language Model (mask words and predict them)
-    \item Next Sentence Prediction (predict relationships between sentences) 
-    \end{itemize}
+    % \begin{itemize}
+    % \item Mask Language Model (mask words and predict them)
+    % \item Next Sentence Prediction (predict relationships between sentences) 
+    % \end{itemize}
   \item \alert{Fine tuned} to specific task
   \end{itemize}
 \end{frame}
+
+\section{Scientific questions}
+
+\begin{frame}{Scientific questions}
+  \begin{description}
+  \item[Q1] Implement \alert{large scale} study on deep learning
+    applied to pathology reports, existing works are on
+    \begin{itemize}
+    \item \alert{small} datasets or
+    \item \alert{few} classes
+    \end{itemize}
+  \item[Q2] Apply \alert{novel} deep learning techniques, like
+    \alert{attention} models and \alert{\acs{bert}}
+  \item[Q3] \alert{Compare} classical \alert{bag-of-words} techniques with
+    newer deep learning techniques in this domain
+  \item[Q4] \alert{Compare} novel \alert{attention}-based and
+    \alert{hierarchical} techniques with simpler models
+  \item[Q5] \alert{Investigate} the contribution and applicability of
+    \alert{unsupervised} learning techniques on uncommon text corpora
+  \item[Q6] \alert{Investigate} the possibility to give
+    \alert{interpretation} to deep learning models
+  \end{description}
+\end{frame}
+
 
 \section{Materials and Methods}
 
 \subsection{Datasets}
 \begin{frame}{Dataset}
+    \begin{center}
+    \scriptsize
+    \def\angle{0}
+    \def\radius{3}
+    \def\cyclelist{{"orange","blue","red","green"}}
+    \newcount\cyclecount \cyclecount=-1
+    \newcount\ind \ind=-1
+    \begin{tikzpicture}[nodes = {font=\sffamily}, scale=0.4]
+      \foreach \percent/\name in {
+        94/Unlabelled,
+        6/Labelled,
+      } {
+        \ifx\percent\empty\else               % If \percent is empty, do nothing
+        \global\advance\cyclecount by 1     % Advance cyclecount
+        \global\advance\ind by 1            % Advance list index
+        \ifnum3<\cyclecount                 % If cyclecount is larger than list
+        \global\cyclecount=0              %   reset cyclecount and
+        \global\ind=0                     %   reset list index
+        \fi
+        \pgfmathparse{\cyclelist[\the\ind]} % Get color from cycle list
+        \edef\color{\pgfmathresult}         %   and store as \color
+        % Draw angle and set labels
+        \draw[fill={\color!50},draw={\color}] (0,0) -- (\angle:\radius)
+        arc (\angle:\angle+\percent*3.6:\radius) -- cycle;
+        \node at (\angle+0.5*\percent*3.6:0.7*\radius) {\percent\,\%};
+        \node[pin=\angle+0.5*\percent*3.6:\name]
+        at (\angle+0.5*\percent*3.6:\radius) {};
+        \pgfmathparse{\angle+\percent*3.6}  % Advance angle
+        \xdef\angle{\pgfmathresult}         %   and store in \angle
+        \fi
+      };
+    \end{tikzpicture}
+  \end{center}
   \begin{itemize}
   \item \alert{$1\,592\,385$} anatomopathological exam results
     \begin{itemize}
@@ -798,7 +857,9 @@
   \item[Q1] Implement \alert{large scale} study on deep learning
     applied to pathology reports
   \item[Q2] Apply \alert{novel} deep learning techniques, like
-    \alert{attention} models and \alert{acs{bert}}
+    \alert{attention} models and \alert{\acs{bert}}
+  \item[Q3] \alert{Compare} classical \alert{bag-of-words} techniques with
+    newer deep learning techniques in this domain
   \item[Q4] \alert{Compare} novel \alert{attention}-based and
     \alert{hierarchical} techniques with simpler models
   \item[Q6] \alert{Investigate} the possibility to give
@@ -884,6 +945,25 @@
 \end{figure}
 \end{frame}
 
+\section{Conclusions}
+
+\begin{frame}{Conclusions}
+  \begin{itemize}
+  \item We effectively implemented a \alert{large scale} study on classical
+    machine learning and novel  deep learning methods
+    applied to pathology reports
+  \item In this context, \alert{bag-of-words} techniques are not
+    considerably worst than \alert{deep learning}
+  \item \alert{Hierarchical} model are not beneficial
+  \item \alert{Attention} models are almost equivalent to a simpler
+    element-wise
+    \alert{max} pooling model
+  \item \alert{Word vectors} can be effectively employed
+  \item We can implement \alert{interpretable} models without
+    catastrophic loss
+  \end{itemize}
+\end{frame}
+
 \begin{frame}
   \begin{center}
     \textbf{\calligra\Huge The End.}\\
@@ -892,17 +972,15 @@
   \end{center}
 \end{frame}
 
-\section{Conclusions}
-
 
 %\appendix
 \backupbegin
 
-\begin{frame}[allowframebreaks]{Bibliography}
-  \scriptsize
-  %\nocite{*}
-  \bibliography{slides}
-\end{frame}
+% \begin{frame}[allowframebreaks]{Bibliography}
+%   \scriptsize
+%   %\nocite{*}
+%   \bibliography{slides}
+% \end{frame}
 
 
 \backupend
