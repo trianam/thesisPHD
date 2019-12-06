@@ -52,7 +52,7 @@
 
 \begin{frame}{Cancer}
   \begin{center}
-    \includegraphics[width=0.45\textwidth]{img/doctor.jpg}
+    \includegraphics[width=0.7\textwidth]{img/doctor.jpg}
   \end{center}  
 \end{frame}
 
@@ -93,6 +93,8 @@
 
 \section{Machine Learning}
 
+\subsection{Representations}
+
 \begin{frame}{Bag-of-words}
   \begin{center}
     \includegraphics[width=0.45\textwidth]{img/bow.png}
@@ -103,6 +105,19 @@
     \end{equation*}
   \end{block}
 \end{frame}
+
+\begin{frame}{Word vectors}
+  \begin{itemize}
+  \item \alert{Transforms} words in vectors
+  \item \alert{Unsupervised} learning method
+  \item \alert{Semantic} relations encoded in vector space geometric relations 
+  \end{itemize}
+  \begin{center}
+    \includegraphics[width=0.6\textwidth]{img/man_woman.jpg}
+  \end{center}
+\end{frame}
+
+\subsection{Classic models}
 
 \begin{frame}{\acf{svm}}
   \centering
@@ -436,17 +451,6 @@
 \end{figure}
 \end{frame}
 
-\begin{frame}{Word vectors}
-  \begin{itemize}
-  \item \alert{Transforms} words in vectors
-  \item \alert{Unsupervised} learning method
-  \item \alert{Semantic} relations encoded in vector space geometric relations 
-  \end{itemize}
-  \begin{center}
-    \includegraphics[width=0.6\textwidth]{img/man_woman.jpg}
-  \end{center}
-\end{frame}
-
 \subsection{Attention Models}
 
 \begin{frame}{Attention models}
@@ -459,14 +463,12 @@
   \end{center}  
 \end{frame}
 
-\subsection{Hierarchical Attention}
 \begin{frame}{\ac{han}}
   \begin{center}
     \includegraphics[width=0.57\textwidth]{img/han.png}
   \end{center}    
 \end{frame}
 
-\subsection{\acs{bert}}
 \begin{frame}{\acf{bert}}
   \begin{center}
     %\begin{minipage}{.33\textwidth}
@@ -618,13 +620,13 @@
     \alert{\acs{glove}}
   \item[\lstmb] \alert{\acs{lstm}} trained on \alert{\acs{glove}}
   \item[\gru] \alert{\acs{gru}} trained on \alert{\acs{glove}}
-  \item[\maxp] \alert{\acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
   \item[\softmax] \alert{\acs{gru}} with \alert{attention} trained on \alert{\acs{glove}}
-  \item[\maxi] \alert{\acs{gru}} with \alert{max} pooling, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
-  \item[\softmaxi] \alert{\acs{gru}} with \alert{attention}, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
-  \item[\maxh] \alert{hierarchical \acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
   \item[\softmaxh] \alert{hierarchical \acs{gru}} with \alert{attention} trained on \alert{\acs{glove}}
   \item[\bert] \alert{pretrained} on unlabeled data and \alert{fine tuned} with labeled data
+  \item[\maxp] \alert{\acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
+  \item[\maxh] \alert{hierarchical \acs{gru}} with \alert{max} pooling trained on \alert{\acs{glove}}
+  \item[\maxi] \alert{\acs{gru}} with \alert{max} pooling, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
+  \item[\softmaxi] \alert{\acs{gru}} with \alert{attention}, in \alert{interpretable} setting, trained on \alert{\acs{glove}}
   \end{description}
 \end{frame}
 
@@ -718,7 +720,7 @@
 \end{figure}
 \end{frame}
 
-\begin{frame}{\gru, \maxp, \softmax}
+\begin{frame}{\gru, \softmax, \maxp}
   \begin{block}{Plain model}
   \begin{align*}
   e_t &= E(x_t;\theta^e)\\
@@ -739,7 +741,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\maxi, \softmaxi}
+\begin{frame}{\softmaxi, \maxi}
   \begin{block}{Interpretable model}
     \begin{align*}
   e_t &= E(x_t;\theta^e)\\
@@ -757,7 +759,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{\maxh, \softmaxh}
+\begin{frame}{\softmaxh, \maxh}
   \begin{block}{Hierarchical model}
     \begin{align*}
   e_{s,t} &= E(x_{s,t};\theta^e)\\
@@ -822,8 +824,8 @@
 \begin{frame}{Preliminary attention VS max}
   \begin{block}{Answered questions}
   \begin{itemize}
-  \item[Q4] \alert{Compare} novel \alert{attention}-based and
-    \alert{hierarchical} techniques with simpler models
+  \item[Q4] \alert{Compare} novel \alert{attention} model with simpler
+    max pooling
   \item[Q6] \alert{Investigate} the possibility to give
     \alert{interpretation} to deep learning models
   \end{itemize}
@@ -874,26 +876,28 @@
 \end{frame}
 
 \begin{frame}{Attention VS max, hierarchical VS plain}
-  \small
+  \tiny
+
   \begin{center}
-    \begin{tabular}{ccccc}
+    \begin{tabular}{ccccc|cccc}
     \hline
-    \textbf{SITE}&Accuracy&Top 3 Acc.&Top 5 Acc.&MacroF1\\
+        &\multicolumn{4}{c}{Topography}&\multicolumn{4}{c}{Morphology}\\
+    &Acc.&Top 3&Top 5&MacroF1&Acc.&Top 3&Top 5&Macro F1\\
     \hline
-    \svm{}     &89.7&95.9&96.8&60.0\\
-    \xgb{}     &89.1&95.8&97.2&58.0\\
+    \svm{}     &89.7&95.9&96.8&60.0&82.4&94.0&95.6&53.7\\
+    \xgb{}     &89.1&95.8&97.2&58.0&84.1&94.4&96.5&59.6\\
     \hline
-    \gru{}     &89.9&96.5&97.7&58.3\\
-    \bert{}    &89.9&96.3&97.8&56.6\\
+    \gru{}     &89.9&96.5&97.7&58.3&83.3&94.6&96.6&55.2\\
+    \bert{}    &89.9&96.3&97.8&56.6&84.3&93.2&94.9&51.1\\    
     \hline
-    \maxi{}    &88.0&95.4&96.2&46.1\\
-    \maxh{}    &89.9&96.2&97.8&58.8\\
-    \softmaxh{}&89.9&96.3&97.7&58.0\\
-    \maxp{}    &\textbf{90.3}&\textbf{96.6}&\textbf{98.1}&\textbf{61.9}\\
-    \softmax{} &90.1&96.2&97.6&60.0\\
+    \maxi{}    &88.0&95.4&96.2&46.1&73.4&91.0&93.6&31.3\\
+    \maxh{}    &89.9&96.2&97.8&58.8&83.7&94.4&96.4&54.5\\
+    \softmaxh{}&89.9&96.3&97.7&58.0&83.7&94.4&96.2&57.5\\
+    \maxp{}    &\textbf{90.3}&\textbf{96.6}&\textbf{98.1}&\textbf{61.9}&84.6&\textbf{95.0}&\textbf{96.9}&59.2\\
+    \softmax{} &90.1&96.2&97.6&60.0&\textbf{84.8}&94.9&\textbf{96.9}&\textbf{61.3}\\
     \hline
-    \end{tabular}
-        \tiny
+  \end{tabular}
+\\[1cm]
     \begin{tabular}{cccc|ccc}
     \hline
     &\multicolumn{3}{c}{Topography}&\multicolumn{3}{c}{Morphology}\\
@@ -975,6 +979,81 @@
 
 %\appendix
 \backupbegin
+
+\begin{frame}{\acf{bert}}
+  \begin{center}
+    %\begin{minipage}{.33\textwidth}
+      \includegraphics[width=.5\textwidth]{img/transformer1.png}
+      % \end{minipage}
+      
+     \begin{minipage}{.4\textwidth}
+      \includegraphics[width=\textwidth]{img/transformer2.png}
+     \end{minipage}
+     \begin{minipage}{.4\textwidth}
+      \includegraphics[width=\textwidth]{img/transformer3.png}
+     \end{minipage}
+    \end{center}
+  \end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{table}
+  \centering
+  \caption{Results for \fullSite{} task.}
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{../tabs/fullSite.tex}
+\end{table}
+\end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{../img/plots/pr-curve-sede12-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \fullSite{} task.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{table}
+  \centering
+  \caption{Results for \type{} task.}
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{../tabs/type.tex}
+\end{table}
+\end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{../img/plots/pr-curve-morfo1-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \type{} task.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{table}
+  \centering
+  \caption{Results for \behaviour{} task.}
+  %\scriptsize
+  \footnotesize
+  %\small
+  \input{../tabs/behaviour.tex}
+\end{table}
+\end{frame}
+
+\begin{frame}{Bag-of-words VS word vectors, \acs{svm} VS deep learning}
+\begin{figure}
+  \centering
+  \resizebox{0.9\textwidth}{!}{\input{../img/plots/pr-curve-morfo2-macro.pgf}}
+  \caption{Macro-averaged recall-precision curves for \behaviour{} task.}
+\end{figure}
+
+\end{frame}
 
 % \begin{frame}[allowframebreaks]{Bibliography}
 %   \scriptsize
