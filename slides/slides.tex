@@ -495,11 +495,54 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Existing works (linear classifiers)}
+  \begin{block}{\footnotesize\bibentry{jouhet_automated_2011}}
+    \begin{itemize}
+      \footnotesize
+    \item \acs{svm} and Naive Bayes classifiers
+    \item \alert{$5\,121$} French pathology reports, \alert{26}
+      topographic classes and \alert{18} morphological classes 
+    \item accuracy of \alert{72.6\%} on topography and \alert{86.4\%} on morphology
+    \end{itemize}
+  \end{block}
+  \begin{block}{\footnotesize\bibentry{kavuluru_automatic_2013}}
+    \begin{itemize}
+      \footnotesize
+    \item \acs{svm}, Naive Bayes, and logistic regression
+    \item \alert{$56\,426$} English reports, \alert{14}, \alert{42}, and \alert{57} topography classes
+    \item Micro-averaged F1 measure of \alert{90\%}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Existing works (Deep Learning)}
+  \begin{block}{\footnotesize\bibentry{qiu_deep_2018}}
+    \begin{itemize}
+      \footnotesize
+    \item \alert{\acs{cnn}}, \alert{word vectors} pretrained on 
+      PubMed
+    \item \alert{942} breast and lung cancer English
+      reports, \alert{12} topography classes
+    \item Micro-averaged F1 score of \alert{72.2\%} on minimally
+      populated, and \alert{81.1\%} on well populated classes
+    \end{itemize}
+  \end{block}
+  \begin{block}{\footnotesize\bibentry{gao_hierarchical_2018}}
+    \begin{itemize}
+      \footnotesize
+    \item \alert{\acs{rnn}} with hierarchical attention
+    \item \alert{Same} dataset
+    \item Micro-averaged F1 score of \alert{80\%}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+
 \section{Scientific questions}
 
 \begin{frame}{Scientific questions}
   \begin{description}
-  \item[Q1] Implement \alert{large scale} study on deep learning
+  \item[Q1] Implement \alert{large scale} study on machine learning
     applied to pathology reports, existing works are on
     \begin{itemize}
     \item \alert{small} datasets or
@@ -1055,11 +1098,12 @@
 
 \end{frame}
 
-% \begin{frame}[allowframebreaks]{Bibliography}
-%   \scriptsize
-%   %\nocite{*}
-%   \bibliography{slides}
-% \end{frame}
+\begin{frame}[allowframebreaks]{Bibliography}
+  \scriptsize
+  %\nocite{*}
+  \bibliography{../Oncology,../more,../evenMore}
+
+\end{frame}
 
 
 \backupend
