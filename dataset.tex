@@ -25,9 +25,26 @@ the three text fields
 into a single text document. We did not apply any conflation (except for
 case normalization) and we kept punctuation.
 
-
 We also collected the remaining unlabeled part of the dataset to train
 unsupervised methods.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{img/sentPerDoc.eps}
+  \includegraphics[width=\floatwidth]{img/wordPerSent.eps}
+  \caption{Distribution of the number of sentences per document (top)
+    and the number of words per sentence (bottom).}
+  \label{fig:wordsDist}
+\end{figure}
+For some of our experiments, we further split the records in sentences
+for the use on hierarchical 
+models. For this purpose we employed the \emph{spaCy} sentence
+segmentation\footnote{\texttt{https://spacy.io/}}. We note that the
+distribution of our documents in 
+\cref{fig:wordsDist} is different respect to the one in
+\cite{gao_hierarchical_2018}. The distributions of words per sentence
+are similar, but our documents contains on average
+less sentences per document.
 
 \subsection{Preparation}
 Originally, the data
@@ -71,14 +88,17 @@ histology table that cannot be joined with
 the neoplasm table.
 
 \section{Models}\label{sec:models}
-In total, we created thirteen models:
+In total, we created fourteen models:
 \begin{description}
 \item[\svm] uses \ac{svm} trained on \ac{tfidf} representations of text
   using unigrams;
 \item[\svmb] uses \ac{svm} trained on \ac{tfidf} representations
   using unigrams and bigrams;
-\item[\lstmng] uses \ac{lstm} layers trained on \ac{tfidf} representations using
-  bigrams;
+\item[\xgb] uses gradient boosted decision trees
+  \cite{chen2016xgboost} on \ac{tfidf} representations
+  using unigrams and bigrams
+\item[\lstmng] uses \ac{lstm} layers trained on \ac{tfidf}
+  representations using bigrams;
 \item[\lstmc] uses mixed convolutional and \ac{lstm} layers trained on
   \ac{glove} representations;
 \item[\lstmb] uses \ac{lstm} trained on \ac{glove} representations;
@@ -245,7 +265,7 @@ The other models where trained on different hyperparameters
 configurations whose range is explained in
 \cref{sec:hyperparameters}. We proceed to explain in detail their
 structure.
-\subsection{\maxp, \softmax, \maxi, \softmaxi}
+\subsection{\maxp, \softmax}
 \label{sec:model}
 In our setting, a dataset $\mathcal{D}=\{(\vect{x}^{(i)},y^{(i)})\}$
 consists of variable length sequence vectors $\vect{x}^{(i)}$. For
@@ -260,14 +280,13 @@ this work compute their predictions $f(\vect{x})$ as follows:
   h^f_t &= F(e_t,h^f_{t-1};\theta^f),\label{eq:maxModelRL}\\  
   h^r_t &= R(e_t,h^r_{t+1};\theta^r),\label{eq:maxModelRR}\\
   u_t &= G(h_t;\theta^h),\label{eq:maxModelF}\\
-  \phi &= A(\vect{h},\vect{u};\theta^a),\label{eq:aggregation}\\
+  \phi &= A(\vect{u};\theta^a),\label{eq:aggregation}\\
   f(\vect{x}) &= g(\phi;\theta^c).\label{eq:maxModelC}
 \end{align}
 $E$ is an embedding function mapping words into $p$-dimensional real
-vectors where embedding parameters $\theta_e$ can be either
-pretrained and adjustable or fixed, see
-Section~\ref{sec:word-vectors}.  Functions $F$ and $R$ correspond to
-(forward and reverse) 
+vectors where embedding parameters $\theta^e$ can be either
+pretrained and adjustable or fixed, see Section~\ref{sec:word-vectors}
+below.  Functions $F$ and $R$ correspond to (forward and reverse)
 dynamics that can be described in terms of several (possibly layered)
 recurrent cells. Each vector $h_t$,
 the concatenation of $h^f_t$ and $h^r_t$, can be interpreted as latent
@@ -279,11 +298,12 @@ single $d$-dimensional representation vector for the entire sequence
 and $g$ is a softmax layer. Possible choices for the aggregator
 function include:
 \begin{itemize}
-\item $\phi=(h^f_T,h^r_1)$, which
-  extracts the extreme latent representations; in principle, these may
-  be sufficient since they depend on the whole sequence due to 
-  bidirectional dynamics. However, note that this approach may require
-  long-term dependencies to be effectively learned;
+\item $\phi=(h^f_T,h^r_1)$ (in this case $G$ is the identity
+  function), which extracts the extreme latent representations; in
+  principle, these may be sufficient since they depend on the whole
+  sequence due to bidirectional dynamics. However, note that this
+  approach may require long-term dependencies to be effectively
+  learned;
 \item
   % $\phi = \sum_t a_t(\vect{u};\theta^a) h_t$,
   $\phi = \sum_t a_t(\vect{u};\theta^a) u_t$,
@@ -303,17 +323,20 @@ function include:
   measured as a similarity with a context vector $c$ that is learned
   with the model and can be seen as an embedded representation of an
   high level query as in memory networks \cite{sukhbaatar2015end};
-\item $\phi = \max_t u_t$ where the maximum is taken element-wise
-  along the sequence. This approach can be interpreted either as a
-  simplified (parameter-less) attention mechanism, or a bag-layer as
-  proposed in the context of multi-instance
+\item $\phi_j = \max_t u_{j,t}$. This approach is closely related to
+  the bag-layer proposed in the context of multi-multi-instance
   learning~\cite{tibo2017network}. In this case, each ``feature''
   $\phi_j$ will be positive if at least one of $u_{j,1},\dots,u_{j,T}$
   is positive. The resulting classifier will find it easy to create
   decision rules predicting a document as belonging to a certain class
   if a given set of contextualized word representations are present
   and another given set of contextualized word representations are
-  absent in the sequence.
+  absent in the sequence. Note that this aggregator can also be
+  interpreted as a kind of hard attention mechanism where attention
+  concentrates completely on a single time step but the attended time
+  step is different for each feature $\phi_j$. As detailed in
+  Section~\ref{ch:artificial}, a new model interpretation strategy can
+  be derived when using this aggregator.
 \end{itemize}
 
 The parameters $\theta^f,\theta^r,\theta^h$, and $\theta^a$ (if
@@ -327,15 +350,30 @@ where $\theta=\theta^f\cup\theta^r\cup\theta^h\cup\theta^a$.
 We call \maxp{} the model $f(\vect{x})$ when setting the aggregator
 function $A$ equal to the max pooling $\max_t u_t$. When we use
 the attention $\sum_t a_t(\vect{u};\theta^a) u_t$ instead, we call the
-model \softmax{}.
+model \softmax{}. When the aggregating function is equal to
+$\phi=(h^f_T,h^r_1)$ the model represents a plain bidirectional
+\ac{rnn} and we call it \gru{}.
 
+\subsection{\maxi, \softmaxi}
 The model is flexible enough to gain interpretability under certain
 assumptions. If we remove the last layer in \eqref{eq:maxModelC},
-the dimension of last layer in \eqref{eq:maxModelF}
+the size of last layer in \eqref{eq:maxModelF}
 needs to be equal to the
-output dimension (in the experiments: $1$ for the artificial dataset,
-$68$ for the site task, and $203$ for the 
-morphology).
+output size.
+%(in the experiments: $1$ for the artificial dataset,
+%$61$ for the site task, and $134$ for the 
+%type).
+The model in this configuration compute their predictions
+$f(\vect{x})$ as follows:
+\begin{align}
+  e_t &= E(x_t;\theta^e),\\
+  h^f_t &= F(e_t,h^f_{t-1};\theta^f),\\
+  h^r_t &= R(e_t,h^r_{t+1};\theta^r),\\
+  u_t &= G(h_t;\theta^h),\\
+  f(\vect{x}) &= A(\vect{u};\theta^a),
+\end{align}
+where $E$, $F$, $R$, $G$ and $A$ are defined as in \cref{sec:model}.
+
 We hypothesized that, in this case, the values of
 $u_t$ (or the weighted values $a_t(\vect{u};\sigma^a)u_t$, if we use the
 attention as aggregator) collect information on the importance of the
@@ -353,7 +391,7 @@ when using the attention.
 % dimension $q$.
 \subsection{\maxh, \softmaxh}
 \label{sec:modelh}
-We extend the plain model of the previous section with a hierarchical setting,
+We extend the plain model of \cref{sec:model} with a hierarchical setting,
 similarly to other works \cite{yang_hierarchical_2016}. In this
 setting our dataset $\mathcal{D}=\{\vect{x}^{(i)},y^{(i)}\}$
 consists of variable length sequence of sequence vectors
@@ -366,11 +404,11 @@ target class. The prediction $f(\vect{x})$ is calculated:
   h^f_{s,t} &= F(e_{s,t},h^f_{s,t-1};\theta^{f}),\label{eq:maxModelRLH}\\  
   h^r_{s,t} &= R(e_{s,t},h^r_{s,t+1};\theta^{r}),\label{eq:maxModelRRH}\\
   u_{s,t} &= G(h_{s,t};\theta^{h}),\label{eq:maxModelFH}\\
-  \phi_s &= A(\vect{h}_s,\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
-  h'^{f}_{s} &= F'(\phi_{s},h'^{f}_{s-1};\theta'^{f}),\label{eq:maxModelRLHS}\\  
-  h'^{r}_{s} &= R'(\phi_{s},h'^{r}_{s+1};\theta'^{r}),\label{eq:maxModelRRHS}\\
-  \phi' &= A'(\vect{s},\vect{h}';\theta'^{a}),\label{eq:aggregationHS}\\
-  f(\vect{x}) &= g(\phi';\theta^c).\label{eq:maxModelCH}
+  \phi_s &= A(\vect{u}_s;\theta^{a}),\label{eq:aggregationH}\\
+  \bar{h}^{f}_{s} &= \bar{F}(\phi_{s},\bar{h}^{f}_{s-1};\bar{\theta}^{f}),\label{eq:maxModelRLHS}\\  
+  \bar{h}^{r}_{s} &= \bar{R}(\phi_{s},\bar{h}^{r}_{s+1};\bar{\theta}^{r}),\label{eq:maxModelRRHS}\\
+  \bar{\phi} &= \bar{A}(\bar{\vect{h}};\bar{\theta}^{a}),\label{eq:aggregationHS}\\
+  f(\vect{x}) &= g(\bar{\phi};\theta^c).\label{eq:maxModelCH}
 \end{align}
 As in the plain model, $E$ is an embedding function, $F$ and $R$
 correspond to forward and reverse dynamics that process word
@@ -379,18 +417,17 @@ $h_{s,t}=h_{s,t}^f\oplus h_{s,t}^r$ is the latent representation of
 the information contained at position $t$ of the $s$-th sentence,
 $u_{s,t}$ is the contextualized representation of the word at position
 $t$ of the $s$-th sentence, and $A$ is an aggregation function that
-creates a single representation for the sentence. Furthermore, $F'$ and
-$R'$ correspond to 
+creates a single representation for the sentence. Furthermore, $\bar{F}$ and
+$\bar{R}$ correspond to 
 forward and reverse dynamics that process sentence representations,
-and $A'$ is the aggregation function that creates a single
-representation for the entire document. $h'_s=h'^f_s\oplus h'^r_s$
+and $\bar{A}$ is the aggregation function that creates a single
+representation for the entire document. $\bar{h}_s=\bar{h}^f_s\oplus \bar{h}^r_s$
 can be interpreted as the
 latent representation of the information contained in the sentence $s$
 for the document.
 
 We call \maxh{} and \softmaxh{} the hierarchical model when we use
 respectively the max pooling and the attention.
-
 
 %%% Local Variables:
 %%% mode: latex

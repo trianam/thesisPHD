@@ -68,7 +68,7 @@ hierarchical models to the cancer pathology reports. We also want to
 answer to Q6 because we implement interpretable models. 
 
 
-\section{Bag-of-words, word vectors, \ac{svm} and deep learning}
+\section{Bag-of-words VS word vectors, \ac{svm} VS deep learning}
 \label{ch:icdoFirst}
 The focus of this section is to asses the improvement of employing
 word vectors respect to the use of bag-of-words and to evaluate the
@@ -263,7 +263,7 @@ This work demonstrated that the machine learning approaches can be
 used to provide an automated support in cancer classification based on
 the information contained in free-text pathology reports.
 
-\section{Aggregation and interpretability}
+\section{Preliminary aggregation and interpretability}
 \label{ch:artificial}
 
 Classic \ac{rnn} approaches exhibit some limits related to
@@ -425,7 +425,7 @@ still needs to rely on the entire sequence. Thus, there is not the
 strong focusing effect of the max aggregation.
 
 
-\section{Aggregation, interpretability, hierarchical}
+\section{Aggregation, interpretability, hierarchy}
 \label{ch:icdo}
 In these experiments we further refined the dataset. We removed duplicate
 reports and reports labeled with extremely rare (1048
@@ -495,38 +495,38 @@ refers to \ac{glove}
 hyperparameters~\cite{pennington_glove:_2014}. With an intrinsic
 evaluation, we found that the better configuration was $60$ for the vector
 size, $15$ for the window size, and $50$ iterations. $\xi^f$,
-$\xi^r$, $\xi'^{f}$, and $\xi'^{r}$ define the number of
+$\xi^r$, $\bar{\xi}^{f}$, and $\bar{\xi}^{r}$ define the number of
 \ac{gru} layers ($\xi_{(l)}$) and the number of unit per each layer
-($\xi_{(d)}$) respectively for $F$, $R$, $F'$, and $R'$. 
+($\xi_{(d)}$) respectively for $F$, $R$, $\bar{F}$, and $\bar{R}$. 
 $G$ is a \ac{mlp}, $\xi^h$ controls the number of
-layers and their dimension. Regarding $F$, $R$, and $G$, we decided to
+layers and their size. Regarding $F$, $R$, and $G$, we decided to
 have all the stacked layer with 
-the same dimension to limit the
-hyperparameters space. $\xi^a$ and $\xi'^a$ control the
-kind of aggregating function of $A$ and $A'$ respectively and, in case
+the same size to limit the
+hyperparameters space. $\xi^a$ and $\bar{\xi}^a$ control the
+kind of aggregating function of $A$ and $\bar{A}$ respectively and, in case
 of \emph{attention}, 
-it controls the dimension of the attention layer. Finally, $\xi^c$ controls the
-data-dependent output dimension of $g$.
+it controls the size of the attention layer. Finally, $\xi^c$ controls the
+data-dependent output size of $g$.
 
-In \maxp{} we used the \emph{max} aggregation
-function 
-in the plain model of \cref{sec:modelh}. We determined the
-hyperparameters evaluating the validation set in the space (with the
-better configuration underlined):
+Optimal values were obtained by grid search using the validation
+accuracy as the objective.
+In \maxp{} we used the \emph{max} aggregation function in the plain
+model of \cref{sec:modelh}.
+
 \begin{align*}
   \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1},2],\\
   \xi_{(d)}^f=\xi_{(d)}^r&\in[2,4,8,16,32,64,\underline{128},256,512],\\
   \xi_{(l)}^h&\in[\underline{1},2,4],\\
   \xi_{(d)}^h&\in[2,4,8,16,32,64,128,256,\underline{512},1024,2048],
 \end{align*}
-for the \emph{main site} task, and:
+for the \emph{topography} site task, and:
 \begin{align*}
   \xi_{(l)}^f=\xi_{(l)}^r&\in[\underline{1}],\\
   \xi_{(d)}^f=\xi_{(d)}^r&\in[2,4,8,16,32,64,\underline{128},256,512],\\
   \xi_{(l)}^h&\in[\underline{1},2,4],\\
   \xi_{(d)}^h&\in[2,4,8,16,32,64,\underline{128},256,512,1024,2048],
 \end{align*}
-for the \emph{morphology} task.
+for the \emph{morphology} type task.
 
 In \softmax{} we used the \emph{attention} aggregation function in the
 plain model. The hyperparameters
@@ -551,15 +551,15 @@ for the morphology.
 In \maxh{} we used the \emph{max} aggregation in the hierarchical
 model of \cref{sec:modelh}. The hyperparameters space was:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\bar{\xi}^f_{(l)}=\bar{\xi}^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\bar{\xi}^f_{(d)}=\bar{\xi}^r_{(d)}&\in[32,\underline{64},128,256],\\
   \xi_{(l)}^h&\in[0,1,\underline{2},4],\\
   \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
 \end{align*}
-for the site, and:
+for the topography, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\bar{\xi}^f_{(l)}=\bar{\xi}^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\bar{\xi}^f_{(d)}=\bar{\xi}^r_{(d)}&\in[32,\underline{64},128,256],\\
   \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
   \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
 \end{align*}
@@ -568,19 +568,19 @@ for the morphology.
 In \softmaxh{} we used the \emph{attention} aggregation in the
 hierarchical model. The hyperparameters space was:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,64,\underline{128},256],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\bar{\xi}^f_{(l)}=\bar{\xi}^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\bar{\xi}^f_{(d)}=\bar{\xi}^r_{(d)}&\in[32,64,\underline{128},256],\\
   \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
   \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
-  \xi_{(d)}^a=\xi'^a_{(d)}&\in[64,\underline{128},256,512],
+  \xi_{(d)}^a=\bar{\xi}^a_{(d)}&\in[64,\underline{128},256,512],
 \end{align*}
-for the site, and:
+for the topography, and:
 \begin{align*}
-  \xi_{(l)}^f=\xi_{(l)}^r=\xi'^f_{(l)}=\xi'^r_{(l)}&\in[\underline{1}],\\
-  \xi_{(d)}^f=\xi_{(d)}^r=\xi'^f_{(d)}=\xi'^r_{(d)}&\in[32,\underline{64},128,256],\\
+  \xi_{(l)}^f=\xi_{(l)}^r=\bar{\xi}^f_{(l)}=\bar{\xi}^r_{(l)}&\in[\underline{1}],\\
+  \xi_{(d)}^f=\xi_{(d)}^r=\bar{\xi}^f_{(d)}=\bar{\xi}^r_{(d)}&\in[32,\underline{64},128,256],\\
   \xi_{(l)}^h&\in[0,\underline{1},2,4],\\
   \xi_{(d)}^h&\in[256,512,\underline{1024},2048],\\
-  \xi_{(d)}^a=\xi'^a_{(d)}&\in[64,\underline{128},256,512],
+  \xi_{(d)}^a=\bar{\xi}^a_{(d)}&\in[64,\underline{128},256,512],
 \end{align*}
 for the morphology.
 
@@ -593,15 +593,15 @@ space was:
   \xi_{(l)}^h&\in[\underline{1},2,4],\\
   \xi_{(d)}^h&\in[2,4,8,16,32,64,128,256,512,1024,2048],
 \end{align*}
-for the site, and:
+for the topography, and:
 \begin{align*}
   \xi_{(l)}^f=\xi_{(l)}^r&\in[1,\underline{2},4],\\
   \xi_{(d)}^f=\xi_{(d)}^r&\in[64,128,\underline{256},512],\\
   \xi_{(l)}^h&\in[\underline{1}],\\
   \xi_{(d)}^h&\in[],
 \end{align*}
-for the morphology. Note that, in this setting, the dimension of the
-last layer of $G$ must be equal to the output dimension of the model
+for the morphology. Note that, in this setting, the size of the
+last layer of $G$ must be equal to the output size of the model
 (and the softmax is applied directly after the aggregation $A$,
 without any layer). Thus, $\xi_{(d)}^h$ refers only to the
 layers before the last one, if they exist.
@@ -609,7 +609,6 @@ layers before the last one, if they exist.
 Regarding \gru{}, we searched in a space of $[1,2,4]$ number of layers of
 dimension in $[128,256,512,1024]$. We found that the best
 configuration was using $2$ layers of dimension $256$.
-
 
 
 % The hyperparameters $\xi=\xi^l\cup\xi^r\cup\xi^h\cup\xi^c$ define the
@@ -639,39 +638,106 @@ configuration was using $2$ layers of dimension $256$.
 
 
 \subsection{Results}
-
 \begin{table}
   \centering
-  \caption{Results on cancer data}
-  \label{tab:results}
-  \begin{tabular}{|c|c|c|c|c|c|}
+  \caption{Topography site prediction (61 classes)}
+  \label{tab:results2site}
+  \begin{tabular}{ccccc}
     \hline
-    &Acc.&Acc. T3&Acc. T5&MAP&K\\
+    &Accuracy&Top 3 Acc.&Top 5 Acc.&MacroF1\\
     \hline
+    \svm{}     &89.7&95.9&96.8&60.0\\
+    \xgb{}     &89.1&95.8&97.2&58.0\\
     \hline
-    \textbf{Site}&&&&&\\
-    \gru{}&0.8977&0.9636&0.9764&0.9331&0.8848\\
-    \bert{}&0.8980&0.9623&0.9768&0.9330&0.8852\\
-    \maxi{}&0.8792&0.9533&0.9610&0.9190&0.8637\\
-    \maxh{}&0.8980&0.9611&0.9773&0.9329&0.8851\\
-    \softmaxh{}&0.8983&0.9617&0.9760&0.9329&0.8855\\
-    \softmax{}&0.9008&0.9607&0.9749&0.9341&0.8883\\
-    \maxp{}&\textbf{0.9024}&\textbf{0.9658}&\textbf{0.9797}&\textbf{0.9369}&\textbf{0.8901}\\
+    \gru{}     &89.9&96.5&97.7&58.3\\
+    \bert{}    &89.9&96.3&97.8&56.6\\
     \hline
-    \hline
-    \textbf{Morpho.}&&&&&\\
-    \gru{}&0.8266&0.9402&0.9602&0.8881&0.8064\\
-    \bert{}&0.8367&0.9267&0.9439&0.8870&0.8178\\
-    \maxi{}&0.7317&0.9012&0.9305&0.8169&0.6964\\
-    \maxh{}&0.8313&0.9382&0.9582&0.8894&0.8117\\
-    \softmaxh{}&0.8318&0.9388&0.9566&0.8894&0.8119\\
-    \softmax{}&\textbf{0.8424}&0.9445&0.9632&\textbf{0.8973}&\textbf{0.8240}\\
-    \maxp{}&0.8394&\textbf{0.9452}&\textbf{0.9634}&0.8962&0.8207\\
+    \maxi{}    &88.0&95.4&96.2&46.1\\
+    \maxh{}    &89.9&96.2&97.8&58.8\\
+    \softmaxh{}&89.9&96.3&97.7&58.0\\
+    \maxp{}    &\textbf{90.3}&\textbf{96.6}&\textbf{98.1}&\textbf{61.9}\\
+    \softmax{} &90.1&96.2&97.6&60.0\\
     \hline
   \end{tabular}
 \end{table}
-In \cref{tab:results} we summarized the results of the models on the test
-dataset. We report accuracy, \ac{map} and Cohen's kappa score (K).
+\begin{table}
+  \centering
+  \caption{Morphology type prediction (134 classes)}
+  \label{tab:results2morpho}
+  \begin{tabular}{ccccc}
+    \hline
+    &Accuracy&Top 3 Acc.&Top 5 Acc.&Macro F1\\
+    \hline
+    \svm{}     &82.4&94.0&95.6&53.7\\
+    \xgb{}     &84.1&94.4&96.5&59.6\\
+    \hline
+    \gru{}     &83.3&94.6&96.6&55.2\\
+    \bert{}    &84.3&93.2&94.9&51.1\\    
+    \hline
+    \maxi{}    &73.4&91.0&93.6&31.3\\
+    \maxh{}    &83.7&94.4&96.4&54.5\\
+    \softmaxh{}&83.7&94.4&96.2&57.5\\
+    \maxp{}    &84.6&\textbf{95.0}&\textbf{96.9}&59.2\\
+    \softmax{} &\textbf{84.8}&94.9&\textbf{96.9}&\textbf{61.3}\\
+    \hline
+  \end{tabular}
+\end{table}
+\begin{table}
+  \centering
+  \caption{Macro F1 measure by groups of class frequency}
+  \label{tab:results2difficulty}
+  \begin{tabular}{cccc|ccc}
+    \hline
+    &\multicolumn{3}{c}{Topography}&\multicolumn{3}{c}{Morphology}\\
+    &easy&avg.&hard&easy&avg.&hard\\
+    &(4 cls)&(18 cls)&(39 cls)&(5 cls)&(18 cls)&(111 cls)\\
+    \hline
+    \svm{}     &95.7&\textbf{86.9}&50.9&90.5&68.6&48.4\\
+    \xgb{}     &95.6&86.4&48.2&92.0&72.4&54.8\\
+    \hline
+    \gru{}     &\textbf{96.1}&72.2&48.0&91.4&71.6&49.7\\
+    \bert{}    &95.7&73.2&44.9&\textbf{92.9}&\textbf{74.4}&43.9\\    
+    \hline
+    \maxi{}    &95.0&66.6&31.4&87.1&41.9&25.1\\
+    \maxh{}    &95.8&72.4&48.8&92.7&71.8&48.8\\
+    \softmaxh{}&96.0&73.1&47.1&91.9&72.3&52.6\\
+    \maxp{}    &96.0&73.3&\textbf{53.1}&92.7&72.3&53.8\\
+    \softmax{} &96.0&73.1&50.3&92.8&72.3&\textbf{56.7}\\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+In \cref{tab:results2site} and \cref{tab:results2morpho} we summarize the results
+of different models on test data in terms of accuracy, top-3 and top-5
+accuracy (counting as correctly classified a document whose true class
+appears within the first three or five top predictions), and
+macro-averaged F1 score. In \cref{tab:results2difficulty} we
+investigate the $F1$ score on different subsets of classes. We
+consider a class \emph{easy} if it has more than $1000$ examples in
+the test set, \emph{average} if it has between $100$ and $1000$
+examples, and \emph{hard} if it has less than $100$ examples.
+
+In the case of topography, when focusing on the performance on classes
+with many examples, all models tend to perform similarly, with even
+the interpretable model attaining high F1 scores. The advantage of
+recurrent networks over bag-of-word representations is more pronounced
+when focusing on rare classes. One possible explanation is that the
+representation learned by recurrent networks is shared across all
+classes, leveraging the advantage of multi-task
+learning~\cite{caruana1997multitask} in this case.  We also note that
+in no case hierarchical attention models outperform flat attention
+models and max-pooling performs the best on rare classes. In the case
+of morphology, differences among different models are more pronounced,
+with \ac{bert} being very effective for densely populated classes (but
+not for rare classes). Again hierarchical attention does not
+outperform flat attention. This result differs from the ones reported
+in~\cite{gao_hierarchical_2018} but datasets are very different in
+size and number of classes, and of course differences in the writing
+style of pathologist in our dataset could be
+significant. In particular our documents contains on average few
+sentences (see \cref{fig:wordsDist}), and this can be the main reason
+of the poor performances of hierarchical models.
 
 \begin{table}
   \centering
@@ -693,10 +759,6 @@ dataset. We report accuracy, \ac{map} and Cohen's kappa score (K).
     \hline
   \end{tabular}
 \end{table}
-From the results we observe that the use of hierarchical models and
-recent architectures like \ac{bert} is not beneficial in this
-context. Moreover, we can see that attention models are equivalent to a
-simpler max pooling.
 
 The interpretable model is not as powerful as \maxp{}, and in this task
 not even as the baseline, but it can be used as a
