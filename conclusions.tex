@@ -9,7 +9,7 @@ methods to generate a list of putative incident cases and to
 automatically estimate process indicators is thus an opportunity to
 perform an up-to-date evaluation of cancer-care quality. In
 particular, machine learning techniques like the ones presented in
-this paper could overcome the delay in cancer case definition by the
+this work could overcome the delay in cancer case definition by the
 cancer registry and allow a powerful tool for timely indicators
 computation. The implementation of this procedure could guarantee an
 automated and validated instrument to monitor and evaluate diagnostic
@@ -84,6 +84,87 @@ when we leverage the unlabeled data, thus we can conclude that
 unsupervised techniques can be successfully used in this
 context. Finally, in relation to Q6 we studied the potentialities of
 interpretable models in the pathology records context.
+
+At the moment it is not possible to use the treated techniques to
+completely automate the classification process. The human work is
+still needed to get the gold-standard classification where the
+supervised models are trained. Moreover, the underlying distribution of
+data can drift
+with time \cite{klinkenberg2000detecting} (e.g. due to the
+introduction of new protocols or terminology), and the most reliable
+method to 
+deal with this is to periodically update the model retraining
+it with fresh labelled data.
+
+Another limit of those techniques is that they can be profitably used
+on well represented classes, i.e. common cancer types, but they commit
+errors with a rate that is proportional to the rareness of the cancer
+cases. The best we can do on this 
+front is to use machine learning techniques to fast classify cancer
+cases with the awareness of this problem, and rely on the slower human
+labelling for sensible cases.
+
+In the future, those techniques can be leveraged to develop a report
+classification platform with the double objective of providing an
+automated labelling tool, and an aiding tool that helps and
+accelerates the human 
+labelling process. The automated labelling allows
+the implementation of a
+fast-speed cancer register that is able to produce updated
+statistics at cost of committing errors. The errors can be
+controlled 
+choosing the classification threshold accordingly to the
+recall-precision trade-off --- for this purpose it is possible to use
+curves like
+\cref{fig:curvesSite,fig:curvesFullSite,fig:curvesType,fig:curvesBehaviour}. The 
+aiding tool can employ the interpretable models to implement an
+interface similar to \cref{tab:multiAttention1} that can be useful to
+accelerate the reading of the report and suggest the most probable
+classes.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\floatwidth]{img/useCases3.pdf}
+  \caption{Current cancer registry workflow (top) and possible
+    integration of machine learning methods (bottom).}
+  \label{fig:useCases}
+\end{figure}
+To evaluate a possible use case, consider the current workflow of
+cancer registries in the top part of \cref{fig:useCases}. The medical
+reports of the competence area are collected and manually labelled by
+registry operators. Subsequently the registry calculates useful
+statistics on cancer cases. The manual classification of reports
+causes a necessary delay on the statistics production.
+A possible integration of machine learning methods in this workflow, depicted
+in the bottom part 
+of \cref{fig:useCases}, is
+to use them to automatically label the medical
+reports. This labelling can be used to provide fast and
+updated statistics on (common) cancer cases. The registry operators
+can confirm 
+or change the automatic labels providing in this way new data to
+train and improve the model in a feedback loop.
+
+A future research direction can be to use multi-task learning
+approaches~\cite{caruana1997multitask}, where multiple task can be
+solved at the same time. Those 
+approaches can be leveraged to improve the classification by sharing
+the representations. Another research direction can be to improve the
+classification on rare cancer cases using \emph{few-shot learning}
+techniques~\cite{wang2019few}. Few-shot learning deals with classes
+with few samples, like in our data. \emph{Transfer
+  learning}~\cite{pan2009survey} transfers
+knowledge learned from a domain where data is available to a domain
+where data is scarce. In
+\emph{meta-learning}~\cite{hochreiter2001learning} a meta-learner
+learns
+generic knowledge across tasks and this allows to rapidly generalize a
+learner for a specific new task. Both transfer learning and
+meta-learning can be used in the context of few-shot learning.
+
+Finally, another research line can focus in the improvement of the
+interpretable models. In fact at present time they cannot compete with
+other models.
 
 %%% Local Variables:
 %%% mode: latex

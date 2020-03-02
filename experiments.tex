@@ -54,9 +54,11 @@ reflect a probable practical employment of the classifier, where it is
 being trained on the past data and evaluated on future data. In these
 experiments we are interested in evaluating the effects of the
 attention models, comparing them with a simpler form constituted by
-the max aggregation of \maxp{}. We focused on \ac{gru} because
-preliminary experiments did not show an improvement of using
-\ac{lstm}. With these experiments, we want to show that in this context
+the max aggregation of \maxp{}. In this section we focused on \ac{gru}
+because the experiments did not show an improvement of using
+\ac{lstm} (compare \lstmb{} in \cref{tab:resultsSite,tab:resultsType}
+with \gru{} in \cref{tab:results2site,tab:results2morpho}). With these
+experiments, we want to show that in this context 
 the adoption of hierarchical models is not beneficial. Moreover, we
 want to evaluate how the interpretable models work respect to the
 others.
@@ -75,14 +77,23 @@ word vectors respect to the use of bag-of-words and to evaluate the
 employment of deep learning techniques.
 
 We realized four multiclass classifiers for the
-histological exams. Calling $X$ the distribution of texts, $Y^s$
-of site, $Y^f$ of full site (site plus subsite), $Y^t$ of type, and
-$Y^b$ of behavior:
+histological exams. Regarding the \ac{icdo} classification introduced
+in \cref{sec:icdoCodes}, we call $X$ the distribution of texts; $Y^s$
+of site, i.e. the first two digits $mm$ of the topographical code; $Y^f$ of
+full site (site plus subsite), i.e. all the digits $mms$ of the
+topographical code; $Y^t$ of type, i.e. the first four digits $tttt$ of the
+morphological code; and
+$Y^b$ of behavior, i.e. the last digit $b$ of the morphological
+code. The learning tasks are:
 \begin{description}
-  \item[\site{}] estimates $P(Y^s|X)$;
-  \item[\fullSite{}] estimates $P(Y^f|X)$;
-  \item[\type{}] estimates $P(Y^t|X)$;
-  \item[\behaviour{}] estimates $P(Y^b|X)$.
+  \item[\site{}] estimates $P(Y^s|X)$, e.g. classify a report as a
+    case of breast cancer;
+  \item[\fullSite{}] estimates $P(Y^f|X)$, e.g. classify a report as a
+    case of cancer of upper-inner quadrant of breast;
+  \item[\type{}] estimates $P(Y^t|X)$, e.g. classify a report as a
+    case of adenoma;
+  \item[\behaviour{}] estimates $P(Y^b|X)$, e.g. classify a report as
+    a case of malignant cancer.
 \end{description}
 
 % The different tasks are not fully independent: obviously \fullSite{}

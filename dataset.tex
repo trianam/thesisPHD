@@ -119,6 +119,24 @@ In total, we created fourteen models:
   on our unlabeled data and fine tuned with our labeled data.
 \end{description}
 
+We decided to use \svm{}, \svmb{} and \xgb{} as a baseline and to
+compare unigrams with bigrams representations. With \lstmng{} and
+\lstmb{} we wanted to compare bag of word with \ac{glove}
+representations, and we choose \ac{lstm} because it is a common kind
+of model for text data. With \lstmc{} we wanted to evaluate 
+if a convolutional layer can helps with the classification. In the
+other models, except \bert{}, we use \ac{gru} because they are a
+simpler layer to train and 
+because we successfully confronted them with \ac{lstm}. We choose
+those models because we wanted to use \gru{} as a baseline and we
+wanted to compare max pooling layers
+(\maxp{} and \maxh{}) with attention layers (\softmax{} and \softmaxh{}),
+and to compare plain layers (\maxp{} and \softmax{}) with hierarchical
+layers (\maxh{} and \softmaxh{}). Moreover with
+\maxi{} and \softmaxi{} we tried to develop interpretable
+models. Finally we choose \bert{} because it represents the state of
+the art in many \ac{nlp} tasks.
+
 In models \svm{} and \svmb{}, we used a \ac{tfidf}
 representation ignoring terms present in less
 than 3 documents or in
